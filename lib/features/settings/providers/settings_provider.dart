@@ -1,6 +1,5 @@
 import 'package:core/features/settings/models/app_settings.dart';
 import 'package:core/features/settings/services/settings_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SettingsProvider extends ChangeNotifier {
@@ -33,4 +32,3 @@ class SettingsProvider extends ChangeNotifier {
     await _settingsService.write(next);
   }
 }
-

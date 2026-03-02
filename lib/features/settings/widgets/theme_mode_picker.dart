@@ -12,19 +12,29 @@ class ThemeModePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<ThemeMode>(
-      decoration: const InputDecoration(labelText: 'Theme'),
-      value: value,
-      items: const [
-        DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
-        DropdownMenuItem(value: ThemeMode.light, child: Text('Light')),
-        DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark')),
+    return SegmentedButton<ThemeMode>(
+      segments: const [
+        ButtonSegment(
+          value: ThemeMode.system,
+          icon: Icon(Icons.brightness_auto_rounded),
+          label: Text('System'),
+        ),
+        ButtonSegment(
+          value: ThemeMode.light,
+          icon: Icon(Icons.light_mode_rounded),
+          label: Text('Light'),
+        ),
+        ButtonSegment(
+          value: ThemeMode.dark,
+          icon: Icon(Icons.dark_mode_rounded),
+          label: Text('Dark'),
+        ),
       ],
-      onChanged: (mode) {
-        if (mode == null) return;
-        onChanged(mode);
+      selected: {value},
+      onSelectionChanged: (selected) {
+        onChanged(selected.first);
       },
+      showSelectedIcon: false,
     );
   }
 }
-

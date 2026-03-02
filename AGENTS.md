@@ -153,6 +153,7 @@ class ItemProvider extends ChangeNotifier {
 
 ## Agent Guardrails
 
+- Always use guidance from `SKILLS/flutter-expert.md` and `SKILLS/ui-designer.md` when working in this repository.
 - Do not modify generated platform files unless task explicitly requires it.
 - Avoid changing `android/`, `ios/`, `macos/`, `linux/`, `windows/` for feature work.
 - Keep changes focused; do not refactor unrelated features.
