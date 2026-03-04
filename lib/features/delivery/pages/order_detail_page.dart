@@ -22,12 +22,13 @@ class OrderDetailPage extends StatelessWidget {
 
     if (order == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Order Detail')),
+        appBar: AppBar(title: const Text('Захиалгын дэлгэрэнгүй')),
         body: const Padding(
           padding: EdgeInsets.all(16),
           child: EmptyState(
-            title: 'Order not found',
-            description: 'This order may have been removed from active queue.',
+            title: 'Захиалга олдсонгүй',
+            description:
+                'Энэ захиалга идэвхтэй жагсаалтаас хасагдсан байж болно.',
           ),
         ),
       );
@@ -71,9 +72,15 @@ class OrderDetailPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(order.deliveryAddress, style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  order.deliveryAddress,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 16),
-                Text('Order items', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Захиалгын бараа',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 40,
@@ -87,13 +94,19 @@ class OrderDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Text('Delivery notes', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Хүргэлтийн тэмдэглэл',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 6),
-                Text(order.instructions, style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  order.instructions,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 if (order.proofImagePath != null) ...[
                   const SizedBox(height: 12),
                   Text(
-                    'Proof attached: ${order.proofImagePath}',
+                    'Хавсаргасан баталгаа: ${order.proofImagePath}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -110,7 +123,7 @@ class OrderDetailPage extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.map_outlined),
-                        label: const Text('Navigate'),
+                        label: const Text('Зам нээх'),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -118,11 +131,13 @@ class OrderDetailPage extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           Navigator.of(context).push(
-                            PageTransitions.slideFade(ChatPage(orderId: order.id)),
+                            PageTransitions.slideFade(
+                              ChatPage(orderId: order.id),
+                            ),
                           );
                         },
                         icon: const Icon(Icons.chat_bubble_outline_rounded),
-                        label: const Text('Message'),
+                        label: const Text('Мессеж'),
                       ),
                     ),
                   ],
@@ -131,11 +146,13 @@ class OrderDetailPage extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () {
                     Navigator.of(context).push(
-                      PageTransitions.slideFade(DeliveryProofPage(orderId: order.id)),
+                      PageTransitions.slideFade(
+                        DeliveryProofPage(orderId: order.id),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text('Capture delivery proof'),
+                  label: const Text('Хүргэлтийн баталгаа оруулах'),
                 ),
                 const SizedBox(height: 10),
                 FilledButton(
@@ -154,13 +171,13 @@ class OrderDetailPage extends StatelessWidget {
 
   String _nextStepLabel(DeliveryStep step) {
     return switch (step) {
-      DeliveryStep.pending => 'Accept order',
-      DeliveryStep.accepted => 'Mark picked up',
-      DeliveryStep.pickedUp => 'Mark en route',
-      DeliveryStep.enRoute => 'Mark arrived',
-      DeliveryStep.arrived => 'Proof step ready',
-      DeliveryStep.proof => 'Complete order',
-      DeliveryStep.completed => 'Completed',
+      DeliveryStep.pending => 'Захиалга хүлээж авах',
+      DeliveryStep.accepted => 'Барааг авсан гэж тэмдэглэх',
+      DeliveryStep.pickedUp => 'Замд гарсан гэж тэмдэглэх',
+      DeliveryStep.enRoute => 'Ирсэн гэж тэмдэглэх',
+      DeliveryStep.arrived => 'Баталгаажуулах алхам руу орох',
+      DeliveryStep.proof => 'Захиалга дуусгах',
+      DeliveryStep.completed => 'Дууссан',
     };
   }
 }

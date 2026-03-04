@@ -1,9 +1,13 @@
+import 'package:core/core/app_theme.dart';
 import 'package:core/features/settings/models/app_settings.dart';
 import 'package:core/features/settings/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 
 class InMemorySettingsRepository implements SettingsRepository {
-  AppSettings _settings = const AppSettings(themeMode: ThemeMode.system);
+  AppSettings _settings = const AppSettings(
+    themeMode: ThemeMode.system,
+    designVersion: DesignVersion.glassmorphism,
+  );
 
   @override
   Future<AppSettings> read() async => _settings;
@@ -13,4 +17,3 @@ class InMemorySettingsRepository implements SettingsRepository {
     _settings = settings;
   }
 }
-

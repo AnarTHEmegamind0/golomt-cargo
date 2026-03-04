@@ -5,29 +5,30 @@ class DriverNotificationProvider extends ChangeNotifier {
   final List<DriverNotification> _notifications = [
     DriverNotification(
       id: 'notif_1',
-      title: 'Order ORD-31057 is ready for pickup',
-      subtitle: 'Arka Bakehouse confirmed your handoff spot.',
-      groupLabel: 'Today',
+      title: 'ORD-31057 захиалга авахад бэлэн боллоо',
+      subtitle: 'Арка Бэйкхаус таны хүлээлгэн өгөх цэгийг баталгаажууллаа.',
+      groupLabel: 'Өнөөдөр',
       createdAt: DateTime.now().subtract(const Duration(minutes: 11)),
     ),
     DriverNotification(
       id: 'notif_2',
-      title: 'Customer asked for gate-side delivery',
-      subtitle: 'Ikh Toiruu 34 has security gate constraints.',
-      groupLabel: 'Today',
+      title: 'Хэрэглэгч хаалган дээр хүлээлгэн өгөх хүсэлт илгээлээ',
+      subtitle: 'Их тойруу 34 дээр хамгаалалтын хаалгатай тул анхаарна уу.',
+      groupLabel: 'Өнөөдөр',
       createdAt: DateTime.now().subtract(const Duration(minutes: 46)),
     ),
     DriverNotification(
       id: 'notif_3',
-      title: 'Weekly bonus updated',
-      subtitle: 'You unlocked 14,500 MNT weekend boost.',
-      groupLabel: 'Yesterday',
+      title: '7 хоногийн урамшуулал шинэчлэгдлээ',
+      subtitle: 'Та амралтын нэмэгдэл 14,500₮ авах болзол хангалаа.',
+      groupLabel: 'Өчигдөр',
       createdAt: DateTime.now().subtract(const Duration(hours: 22)),
       unread: false,
     ),
   ];
 
-  List<DriverNotification> get notifications => List.unmodifiable(_notifications);
+  List<DriverNotification> get notifications =>
+      List.unmodifiable(_notifications);
 
   int get unreadCount =>
       _notifications.where((notification) => notification.unread).length;

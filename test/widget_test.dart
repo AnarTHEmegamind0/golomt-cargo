@@ -12,25 +12,27 @@ void main() {
       MultiProvider(providers: AppProviders.build(), child: const MyApp()),
     );
 
-    expect(find.text('Login'), findsOneWidget);
-
-    await tester.ensureVisible(find.byKey(const ValueKey('login_submit')));
-    await tester.tap(find.byKey(const ValueKey('login_submit')));
+    final loginButton = find.byKey(const ValueKey('login_submit'));
+    await tester.scrollUntilVisible(loginButton, 240);
+    await tester.tap(loginButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsWidgets);
+    expect(find.text('Нүүр'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('nav_profile')));
     await tester.pumpAndSettle();
-    expect(find.text('Profile'), findsWidgets);
+    expect(find.text('Профайл'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('nav_settings')));
     await tester.pumpAndSettle();
-    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Тохиргоо'), findsWidgets);
 
-    final authProvider = tester.element(find.byType(MyApp)).read<AuthProvider>();
+    final authProvider = tester
+        .element(find.byType(MyApp))
+        .read<AuthProvider>();
     await authProvider.logout();
     await tester.pumpAndSettle();
-    expect(find.text('Login'), findsOneWidget);
+    await tester.scrollUntilVisible(loginButton, 240);
+    expect(loginButton, findsOneWidget);
   });
 }

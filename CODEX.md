@@ -1,0 +1,112 @@
+# CODEX Change Log
+
+## 2026-03-03
+
+- Used `flutter-expert` and `ui-designer` guidance to redesign core app surfaces with a Buunduu-inspired cargo flow and a Pinterest/Awwwards visual style.
+- Added shared premium backdrop component:
+  - `lib/core/design_system/components/cargo_backdrop.dart`
+- Updated visual theme tokens to orange-accent cargo branding and refined dark/light palettes:
+  - `lib/core/app_theme.dart`
+- Reworked shell navigation to a floating modern bottom bar while preserving existing tab keys and provider navigation:
+  - `lib/features/shell/pages/app_shell_page.dart`
+- Rebuilt Home (`DeliveryHomePage`) with:
+  - top identity strip
+  - track registration section
+  - CTA button
+  - promo card
+  - quick action cards
+  - active order masonry feed
+  - File: `lib/features/delivery/pages/delivery_home_page.dart`
+- Reworked Orders tab (`NotificationsPage`) into Buunduu-style order management UI with:
+  - view toggle shell
+  - action pills
+  - search
+  - horizontal status filters
+  - styled dismissible order update cards
+  - File: `lib/features/delivery/pages/notifications_page.dart`
+- Rebuilt Profile screen to match the reference style:
+  - centered identity header
+  - large menu rows with chevrons
+  - integrated dark mode toggle tied to `SettingsProvider`
+  - logout action
+  - File: `lib/features/profile/pages/profile_page.dart`
+- Restyled Settings screen to match the same design system:
+  - `lib/features/settings/pages/settings_page.dart`
+- Validation completed:
+  - `flutter analyze` passed with no issues.
+  - `flutter test` passed (`test/widget_test.dart`).
+
+## 2026-03-03 (Follow-up: Mongolian + clean reference UI)
+
+- Re-applied `AGENTS.md` guardrails and used `flutter-expert` + `ui-designer` for a second pass.
+- Rebuilt Home to a clearer light, minimal layout aligned to the provided reference:
+  - soft backdrop
+  - compact search/action cards
+  - highlighted current shipment
+  - clean recent shipment rows
+  - File: `lib/features/delivery/pages/delivery_home_page.dart`
+- Localized main navigation labels to Mongolian:
+  - File: `lib/features/shell/pages/app_shell_page.dart`
+- Localized Auth screen copy and CTA text to Mongolian:
+  - Files:
+    - `lib/features/auth/widgets/login_form.dart`
+    - `lib/features/auth/pages/login_page.dart`
+- Localized Orders/Notifications experience text to Mongolian:
+  - list empty states
+  - action labels
+  - group labels and notification seed data
+  - Files:
+    - `lib/features/delivery/pages/notifications_page.dart`
+    - `lib/features/delivery/providers/driver_notification_provider.dart`
+- Localized delivery status and order cards to Mongolian:
+  - Files:
+    - `lib/features/delivery/widgets/status_chip.dart`
+    - `lib/features/delivery/widgets/delivery_order_card.dart`
+- Localized additional delivery flow pages to Mongolian:
+  - order detail, earnings, chat, proof, map navigation, onboarding
+  - Files:
+    - `lib/features/delivery/pages/order_detail_page.dart`
+    - `lib/features/delivery/pages/earnings_page.dart`
+    - `lib/features/delivery/pages/chat_page.dart`
+    - `lib/features/delivery/pages/delivery_proof_page.dart`
+    - `lib/features/delivery/pages/order_map_navigation_page.dart`
+    - `lib/features/delivery/pages/onboarding_page.dart`
+    - `lib/features/delivery/providers/chat_provider.dart`
+    - `lib/features/delivery/repositories/fake_delivery_repository.dart`
+- Localized Profile/Settings text and theme picker labels to Mongolian:
+  - Files:
+    - `lib/features/profile/pages/profile_page.dart`
+    - `lib/features/profile/widgets/profile_card.dart`
+    - `lib/features/settings/pages/settings_page.dart`
+    - `lib/features/settings/widgets/theme_mode_picker.dart`
+- Updated widget test expectations for Mongolian UI copy:
+  - File: `test/widget_test.dart`
+- Validation completed:
+  - `flutter analyze` passed.
+  - `flutter test` passed.
+
+## 2026-03-03 (Follow-up: splash + home vibe rebuild)
+
+- Reworked Login into a splash-style entry page inspired by the provided reference image:
+  - phone mockup hero
+  - stronger launch headline
+  - simplified single primary CTA (`login_submit`)
+  - kept existing auth wiring and provider login flow
+  - File: `lib/features/auth/pages/login_page.dart`
+- Rebuilt Home UI to match a cleaner “current shipping + recent shipments” visual rhythm:
+  - refined top greeting/header
+  - search/filter surface
+  - highlighted current shipping card
+  - cleaner recent shipment rows with chevrons
+  - File: `lib/features/delivery/pages/delivery_home_page.dart`
+- Added requested iconized workflow section in Home:
+  - `Салбар сонгох`
+  - `Трак код бүртгэх`
+  - `Барааг хүргүүлэх`
+  - Implemented as compact step cards inside Home workflow block.
+- Updated widget test to support scrollable splash login layout:
+  - scrolls until `login_submit` is visible before tapping
+  - File: `test/widget_test.dart`
+- Validation completed:
+  - `flutter analyze` passed.
+  - `flutter test` passed.

@@ -15,18 +15,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   static const _slides = [
     (
-      title: 'Track deliveries live',
-      description: 'Real-time position updates and route hints in one glance.',
+      title: 'Хүргэлтээ шууд хянаарай',
+      description:
+          'Байршил болон чиглүүлгийн мэдээллээ нэг дороос харах боломжтой.',
       icon: Icons.map_rounded,
     ),
     (
-      title: 'Chat in-app',
-      description: 'Coordinate with customers and restaurants without switching apps.',
+      title: 'Апп дотроос чатлах',
+      description:
+          'Хэрэглэгч болон салбартай шууд холбогдож ажлаа хурдан явуулна.',
       icon: Icons.chat_bubble_outline_rounded,
     ),
     (
-      title: 'Finish with proof',
-      description: 'Attach handoff evidence and settle earnings faster.',
+      title: 'Баталгаатай дуусгах',
+      description:
+          'Хүлээлгэн өгсөн баримтаа хавсаргаад орлогоо хурдан баталгаажуулна.',
       icon: Icons.camera_alt_outlined,
     ),
   ];
@@ -47,7 +50,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
           children: [
             Align(
               alignment: Alignment.centerRight,
-              child: TextButton(onPressed: widget.onFinish, child: const Text('Skip')),
+              child: TextButton(
+                onPressed: widget.onFinish,
+                child: const Text('Алгасах'),
+              ),
             ),
             Expanded(
               child: PageView.builder(
@@ -69,7 +75,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           child: Icon(slide.icon, size: 54),
                         ),
                         const SizedBox(height: 22),
-                        Text(slide.title, style: Theme.of(context).textTheme.headlineMedium),
+                        Text(
+                          slide.title,
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           slide.description,
@@ -95,7 +104,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     curve: Curves.easeOut,
                   );
                 },
-                child: Text(isLast ? 'Get started' : 'Next'),
+                child: Text(isLast ? 'Эхлэх' : 'Дараах'),
               ),
             ),
           ],

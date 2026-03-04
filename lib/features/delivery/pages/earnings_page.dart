@@ -9,14 +9,16 @@ class EarningsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = context.select((DeliveryProvider provider) => provider.todayEarnings);
+    final total = context.select(
+      (DeliveryProvider provider) => provider.todayEarnings,
+    );
     final payout = context.read<EarningService>().estimatedPayout(
       completedTotal: total,
       feeRate: 0.08,
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Earnings')),
+      appBar: AppBar(title: const Text('Орлого')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -34,13 +36,18 @@ class EarningsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Available to withdraw',
+                  'Татах боломжтой үлдэгдэл',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
                 const SizedBox(height: 8),
-                MetricCounter(value: payout, prefix: '\$', decimals: 2),
+                MetricCounter(
+                  value: payout,
+                  suffix: ' \$',
+                  decimals: 2,
+                  prefix: '',
+                ),
               ],
             ),
           ),
@@ -51,11 +58,23 @@ class EarningsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Breakdown', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Задалгаа',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 8),
-                  _RowValue(label: 'Gross', value: '\$${total.toStringAsFixed(2)}'),
-                  _RowValue(label: 'Platform fee', value: '\$${(total - payout).toStringAsFixed(2)}'),
-                  _RowValue(label: 'Net', value: '\$${payout.toStringAsFixed(2)}'),
+                  _RowValue(
+                    label: 'Нийт орлого',
+                    value: '${total.toStringAsFixed(2)} \$',
+                  ),
+                  _RowValue(
+                    label: 'Платформын шимтгэл',
+                    value: '${(total - payout).toStringAsFixed(2)} \$',
+                  ),
+                  _RowValue(
+                    label: 'Гар дээр',
+                    value: '${payout.toStringAsFixed(2)} \$',
+                  ),
                 ],
               ),
             ),
@@ -64,11 +83,13 @@ class EarningsPage extends StatelessWidget {
           FilledButton.icon(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Withdrawal request submitted.')),
+                const SnackBar(
+                  content: Text('Таталтын хүсэлт амжилттай илгээгдлээ.'),
+                ),
               );
             },
             icon: const Icon(Icons.account_balance_wallet_outlined),
-            label: const Text('Request withdrawal'),
+            label: const Text('Таталт хүсэх'),
           ),
         ],
       ),
@@ -88,12 +109,14 @@ class _RowValue extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),

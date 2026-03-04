@@ -1,5 +1,7 @@
+import 'package:core/core/design_system/components/cargo_backdrop.dart';
+import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:core/features/profile/providers/profile_provider.dart';
-import 'package:core/features/profile/widgets/profile_card.dart';
+import 'package:core/features/settings/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,77 +28,197 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final profile = context.select((ProfileProvider p) => p.profile);
     final isLoading = context.select((ProfileProvider p) => p.isLoading);
-    final error = context.select((ProfileProvider p) => p.error);
+    final themeMode = context.select(
+      (SettingsProvider p) => p.settings.themeMode,
+    );
+    final isDarkMode = themeMode == ThemeMode.dark;
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        children: [
-          Text('Profile', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 6),
-          Text(
-            'Driver identity, performance, and vehicle details.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 16),
-          if (isLoading)
-            const Center(child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 30),
-              child: CircularProgressIndicator(),
-            ))
-          else if (error != null)
-            Text(
-              error,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontWeight: FontWeight.w600,
-              ),
-            )
-          else if (profile != null)
-            ProfileCard(profile: profile)
-          else
-            FilledButton(
-              onPressed: context.read<ProfileProvider>().load,
-              child: const Text('Load profile'),
-            ),
-          const SizedBox(height: 12),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: const Color(0xFFB6364C).withValues(alpha: 0.14),
-                    ),
-                    child: const Icon(Icons.two_wheeler_rounded),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Vehicle',
-                          style: Theme.of(context).textTheme.titleMedium,
+    return CargoBackdrop(
+      light: true,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+          children: [
+            if (isLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 48),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else ...[
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 118,
+                      height: 118,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(36),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFF0F3F8), Color(0xFFD8DFEA)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Yamaha NMAX 155 • plate 48-91 УБГ',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                      ),
+                      child: const Icon(
+                        Icons.image_not_supported_rounded,
+                        size: 68,
+                        color: Color(0xFF667087),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 14),
+                    Text(
+                      '80112818',
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      profile?.displayName ?? 'Жолооч',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: const Color(0xFF555E70),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Оноо : 0',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: const Color(0xFF1E2532),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
+              const SizedBox(height: 18),
+              const _MenuTile(
+                icon: Icons.person_outline_rounded,
+                label: 'Миний мэдээлэл',
+              ),
+              const _MenuTile(
+                icon: Icons.local_shipping_outlined,
+                label: 'Хүргэлт',
+              ),
+              const _MenuTile(
+                icon: Icons.location_on_outlined,
+                label: 'Салбарууд',
+              ),
+              const _MenuTile(
+                icon: Icons.emoji_people_outlined,
+                label: 'Бараа очиж авах',
+              ),
+              const _MenuTile(
+                icon: Icons.language_rounded,
+                label: 'Хэл',
+                trailingText: 'Монгол',
+              ),
+              _SwitchTile(
+                icon: Icons.dark_mode_outlined,
+                label: 'Харанхуй горим',
+                value: isDarkMode,
+                onChanged: (value) {
+                  context.read<SettingsProvider>().setThemeMode(
+                    value ? ThemeMode.dark : ThemeMode.light,
+                  );
+                },
+              ),
+              const _MenuTile(
+                icon: Icons.info_outline_rounded,
+                label: 'Тусламж',
+              ),
+              const _MenuTile(
+                icon: Icons.calculate_outlined,
+                label: 'Тооцоолуур',
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: context.read<AuthProvider>().logout,
+                icon: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFFEE5A5A),
+                ),
+                label: Text(
+                  'Гарах',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFEE5A5A),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({required this.icon, required this.label, this.trailingText});
+
+  final IconData icon;
+  final String label;
+  final String? trailingText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFF1E2532), size: 32),
+        title: Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        trailing: trailingText != null
+            ? Text(
+                trailingText!,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              )
+            : const Icon(Icons.chevron_right_rounded, size: 36),
+      ),
+    );
+  }
+}
+
+class _SwitchTile extends StatelessWidget {
+  const _SwitchTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFF1E2532), size: 32),
+        title: Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        trailing: Switch.adaptive(value: value, onChanged: onChanged),
       ),
     );
   }

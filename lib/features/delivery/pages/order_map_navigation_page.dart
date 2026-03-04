@@ -13,7 +13,7 @@ class OrderMapNavigationPage extends StatelessWidget {
     final locationService = context.read<LocationService>();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Navigation $orderId')),
+      appBar: AppBar(title: Text('Чиглүүлэг $orderId')),
       body: Stack(
         children: [
           Positioned.fill(
@@ -27,9 +27,7 @@ class OrderMapNavigationPage extends StatelessWidget {
               ),
             ),
           ),
-          Positioned.fill(
-            child: CustomPaint(painter: _RoutePainter()),
-          ),
+          Positioned.fill(child: CustomPaint(painter: _RoutePainter())),
           Positioned(
             left: 16,
             right: 16,
@@ -48,7 +46,7 @@ class OrderMapNavigationPage extends StatelessWidget {
                           const Icon(Icons.navigation_rounded),
                           const SizedBox(width: 8),
                           Text(
-                            'Live tracking',
+                            'Байршил шууд хянах',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],
@@ -56,8 +54,8 @@ class OrderMapNavigationPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         location == null
-                            ? 'Locking GPS...'
-                            : 'Lat ${location.latitude.toStringAsFixed(4)} • Lng ${location.longitude.toStringAsFixed(4)}',
+                            ? 'GPS түгжиж байна...'
+                            : 'Өргөрөг ${location.latitude.toStringAsFixed(4)} • Уртраг ${location.longitude.toStringAsFixed(4)}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 10),
@@ -65,7 +63,7 @@ class OrderMapNavigationPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Mark arrived'),
+                        child: const Text('Ирсэн гэж тэмдэглэх'),
                       ),
                     ],
                   );

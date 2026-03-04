@@ -17,44 +17,41 @@ class LoginForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Login', style: Theme.of(context).textTheme.titleLarge),
+        Text('Нэвтрэх', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 4),
-        Text(
-          'Sign in to curate and save your best references.',
-          style: muted,
-        ),
+        Text('Өөрийн бүртгэлээр нэвтэрч захиалгаа удирдана уу.', style: muted),
         const SizedBox(height: 18),
-        Text('Email', style: Theme.of(context).textTheme.titleMedium),
+        Text('Имэйл', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 6),
         TextField(
           key: const ValueKey('login_email'),
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
           decoration: const InputDecoration(
-            hintText: 'demo@demo.com',
+            hintText: 'хэрэглэгч@жишээ.мн',
             prefixIcon: Icon(Icons.alternate_email_rounded),
           ),
         ),
         const SizedBox(height: 6),
         Text(
-          'Use your workspace email.',
+          'Бүртгэлтэй имэйл хаягаа ашиглана уу.',
           style: muted?.copyWith(fontSize: 12),
         ),
         const SizedBox(height: 14),
-        Text('Password', style: Theme.of(context).textTheme.titleMedium),
+        Text('Нууц үг', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 6),
         TextField(
           key: const ValueKey('login_password'),
           controller: passwordController,
           obscureText: true,
           decoration: const InputDecoration(
-            hintText: 'password',
+            hintText: '••••••••',
             prefixIcon: Icon(Icons.lock_outline_rounded),
           ),
         ),
         const SizedBox(height: 6),
         Text(
-          'Minimum 8 characters recommended.',
+          'Хамгийн багадаа 8 тэмдэгттэй байхыг зөвлөж байна.',
           style: muted?.copyWith(fontSize: 12),
         ),
       ],

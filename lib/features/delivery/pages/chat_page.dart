@@ -30,10 +30,12 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = context.select((ChatProvider provider) => provider.messages);
+    final messages = context.select(
+      (ChatProvider provider) => provider.messages,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: Text('Chat ${widget.orderId}')),
+      appBar: AppBar(title: Text('Чат ${widget.orderId}')),
       body: Column(
         children: [
           Expanded(
@@ -43,16 +45,23 @@ class _ChatPageState extends State<ChatPage> {
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final message = messages[index];
-                final mine = message.sender == 'Driver';
+                final mine = message.sender == 'Жолооч';
 
                 return Align(
-                  alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: mine
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 280),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: mine
-                          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.14)
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.14)
                           : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: const Color(0xFFE4DBD4)),
@@ -71,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      hintText: 'Type message...',
+                      hintText: 'Мессеж бичих...',
                     ),
                   ),
                 ),
@@ -86,7 +95,7 @@ class _ChatPageState extends State<ChatPage> {
                       text: text,
                     );
                   },
-                  child: const Text('Send'),
+                  child: const Text('Илгээх'),
                 ),
               ],
             ),

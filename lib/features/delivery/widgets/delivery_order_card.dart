@@ -84,21 +84,24 @@ class _DeliveryOrderCardState extends State<DeliveryOrderCard> {
                           bottom: 14,
                           child: Row(
                             children: [
-                              Expanded(child: StatusChip(step: widget.order.step)),
+                              Expanded(
+                                child: StatusChip(step: widget.order.step),
+                              ),
                               const SizedBox(width: 8),
                               if (widget.order.step == DeliveryStep.pending)
                                 FilledButton.tonal(
                                   onPressed: widget.onAccept,
                                   style: FilledButton.styleFrom(
                                     minimumSize: const Size(0, 34),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                     visualDensity: VisualDensity.compact,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 12,
                                       vertical: 8,
                                     ),
                                   ),
-                                  child: const Text('Accept'),
+                                  child: const Text('Хүлээж авах'),
                                 ),
                             ],
                           ),
@@ -114,20 +117,20 @@ class _DeliveryOrderCardState extends State<DeliveryOrderCard> {
               widget.order.restaurantName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 3),
             Text(
-              '${widget.order.deliveryAddress} • ${widget.order.etaMinutes} min',
+              '${widget.order.deliveryAddress} • ${widget.order.etaMinutes} мин',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 5),
             Text(
-              '+ ${widget.order.earnings.toStringAsFixed(2)} USD',
+              '+ ${widget.order.earnings.toStringAsFixed(2)} \$',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w700,

@@ -18,7 +18,7 @@ class _DeliveryProofPageState extends State<DeliveryProofPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Delivery Proof')),
+      appBar: AppBar(title: const Text('Хүргэлтийн баталгаа')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -35,29 +35,34 @@ class _DeliveryProofPageState extends State<DeliveryProofPage> {
                 ),
               ),
               child: const Center(
-                child: Icon(Icons.photo_camera_back_rounded, color: Colors.white, size: 44),
+                child: Icon(
+                  Icons.photo_camera_back_rounded,
+                  color: Colors.white,
+                  size: 44,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             Text(
               _proofPath == null
-                  ? 'No proof captured yet. Tap capture to mock upload.'
-                  : 'Captured: $_proofPath',
+                  ? 'Одоогоор баталгаажуулсан зураг алга.'
+                  : 'Баталгаа: $_proofPath',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 14),
             OutlinedButton.icon(
               onPressed: () {
                 setState(() {
-                  _proofPath = 'proof_${DateTime.now().millisecondsSinceEpoch}.jpg';
+                  _proofPath =
+                      'proof_${DateTime.now().millisecondsSinceEpoch}.jpg';
                 });
               },
               icon: const Icon(Icons.camera_alt_outlined),
-              label: const Text('Capture proof'),
+              label: const Text('Зураг авах'),
             ),
             const SizedBox(height: 10),
             FilledButton(
-                  onPressed: _proofPath == null || _submitting
+              onPressed: _proofPath == null || _submitting
                   ? null
                   : () async {
                       final provider = context.read<DeliveryProvider>();
@@ -71,7 +76,7 @@ class _DeliveryProofPageState extends State<DeliveryProofPage> {
                       setState(() => _submitting = false);
                       navigator.pop();
                     },
-              child: Text(_submitting ? 'Uploading...' : 'Submit proof'),
+              child: Text(_submitting ? 'Илгээж байна...' : 'Баталгаа илгээх'),
             ),
           ],
         ),

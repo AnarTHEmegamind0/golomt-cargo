@@ -9,15 +9,14 @@ import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:core/features/settings/providers/settings_provider.dart';
 import 'package:core/features/shell/pages/app_shell_page.dart';
 
+/// Default design version (1=Glassmorphism, 2=Neumorphism, 3=Minimal, 4=Cyberpunk, 5=Luxury)
+/// This can be overridden by user preference in SettingsProvider
+const int designVersion = 1;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    MultiProvider(
-      providers: AppProviders.build(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MultiProvider(providers: AppProviders.build(), child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -32,6 +31,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final themeMode = context.select(
       (SettingsProvider p) => p.settings.themeMode,
+    );
+    final currentDesignVersion = context.select(
+      (SettingsProvider p) => p.settings.designVersion,
     );
     final isLoggedIn = context.select((AuthProvider p) => p.isLoggedIn);
 
@@ -49,8 +51,8 @@ class _MyAppState extends State<MyApp> {
           child: child!,
         );
       },
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.design(currentDesignVersion, Brightness.light),
+      darkTheme: AppTheme.design(currentDesignVersion, Brightness.dark),
       themeMode: themeMode,
       home: isLoggedIn ? const AppShellPage() : const LoginPage(),
     );

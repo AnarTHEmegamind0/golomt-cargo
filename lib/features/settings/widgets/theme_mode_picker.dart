@@ -17,17 +17,17 @@ class ThemeModePicker extends StatelessWidget {
         ButtonSegment(
           value: ThemeMode.system,
           icon: Icon(Icons.brightness_auto_rounded),
-          label: Text('System'),
+          label: Text('Систем'),
         ),
         ButtonSegment(
           value: ThemeMode.light,
           icon: Icon(Icons.light_mode_rounded),
-          label: Text('Light'),
+          label: Text('Цайвар'),
         ),
         ButtonSegment(
           value: ThemeMode.dark,
           icon: Icon(Icons.dark_mode_rounded),
-          label: Text('Dark'),
+          label: Text('Харанхуй'),
         ),
       ],
       selected: {value},

@@ -1,5 +1,4 @@
 import 'package:core/features/auth/providers/auth_provider.dart';
-import 'package:core/features/auth/widgets/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFF6F1EC), Color(0xFFF2E9E2)],
+            colors: [Color(0xFFF8F3EE), Color(0xFFF3ECE4)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -38,56 +37,99 @@ class _LoginPageState extends State<LoginPage> {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 920;
-
               return Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(18),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1040),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF191312).withValues(alpha: 0.08),
-                            blurRadius: 28,
-                            offset: const Offset(0, 14),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
                           ),
-                        ],
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.88),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFE7DED5)),
+                          ),
+                          child: Text(
+                            'Cargo App',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF2A3348),
+                                ),
+                          ),
+                        ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: wide
-                            ? Row(
-                                children: [
-                                  const Expanded(child: _MoodPanel()),
-                                  const SizedBox(width: 18),
-                                  Expanded(
-                                    child: _AuthPanel(
-                                      emailController: _emailController,
-                                      passwordController: _passwordController,
-                                      isLoading: isLoading,
-                                      error: error,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                children: [
-                                  const _MoodPanel(),
-                                  const SizedBox(height: 18),
-                                  _AuthPanel(
-                                    emailController: _emailController,
-                                    passwordController: _passwordController,
-                                    isLoading: isLoading,
-                                    error: error,
-                                  ),
-                                ],
+                      const SizedBox(height: 14),
+                      const _SplashPhoneMockup(),
+                      const SizedBox(height: 22),
+                      Text(
+                        'Дэлхийг хаалгандаа\nхүлээж ав',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontSize: 39,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                            ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Захиалгын дугаараа бүртгэж, хүргэлтийн явцаа шууд хянаарай.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF677186),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      FilledButton(
+                        key: const ValueKey('login_submit'),
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                await context.read<AuthProvider>().login(
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text,
+                                );
+                              },
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: Text(
+                          isLoading ? 'Нэвтэрч байна...' : 'Эхлэх',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          'Нэвтрэх',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: const Color(0xFF4F596F),
+                                fontWeight: FontWeight.w700,
                               ),
+                        ),
                       ),
-                    ),
+                      if (error != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          error,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               );
@@ -99,105 +141,134 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class _AuthPanel extends StatelessWidget {
-  const _AuthPanel({
-    required this.emailController,
-    required this.passwordController,
-    required this.isLoading,
-    required this.error,
-  });
-
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final bool isLoading;
-  final String? error;
+class _SplashPhoneMockup extends StatelessWidget {
+  const _SplashPhoneMockup();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xFFE8DED7)),
+        borderRadius: BorderRadius.circular(42),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1A2233).withValues(alpha: 0.18),
+            blurRadius: 32,
+            offset: const Offset(0, 18),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          LoginForm(
-            emailController: emailController,
-            passwordController: passwordController,
+      child: AspectRatio(
+        aspectRatio: 0.62,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF111111),
+            borderRadius: BorderRadius.circular(42),
           ),
-          const SizedBox(height: 18),
-          FilledButton(
-            key: const ValueKey('login_submit'),
-            onPressed: isLoading
-                ? null
-                : () async {
-                    await context.read<AuthProvider>().login(
-                      email: emailController.text.trim(),
-                      password: passwordController.text,
-                    );
-                  },
-            child: Text(isLoading ? 'Signing in...' : 'Sign in'),
-          ),
-          if (error != null) ...[
-            const SizedBox(height: 10),
-            Text(
-              error!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontWeight: FontWeight.w600,
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF6EBDD),
+                borderRadius: BorderRadius.circular(38),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '09:41',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2C2C2C),
+                              ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 90,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    const _CourierArt(),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Хүргэлтээ\nудирдахад бэлэн',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              height: 1.08,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Трак кодоо оруулаад эхлээрэй.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF636C7E),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _MoodPanel extends StatelessWidget {
-  const _MoodPanel();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD2455F), Color(0xFFB53049)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          ),
         ),
-        borderRadius: BorderRadius.circular(26),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+}
+
+class _CourierArt extends StatelessWidget {
+  const _CourierArt();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 190,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Text(
-            'PinCargo',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
+          Positioned(
+            left: 20,
+            bottom: 20,
+            child: _BoxCube(size: 88, color: const Color(0xFFE8C389)),
+          ),
+          Positioned(
+            right: 28,
+            bottom: 48,
+            child: _BoxCube(size: 70, color: const Color(0xFFDCAA66)),
+          ),
+          Positioned(
+            left: 86,
+            top: 10,
+            child: Container(
+              width: 110,
+              height: 160,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2B3447),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: const Icon(
+                Icons.delivery_dining_rounded,
+                color: Color(0xFFFFD08C),
+                size: 86,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Collect ideas, track references, and keep inspiration structured.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.86),
-            ),
-          ),
-          const SizedBox(height: 18),
-          const _MoodTile(
-            title: 'Pinned this hour',
-            value: '34',
-            note: 'fresh references added by your team',
-          ),
-          const SizedBox(height: 10),
-          const _MoodTile(
-            title: 'Boards updated',
-            value: '9',
-            note: 'interiors, campaign, style and studio',
           ),
         ],
       ),
@@ -205,60 +276,23 @@ class _MoodPanel extends StatelessWidget {
   }
 }
 
-class _MoodTile extends StatelessWidget {
-  const _MoodTile({
-    required this.title,
-    required this.value,
-    required this.note,
-  });
+class _BoxCube extends StatelessWidget {
+  const _BoxCube({required this.size, required this.color});
 
-  final String title;
-  final String value;
-  final String note;
+  final double size;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.push_pin_rounded, color: Colors.white),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$title • $value',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  note,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.86),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        color: color,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFB98D4F).withValues(alpha: 0.6),
+        ),
       ),
     );
   }

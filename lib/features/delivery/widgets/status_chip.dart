@@ -9,13 +9,13 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (text, color) = switch (step) {
-      DeliveryStep.pending => ('Pending', const Color(0xFFB54708)),
-      DeliveryStep.accepted => ('Accepted', const Color(0xFF175CD3)),
-      DeliveryStep.pickedUp => ('Picked up', const Color(0xFF175CD3)),
-      DeliveryStep.enRoute => ('En route', const Color(0xFF175CD3)),
-      DeliveryStep.arrived => ('Arrived', const Color(0xFF087443)),
-      DeliveryStep.proof => ('Proof needed', const Color(0xFF9E1C3B)),
-      DeliveryStep.completed => ('Completed', const Color(0xFF087443)),
+      DeliveryStep.pending => ('Хүлээгдэж буй', const Color(0xFFB54708)),
+      DeliveryStep.accepted => ('Хүлээн авсан', const Color(0xFF175CD3)),
+      DeliveryStep.pickedUp => ('Авсан', const Color(0xFF175CD3)),
+      DeliveryStep.enRoute => ('Замд яваа', const Color(0xFF175CD3)),
+      DeliveryStep.arrived => ('Ирсэн', const Color(0xFF087443)),
+      DeliveryStep.proof => ('Баталгаа хэрэгтэй', const Color(0xFF9E1C3B)),
+      DeliveryStep.completed => ('Дууссан', const Color(0xFF087443)),
     };
 
     return Container(

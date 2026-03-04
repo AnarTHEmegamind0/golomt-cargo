@@ -25,7 +25,7 @@ class ChatProvider extends ChangeNotifier {
   Future<void> send({required String orderId, required String text}) {
     return _chatService.sendMessage(
       orderId: orderId,
-      sender: 'Driver',
+      sender: 'Жолооч',
       text: text,
     );
   }
