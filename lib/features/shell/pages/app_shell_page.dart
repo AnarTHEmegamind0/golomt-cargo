@@ -1,7 +1,7 @@
-import 'package:core/features/delivery/pages/delivery_home_page.dart';
-import 'package:core/features/delivery/pages/notifications_page.dart';
-import 'package:core/features/delivery/providers/driver_notification_provider.dart';
-import 'package:core/features/profile/pages/profile_page.dart';
+import 'package:core/features/branch/pages/branch_list_page.dart';
+import 'package:core/features/delivery/pages/delivery_tracking_page.dart';
+import 'package:core/features/home/pages/home_page.dart';
+import 'package:core/features/orders/pages/orders_page.dart';
 import 'package:core/features/settings/pages/settings_page.dart';
 import 'package:core/features/shell/service/navigation_controller.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +15,13 @@ class AppShellPage extends StatelessWidget {
     final selectedIndex = context.select(
       (NavigationController controller) => controller.index,
     );
-    final unreadNotifications = context.select(
-      (DriverNotificationProvider provider) => provider.unreadCount,
-    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     final shellDecoration = BoxDecoration(
       color: isDark
-          ? const Color(0xFF141D2A).withValues(alpha: 0.94)
-          : Colors.white.withValues(alpha: 0.94),
+          ? const Color(0xFF141D2A).withValues(alpha: 0.96)
+          : Colors.white.withValues(alpha: 0.96),
       borderRadius: BorderRadius.circular(28),
       border: Border.all(
         color: isDark
@@ -34,9 +32,9 @@ class AppShellPage extends StatelessWidget {
         BoxShadow(
           color: isDark
               ? Colors.black.withValues(alpha: 0.34)
-              : const Color(0xFF1C2332).withValues(alpha: 0.08),
-          blurRadius: 24,
-          offset: const Offset(0, 10),
+              : const Color(0xFF1C2332).withValues(alpha: 0.1),
+          blurRadius: 28,
+          offset: const Offset(0, 12),
         ),
       ],
     );
@@ -46,31 +44,42 @@ class AppShellPage extends StatelessWidget {
       body: IndexedStack(
         index: selectedIndex,
         children: const [
-          DeliveryHomePage(),
-          NotificationsPage(),
-          ProfilePage(),
+          HomePage(),
+          OrdersPage(),
+          DeliveryTrackingPage(),
+          BranchListPage(),
           SettingsPage(),
         ],
       ),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        minimum: const EdgeInsets.fromLTRB(12, 0, 12, 10),
         child: Container(
           decoration: shellDecoration,
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
               backgroundColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
-              indicatorColor: isDark
-                  ? const Color(0xFFF08A1A).withValues(alpha: 0.22)
-                  : const Color(0xFFF08A1A).withValues(alpha: 0.16),
+              indicatorColor: primaryColor.withValues(
+                alpha: isDark ? 0.22 : 0.14,
+              ),
               labelTextStyle: WidgetStateProperty.resolveWith(
                 (states) => TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: states.contains(WidgetState.selected)
                       ? FontWeight.w800
                       : FontWeight.w600,
                   color: states.contains(WidgetState.selected)
-                      ? const Color(0xFFF08A1A)
+                      ? primaryColor
+                      : (isDark
+                            ? const Color(0xFFAAB3C1)
+                            : const Color(0xFF858E9D)),
+                ),
+              ),
+              iconTheme: WidgetStateProperty.resolveWith(
+                (states) => IconThemeData(
+                  size: 24,
+                  color: states.contains(WidgetState.selected)
+                      ? primaryColor
                       : (isDark
                             ? const Color(0xFFAAB3C1)
                             : const Color(0xFF858E9D)),
@@ -78,47 +87,54 @@ class AppShellPage extends StatelessWidget {
               ),
             ),
             child: NavigationBar(
-              height: 74,
+              height: 70,
               selectedIndex: selectedIndex,
               onDestinationSelected: context
                   .read<NavigationController>()
                   .setIndex,
-              destinations: [
-                const NavigationDestination(
-                  icon: Icon(Icons.home_rounded, key: ValueKey('nav_home')),
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined, key: ValueKey('nav_home')),
                   selectedIcon: Icon(
-                    Icons.home_filled,
+                    Icons.home_rounded,
                     key: ValueKey('nav_home_selected'),
                   ),
                   label: 'Нүүр',
                 ),
                 NavigationDestination(
-                  icon: Badge(
-                    isLabelVisible: unreadNotifications > 0,
-                    smallSize: 8,
-                    child: const Icon(
-                      Icons.local_shipping_outlined,
-                      key: ValueKey('nav_notifications'),
-                    ),
+                  icon: Icon(
+                    Icons.inventory_2_outlined,
+                    key: ValueKey('nav_orders'),
                   ),
-                  selectedIcon: const Icon(
-                    Icons.local_shipping_rounded,
-                    key: ValueKey('nav_notifications_selected'),
+                  selectedIcon: Icon(
+                    Icons.inventory_2_rounded,
+                    key: ValueKey('nav_orders_selected'),
                   ),
                   label: 'Захиалга',
                 ),
-                const NavigationDestination(
+                NavigationDestination(
                   icon: Icon(
-                    Icons.person_outline_rounded,
-                    key: ValueKey('nav_profile'),
+                    Icons.local_shipping_outlined,
+                    key: ValueKey('nav_delivery'),
                   ),
                   selectedIcon: Icon(
-                    Icons.person_rounded,
-                    key: ValueKey('nav_profile_selected'),
+                    Icons.local_shipping_rounded,
+                    key: ValueKey('nav_delivery_selected'),
                   ),
-                  label: 'Профайл',
+                  label: 'Хүргэлт',
                 ),
-                const NavigationDestination(
+                NavigationDestination(
+                  icon: Icon(
+                    Icons.storefront_outlined,
+                    key: ValueKey('nav_branch'),
+                  ),
+                  selectedIcon: Icon(
+                    Icons.storefront_rounded,
+                    key: ValueKey('nav_branch_selected'),
+                  ),
+                  label: 'Салбар',
+                ),
+                NavigationDestination(
                   icon: Icon(Icons.tune_rounded, key: ValueKey('nav_settings')),
                   selectedIcon: Icon(
                     Icons.tune_rounded,

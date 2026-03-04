@@ -1,169 +1,184 @@
-import 'package:core/features/auth/providers/auth_provider.dart';
-import 'package:core/features/home/providers/pin_feed_provider.dart';
-import 'package:core/features/home/widgets/home_feed_skeleton.dart';
-import 'package:core/features/home/widgets/live_pulse_dot.dart';
-import 'package:core/features/home/widgets/pinterest_masonry_grid.dart';
+import 'package:core/core/animations/page_transitions.dart';
+import 'package:core/core/design_system/components/app_card.dart';
+import 'package:core/core/design_system/components/cargo_backdrop.dart';
+import 'package:core/core/design_system/components/icon_badge.dart';
+import 'package:core/features/notifications/pages/notifications_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<PinFeedProvider>();
-      if (!provider.hasLoaded) {
-        provider.load();
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final userEmail =
-        context.select((AuthProvider provider) => provider.user?.email) ??
-        'guest@pincargo.app';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isLoading = context.select((PinFeedProvider p) => p.isLoading);
-    final error = context.select((PinFeedProvider p) => p.error);
-    final selectedBoard = context.select((PinFeedProvider p) => p.selectedBoard);
-    final boards = context.select((PinFeedProvider p) => p.boards);
-    final pins = context.select((PinFeedProvider p) => p.pins);
-
-    return SafeArea(
-      child: RefreshIndicator(
-        color: Theme.of(context).colorScheme.primary,
-        onRefresh: () => context.read<PinFeedProvider>().load(forceRefresh: true),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Home', style: Theme.of(context).textTheme.headlineMedium),
-                      const SizedBox(height: 6),
-                      Text(
-                        userEmail,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF676264),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const _TrendBadge(),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Container(
-              height: 52,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE9E3DD)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search_rounded, color: Color(0xFF8B8689)),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Search boards, authors, and ideas',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF8B8689),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: boards.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final board = boards[index];
-                  final selected = board == selectedBoard;
-
-                  return ChoiceChip(
-                    label: Text(board),
-                    selected: selected,
-                    onSelected: (_) => context.read<PinFeedProvider>().selectBoard(board),
-                    visualDensity: VisualDensity.compact,
-                    side: BorderSide(
-                      color: selected
-                          ? Theme.of(context).colorScheme.primary
-                          : const Color(0xFFE3DCD6),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    selectedColor: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.14),
-                    labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: selected
-                          ? Theme.of(context).colorScheme.primary
-                          : const Color(0xFF676264),
-                    ),
-                  );
+    return CargoBackdrop(
+      light: !isDark,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _TopBar(
+                onNotificationsTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(PageTransitions.slideFade(const NotificationsPage()));
                 },
               ),
-            ),
-            const SizedBox(height: 16),
-            if (isLoading)
-              const HomeFeedSkeleton()
-            else if (error != null)
-              _ErrorState(
-                message: error,
-                onRetry: () => context.read<PinFeedProvider>().load(forceRefresh: true),
-              )
-            else if (pins.isEmpty)
-              const _EmptyState()
-            else
-              PinterestMasonryGrid(items: pins),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+              _WelcomeCard(),
+              const SizedBox(height: 24),
+              Text(
+                'Хялбар ажлын урсгал',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 14),
+              const _WorkflowGrid(),
+              const SizedBox(height: 24),
+              Text(
+                'Түгээмэл үйлдлүүд',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 14),
+              const _QuickActionsRow(),
+              const SizedBox(height: 24),
+              Text(
+                'Статистик',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 14),
+              const _StatsRow(),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _TrendBadge extends StatelessWidget {
-  const _TrendBadge();
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.onNotificationsTap});
+
+  final VoidCallback onNotificationsTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: Theme.of(context).colorScheme.surface,
-        border: Border.all(color: const Color(0xFFE3DCD6)),
-      ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Сайн уу',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? const Color(0xFF8B95A8)
+                      : const Color(0xFF75819A),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Буундуу Карго',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Stack(
+          children: [
+            IconButton.filledTonal(
+              onPressed: onNotificationsTap,
+              style: IconButton.styleFrom(
+                backgroundColor: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.92),
+                foregroundColor: isDark
+                    ? const Color(0xFFE8ECF4)
+                    : const Color(0xFF1E2638),
+              ),
+              icon: const Icon(Icons.notifications_rounded),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF1A2234) : Colors.white,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _WelcomeCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GradientCard(
+      colors: const [Color(0xFFF08A1A), Color(0xFFE85D04)],
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          const LivePulseDot(),
-          const SizedBox(width: 8),
-          Text(
-            'Live trend',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF676264),
-              fontWeight: FontWeight.w700,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Таны ачаа аюулгүй, хурдан!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Хятадаас Монгол руу хамгийн хурдан хүргэлт',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Icons.local_shipping_rounded,
+              size: 36,
+              color: Colors.white,
             ),
           ),
         ],
@@ -172,68 +187,242 @@ class _TrendBadge extends StatelessWidget {
   }
 }
 
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
+class _WorkflowGrid extends StatelessWidget {
+  const _WorkflowGrid();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE3DCD6)),
+    final workflows = [
+      _WorkflowData(
+        icon: Icons.storefront_rounded,
+        title: 'Салбар сонгох',
+        color: const Color(0xFF8B5CF6),
+        step: 1,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Could not load feed', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
-          Text(
-            message,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.error),
+      _WorkflowData(
+        icon: Icons.qr_code_scanner_rounded,
+        title: 'Трак код бүртгэх',
+        color: const Color(0xFF3B82F6),
+        step: 2,
+      ),
+      _WorkflowData(
+        icon: Icons.payment_rounded,
+        title: 'Төлбөр төлөх',
+        color: const Color(0xFF10B981),
+        step: 3,
+      ),
+      _WorkflowData(
+        icon: Icons.local_shipping_rounded,
+        title: 'Хүргэлт захиалах',
+        color: const Color(0xFFF59E0B),
+        step: 4,
+      ),
+      _WorkflowData(
+        icon: Icons.check_circle_rounded,
+        title: 'Ачаа хүлээн авах',
+        color: const Color(0xFFEC4899),
+        step: 5,
+      ),
+      _WorkflowData(
+        icon: Icons.support_agent_rounded,
+        title: 'Тусламж авах',
+        color: const Color(0xFF06B6D4),
+        step: 6,
+      ),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.95,
+      ),
+      itemCount: workflows.length,
+      itemBuilder: (context, index) {
+        final workflow = workflows[index];
+        return WorkflowIconItem(
+          icon: workflow.icon,
+          title: workflow.title,
+          subtitle: '0${workflow.step}',
+          color: workflow.color,
+          onTap: () {
+            // Handle workflow tap
+          },
+        );
+      },
+    );
+  }
+}
+
+class _WorkflowData {
+  const _WorkflowData({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.step,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color color;
+  final int step;
+}
+
+class _QuickActionsRow extends StatelessWidget {
+  const _QuickActionsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _QuickActionCard(
+            icon: Icons.add_box_rounded,
+            title: 'Захиалга нэмэх',
+            color: const Color(0xFF8B5CF6),
+            onTap: () {},
           ),
-          const SizedBox(height: 14),
-          FilledButton(onPressed: onRetry, child: const Text('Try again')),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _QuickActionCard(
+            icon: Icons.search_rounded,
+            title: 'Ачаа хайх',
+            color: const Color(0xFF3B82F6),
+            onTap: () {},
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  const _QuickActionCard({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          IconBadge(icon: icon, color: color, size: 44),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+class _StatsRow extends StatelessWidget {
+  const _StatsRow();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE3DCD6)),
-      ),
+    return Row(
+      children: [
+        Expanded(
+          child: _StatCard(
+            label: 'Нийт захиалга',
+            value: '24',
+            icon: Icons.inventory_2_rounded,
+            color: const Color(0xFF8B5CF6),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _StatCard(
+            label: 'Хүргэгдсэн',
+            value: '18',
+            icon: Icons.check_circle_rounded,
+            color: const Color(0xFF10B981),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _StatCard(
+            label: 'Замд яваа',
+            value: '6',
+            icon: Icons.local_shipping_rounded,
+            color: const Color(0xFFF59E0B),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AppCard(
+      padding: const EdgeInsets.all(14),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.grid_view_rounded,
-            size: 32,
-            color: Theme.of(context).colorScheme.primary,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(height: 10),
-          Text('No ideas in this board yet', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
           Text(
-            'Switch to another board or refresh to get new recommendations.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF676264)),
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: isDark ? const Color(0xFFE8ECF4) : const Color(0xFF1E2638),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFF8B95A8) : const Color(0xFF677186),
+            ),
           ),
         ],
       ),
