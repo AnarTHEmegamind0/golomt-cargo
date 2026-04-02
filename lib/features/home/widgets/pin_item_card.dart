@@ -45,6 +45,42 @@ class _PinItemCardState extends State<PinItemCard> {
                   ),
                   child: Stack(
                     children: [
+                      // Decorative elements wrapped in ExcludeSemantics
+                      Positioned(
+                        left: -20,
+                        bottom: -16,
+                        child: ExcludeSemantics(
+                          child: IgnorePointer(
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withValues(alpha: 0.18),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: -18,
+                        bottom: 28,
+                        child: ExcludeSemantics(
+                          child: IgnorePointer(
+                            child: Transform.rotate(
+                              angle: 0.22,
+                              child: Container(
+                                width: 88,
+                                height: 88,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(22),
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       Positioned(
                         top: 14,
                         right: 12,
@@ -62,33 +98,6 @@ class _PinItemCardState extends State<PinItemCard> {
                             style: textTheme.bodySmall?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: -20,
-                        bottom: -16,
-                        child: Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.18),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: -18,
-                        bottom: 28,
-                        child: Transform.rotate(
-                          angle: 0.22,
-                          child: Container(
-                            width: 88,
-                            height: 88,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(22),
-                              color: Colors.white.withValues(alpha: 0.2),
                             ),
                           ),
                         ),

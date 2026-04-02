@@ -7,7 +7,7 @@ class FakeBranchRepository implements BranchRepository {
   static final List<Branch> _fakeBranches = [
     const Branch(
       id: 'branch-001',
-      name: 'Буундуу Карго - Улаанбаатар',
+      name: 'Голомт карго - Улаанбаатар',
       address: 'Хан-Уул дүүрэг, 15-р хороо, Ажилчны гудамж 45',
       chinaAddress: '广州市白云区石井镇红星村石沙路168号档口B区108号',
       latitude: 47.9184,
@@ -19,7 +19,7 @@ class FakeBranchRepository implements BranchRepository {
     ),
     const Branch(
       id: 'branch-002',
-      name: 'Буундуу Карго - Дархан',
+      name: 'Голомт карго - Дархан',
       address: 'Дархан-Уул аймаг, 4-р баг, Төмөр замын гудамж',
       chinaAddress: '深圳市罗湖区笋岗东路3002号万通大厦A座5楼501室',
       latitude: 49.4685,
@@ -31,7 +31,7 @@ class FakeBranchRepository implements BranchRepository {
     ),
     const Branch(
       id: 'branch-003',
-      name: 'Буундуу Карго - Эрдэнэт',
+      name: 'Голомт карго - Эрдэнэт',
       address: 'Орхон аймаг, Баян-Өндөр сум, 1-р баг',
       chinaAddress: '义乌市福田街道荷叶塘工业区A栋3楼',
       latitude: 49.0275,
@@ -43,7 +43,7 @@ class FakeBranchRepository implements BranchRepository {
     ),
     const Branch(
       id: 'branch-004',
-      name: 'Буундуу Карго - Чойр',
+      name: 'Голомт карго - Чойр',
       address: 'Говьсүмбэр аймаг, Сүмбэр сум, 2-р баг',
       chinaAddress: '二连浩特市前进路88号',
       latitude: 46.3568,
@@ -55,7 +55,7 @@ class FakeBranchRepository implements BranchRepository {
     ),
     const Branch(
       id: 'branch-005',
-      name: 'Буундуу Карго - Замын-Үүд',
+      name: 'Голомт карго - Замын-Үүд',
       address: 'Дорноговь аймаг, Замын-Үүд сум',
       chinaAddress: '二连浩特市国门大道66号',
       latitude: 43.7157,

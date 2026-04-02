@@ -16,18 +16,28 @@ class OrderMapNavigationPage extends StatelessWidget {
       appBar: AppBar(title: Text('Чиглүүлэг $orderId')),
       body: Stack(
         children: [
+          // Background gradient
           Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF3A4C57), Color(0xFF92ABB7)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            child: ExcludeSemantics(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF3A4C57), Color(0xFF92ABB7)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
               ),
             ),
           ),
-          Positioned.fill(child: CustomPaint(painter: _RoutePainter())),
+          // Route painter
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: IgnorePointer(
+                child: CustomPaint(painter: _RoutePainter()),
+              ),
+            ),
+          ),
           Positioned(
             left: 16,
             right: 16,

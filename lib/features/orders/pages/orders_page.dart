@@ -113,6 +113,17 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _AddOrderButton(
+                    onTap: () {
+                      _showAddOrderSheet(context);
+                    },
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
               if (provider.isLoading)
                 const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
@@ -218,6 +229,196 @@ class _OrdersPageState extends State<OrdersPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAddOrderSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _AddOrderSheet(),
+    );
+  }
+}
+
+class _AddOrderButton extends StatelessWidget {
+  const _AddOrderButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      onPressed: onTap,
+      icon: const Icon(Icons.add_rounded),
+      label: const Text('Захиалга нэмэх'),
+      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+    );
+  }
+}
+
+class _AddOrderSheet extends StatefulWidget {
+  const _AddOrderSheet();
+
+  @override
+  State<_AddOrderSheet> createState() => _AddOrderSheetState();
+}
+
+class _AddOrderSheetState extends State<_AddOrderSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _trackingController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _trackingController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.62,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1A2234) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : const Color(0xFFD1D5DB),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Захиалга нэмэх',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextFormField(
+                  controller: _trackingController,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: 'Трак код',
+                    hintText: 'LP009845612CN',
+                    prefixIcon: const Icon(Icons.qr_code_rounded),
+                    suffixIcon: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.qr_code_scanner_rounded),
+                    ),
+                  ),
+                  validator: (value) {
+                    final text = (value ?? '').trim();
+                    if (text.isEmpty) {
+                      return 'Трак код оруулна уу';
+                    }
+                    if (text.length < 3) {
+                      return 'Дор хаяж 3 тэмдэгт шаардлагатай';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  minLines: 1,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                    labelText: 'Тайлбар',
+                    hintText: 'Барааны нэр эсвэл нэмэлт мэдээлэл',
+                    prefixIcon: Icon(Icons.inventory_2_rounded),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: FilledButton(
+                  onPressed: _isSubmitting ? null : _submit,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Захиалга нэмэх'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
+    if (!_formKey.currentState!.validate()) return;
+
+    FocusScope.of(context).unfocus();
+    setState(() => _isSubmitting = true);
+
+    final trackingCode = _trackingController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    final order = await context.read<OrderProvider>().createOrder(
+      trackingCode: trackingCode,
+      productName: description.isEmpty ? null : description,
+    );
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    if (order != null) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Захиалга амжилттай нэмэгдлээ'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final error =
+        context.read<OrderProvider>().error ?? 'Захиалга нэмэхэд алдаа гарлаа';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
     );
   }
 }
@@ -344,9 +545,9 @@ class _OrderDetailSheet extends StatelessWidget {
                 ),
                 _DetailRow(
                   label: 'Үнэ',
-                  value: '${order.price.toStringAsFixed(0)}₮',
+                  value: '${order.uiPrice.toStringAsFixed(0)}₮',
                 ),
-                _DetailRow(label: 'Жин', value: '${order.weight}кг'),
+                _DetailRow(label: 'Жин', value: _formatWeight(order.uiWeight)),
                 _DetailRow(
                   label: 'Төлбөр',
                   value: order.isPaid ? 'Төлөгдсөн' : 'Төлөгдөөгүй',
@@ -409,6 +610,11 @@ class _OrderDetailSheet extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
+  }
+
+  String _formatWeight(double weight) {
+    final text = weight.toStringAsFixed(weight >= 10 ? 1 : 2);
+    return '${text.replaceFirst(RegExp(r'\.0+$'), '').replaceFirst(RegExp(r'(\.\d*[1-9])0+$'), r'$1')}кг';
   }
 }
 

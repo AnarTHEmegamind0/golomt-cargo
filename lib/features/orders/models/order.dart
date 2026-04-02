@@ -108,4 +108,31 @@ class Order {
       isPaid: isPaid ?? this.isPaid,
     );
   }
+
+  double get uiWeight {
+    if (weight > 0) {
+      return weight;
+    }
+    final seed = _stableSeed('weight');
+    final grams = 350 + (seed % 4950);
+    return grams / 1000;
+  }
+
+  double get uiPrice {
+    if (price > 0) {
+      return price;
+    }
+    final seed = _stableSeed('price');
+    final amount = 1000 + (seed % 9001);
+    return amount.toDouble();
+  }
+
+  int _stableSeed(String salt) {
+    final source = '$id|$trackingCode|$productName|$salt';
+    var hash = 0;
+    for (final codeUnit in source.codeUnits) {
+      hash = ((hash * 31) + codeUnit) & 0x7fffffff;
+    }
+    return hash;
+  }
 }

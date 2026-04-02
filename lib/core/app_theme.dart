@@ -1,3 +1,4 @@
+import 'package:core/core/brand_palette.dart';
 import 'package:flutter/material.dart';
 
 /// Design version enum for 5 distinct design aesthetics
@@ -179,11 +180,11 @@ class DesignConfig {
 }
 
 class AppTheme {
-  // Base colors - orange/blue foundation
-  static const _accentOrange = Color(0xFFF08A1A);
-  static const _accentBlue = Color(0xFF2563EB);
-  static const _lightBackground = Color(0xFFF0F2F6);
-  static const _darkBackground = Color(0xFF111827);
+  // Base colors - blue-first foundation
+  static const _accentOrange = BrandPalette.electricBlue;
+  static const _accentBlue = BrandPalette.navyBlue;
+  static const _lightBackground = BrandPalette.softBlueBackground;
+  static const _darkBackground = BrandPalette.primaryText;
 
   // Legacy methods for backward compatibility
   static ThemeData light() =>
@@ -222,7 +223,7 @@ class AppTheme {
             brightness: Brightness.light,
           ).copyWith(
             primary: _accentOrange,
-            secondary: const Color(0xFFD96A12),
+            secondary: const Color(0xFF1E40AF),
             surface: Colors.white.withValues(alpha: 0.85),
             error: const Color(0xFFB3261E),
           )
@@ -230,8 +231,8 @@ class AppTheme {
             seedColor: _accentOrange,
             brightness: Brightness.dark,
           ).copyWith(
-            primary: const Color(0xFFF4A142),
-            secondary: const Color(0xFFE98A22),
+            primary: const Color(0xFF60A5FA),
+            secondary: const Color(0xFF3B82F6),
             surface: const Color(0xFF1C2537).withValues(alpha: 0.85),
             error: const Color(0xFFFFB4AB),
           );
@@ -280,7 +281,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(50),
           side: BorderSide(
-            color: isLight ? const Color(0xFFE5DDD7) : const Color(0xFF333F55),
+            color: isLight ? const Color(0xFFE2E8F0) : const Color(0xFF333F55),
             width: config.borderWidth,
           ),
           shape: RoundedRectangleBorder(
@@ -292,7 +293,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isLight
-            ? const Color(0xFFFCFAF8).withValues(alpha: 0.7)
+            ? const Color(0xFFF8FAFC).withValues(alpha: 0.7)
             : const Color(0xFF222C3F).withValues(alpha: 0.7),
         labelStyle: TextStyle(
           color: isLight ? const Color(0xFF5C667C) : const Color(0xFFAAB3C6),
@@ -305,13 +306,13 @@ class AppTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(config.inputBorderRadius),
           borderSide: BorderSide(
-            color: isLight ? const Color(0xFFE5DDD7) : const Color(0xFF333F55),
+            color: isLight ? const Color(0xFFE2E8F0) : const Color(0xFF333F55),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(config.inputBorderRadius),
           borderSide: BorderSide(
-            color: isLight ? const Color(0xFFE5DDD7) : const Color(0xFF333F55),
+            color: isLight ? const Color(0xFFE2E8F0) : const Color(0xFF333F55),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -362,7 +363,7 @@ class AppTheme {
             seedColor: _accentBlue,
             brightness: Brightness.dark,
           ).copyWith(
-            primary: const Color(0xFFF4A142),
+            primary: const Color(0xFF60A5FA),
             secondary: _accentBlue.withValues(alpha: 0.8),
             surface: baseColor,
             error: const Color(0xFFFFB4AB),
@@ -490,7 +491,7 @@ class AppTheme {
             seedColor: _accentOrange,
             brightness: Brightness.dark,
           ).copyWith(
-            primary: const Color(0xFFF4A142),
+            primary: const Color(0xFF60A5FA),
             secondary: const Color(0xFF60A5FA),
             surface: const Color(0xFF18181B),
             error: const Color(0xFFFCA5A5),
@@ -613,8 +614,8 @@ class AppTheme {
   // dark overlays, motion blur, scanline effects
   // ============================================
   static ThemeData _buildCyberpunk(bool isLight, DesignConfig config) {
-    final neonOrange = const Color(0xFFFF6B00);
-    final neonBlue = const Color(0xFF00D4FF);
+    final neonOrange = const Color(0xFF38BDF8);
+    final neonBlue = const Color(0xFF6366F1);
     final darkBase = const Color(0xFF0A0A0F);
 
     final scheme = isLight
@@ -773,7 +774,7 @@ class AppTheme {
             brightness: Brightness.dark,
           ).copyWith(
             primary: goldLight,
-            secondary: const Color(0xFFF4A142),
+            secondary: const Color(0xFF60A5FA),
             surface: const Color(0xFF252220),
             error: const Color(0xFFFC8181),
           );

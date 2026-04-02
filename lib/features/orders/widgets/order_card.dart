@@ -112,12 +112,12 @@ class OrderListCard extends StatelessWidget {
                   children: [
                     _InfoPill(
                       icon: Icons.scale_rounded,
-                      label: '${order.weight}кг',
+                      label: _formatWeight(order.uiWeight),
                     ),
                     const SizedBox(width: 8),
                     _InfoPill(
                       icon: Icons.payments_rounded,
-                      label: _formatPrice(order.price),
+                      label: _formatPrice(order.uiPrice),
                       color: order.isPaid
                           ? const Color(0xFF10B981)
                           : const Color(0xFFF59E0B),
@@ -158,6 +158,11 @@ class OrderListCard extends StatelessWidget {
       return '${(price / 1000).toStringAsFixed(0)}K₮';
     }
     return '${price.toStringAsFixed(0)}₮';
+  }
+
+  String _formatWeight(double weight) {
+    final text = weight.toStringAsFixed(weight >= 10 ? 1 : 2);
+    return '${text.replaceFirst(RegExp(r'\.0+$'), '').replaceFirst(RegExp(r'(\.\d*[1-9])0+$'), r'$1')}кг';
   }
 }
 
@@ -237,7 +242,7 @@ class OrderGridCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    _formatPrice(order.price),
+                    _formatPrice(order.uiPrice),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,

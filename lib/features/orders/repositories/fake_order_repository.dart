@@ -96,6 +96,34 @@ class FakeOrderRepository implements OrderRepository {
   ];
 
   @override
+  Future<Order> createOrder({
+    required String trackingCode,
+    String? productName,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    final normalizedTracking = trackingCode.trim();
+    if (normalizedTracking.isEmpty) {
+      throw Exception('Tracking code is required');
+    }
+
+    final normalizedName = (productName ?? '').trim();
+    final order = Order(
+      id: 'ord-${DateTime.now().millisecondsSinceEpoch}',
+      trackingCode: normalizedTracking,
+      productName: normalizedName.isEmpty
+          ? 'Cargo $normalizedTracking'
+          : normalizedName,
+      status: OrderStatus.pending,
+      createdAt: DateTime.now(),
+      price: 0,
+      weight: 0,
+      isPaid: false,
+    );
+    _orders.insert(0, order);
+    return order;
+  }
+
+  @override
   Future<List<Order>> fetchAll() async {
     await Future.delayed(const Duration(milliseconds: 500));
     return List.from(_orders);
@@ -149,5 +177,15 @@ class FakeOrderRepository implements OrderRepository {
     if (index != -1) {
       _orders[index] = _orders[index].copyWith(status: OrderStatus.transit);
     }
+  }
+
+  @override
+  Future<void> updateStatus(String id, OrderStatus status) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final index = _orders.indexWhere((o) => o.id == id);
+    if (index == -1) {
+      throw Exception('Order not found');
+    }
+    _orders[index] = _orders[index].copyWith(status: status);
   }
 }

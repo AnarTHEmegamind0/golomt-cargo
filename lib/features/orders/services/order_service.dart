@@ -8,6 +8,13 @@ class OrderService {
 
   final OrderRepository _repository;
 
+  Future<Order> createOrder({
+    required String trackingCode,
+    String? productName,
+  }) => _repository.createOrder(
+    trackingCode: trackingCode,
+    productName: productName,
+  );
   Future<List<Order>> fetchAll() => _repository.fetchAll();
   Future<Order?> fetchById(String id) => _repository.fetchById(id);
   Future<List<Order>> fetchByStatus(OrderStatus status) =>
@@ -16,4 +23,6 @@ class OrderService {
   Future<void> delete(String id) => _repository.delete(id);
   Future<void> markAsPaid(String id) => _repository.markAsPaid(id);
   Future<void> requestDelivery(String id) => _repository.requestDelivery(id);
+  Future<void> updateStatus(String id, OrderStatus status) =>
+      _repository.updateStatus(id, status);
 }

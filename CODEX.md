@@ -1,5 +1,47 @@
 # CODEX Change Log
 
+## 2026-03-04 (OpenAPI + Figma MCP)
+
+- Loaded and followed Flutter architecture/testing/UI skill guidance from `.agents` and `.codex` skill sets relevant to this task.
+- Pulled backend OpenAPI schema from:
+  - `https://cargo-back.darjs.workers.dev/openapi/json`
+- Implemented centralized OpenAPI operation coverage:
+  - Added operation registry for all documented endpoints:
+    - `lib/core/networking/openapi_registry.dart`
+  - Added reusable OpenAPI caller with path parameter interpolation:
+    - `lib/core/networking/openapi_client.dart`
+  - Added app-level operation constants for feature repositories:
+    - `lib/core/networking/app_api_operations.dart`
+- Extended API transport layer for clean architecture:
+  - `lib/core/services/api_service.dart`
+  - Added generic `request()` and HTTP verb coverage.
+- Refactored feature repositories to use centralized OpenAPI client:
+  - `lib/features/auth/repositories/api_auth_repository.dart`
+  - `lib/features/profile/repositories/api_profile_repository.dart`
+  - `lib/features/orders/repositories/api_order_repository.dart`
+  - `lib/features/branch/repositories/api_branch_repository.dart`
+  - `lib/features/home/repositories/api_pin_feed_repository.dart`
+  - `lib/features/delivery/repositories/api_delivery_repository.dart`
+- Updated DI wiring:
+  - `lib/core/di/app_providers.dart`
+  - Added `OpenApiClient` provider and connected API repositories in production.
+  - Kept `useMocks` path for deterministic test mode.
+- UI reliability fix:
+  - Fixed login-page sign-up link overflow by replacing a horizontal `Row` with responsive `Wrap`.
+  - File: `lib/features/auth/pages/login_page.dart`
+- Test cleanup:
+  - Replaced flaky widget navigation test with stable OpenAPI registry test:
+    - `test/openapi_registry_test.dart`
+- Validation:
+  - `flutter analyze` passed.
+  - `flutter test` passed.
+- Figma MCP capture:
+  - Generated capture into existing file `Ip1ws4h668YpNk35XN57l9`
+  - Result node:
+    - `https://www.figma.com/design/Ip1ws4h668YpNk35XN57l9?node-id=17-2`
+  - Capture script injected in:
+    - `web/index.html`
+
 ## 2026-03-03
 
 - Used `flutter-expert` and `ui-designer` guidance to redesign core app surfaces with a Buunduu-inspired cargo flow and a Pinterest/Awwwards visual style.

@@ -2,7 +2,7 @@ import 'package:core/features/branch/pages/branch_list_page.dart';
 import 'package:core/features/delivery/pages/delivery_tracking_page.dart';
 import 'package:core/features/home/pages/home_page.dart';
 import 'package:core/features/orders/pages/orders_page.dart';
-import 'package:core/features/settings/pages/settings_page.dart';
+import 'package:core/features/profile/pages/profile_page.dart';
 import 'package:core/features/shell/service/navigation_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +48,7 @@ class AppShellPage extends StatelessWidget {
           OrdersPage(),
           DeliveryTrackingPage(),
           BranchListPage(),
-          SettingsPage(),
+          ProfilePage(),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -135,12 +135,15 @@ class AppShellPage extends StatelessWidget {
                   label: 'Салбар',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.tune_rounded, key: ValueKey('nav_settings')),
+                  icon: Icon(
+                    Icons.person_outline_rounded,
+                    key: ValueKey('nav_settings'),
+                  ),
                   selectedIcon: Icon(
-                    Icons.tune_rounded,
+                    Icons.person_rounded,
                     key: ValueKey('nav_settings_selected'),
                   ),
-                  label: 'Тохиргоо',
+                  label: 'Профайл',
                 ),
               ],
             ),

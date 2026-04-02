@@ -1,3 +1,4 @@
+import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:core/features/profile/providers/profile_provider.dart';
@@ -26,15 +27,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final profile = context.select((ProfileProvider p) => p.profile);
     final isLoading = context.select((ProfileProvider p) => p.isLoading);
     final themeMode = context.select(
       (SettingsProvider p) => p.settings.themeMode,
     );
     final isDarkMode = themeMode == ThemeMode.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
     return CargoBackdrop(
-      light: true,
+      light: !isDark,
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
@@ -53,16 +56,30 @@ class _ProfilePageState extends State<ProfilePage> {
                       height: 118,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(36),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFF0F3F8), Color(0xFFD8DFEA)],
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? const [Color(0xFF1F2F54), Color(0xFF162445)]
+                              : const [
+                                  BrandPalette.white,
+                                  BrandPalette.softBlueBackground,
+                                ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.18)
+                              : BrandPalette.electricBlue.withValues(
+                                  alpha: 0.16,
+                                ),
+                        ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.image_not_supported_rounded,
                         size: 68,
-                        color: Color(0xFF667087),
+                        color: isDark
+                            ? const Color(0xFF8DB4FF)
+                            : BrandPalette.navyBlue,
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -74,16 +91,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 4),
                     Text(
                       profile?.displayName ?? 'Жолооч',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFF555E70),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Оноо : 0',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFF1E2532),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -91,27 +100,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 18),
-              const _MenuTile(
+              _MenuTile(
                 icon: Icons.person_outline_rounded,
                 label: 'Миний мэдээлэл',
               ),
-              const _MenuTile(
-                icon: Icons.local_shipping_outlined,
-                label: 'Хүргэлт',
-              ),
-              const _MenuTile(
-                icon: Icons.location_on_outlined,
-                label: 'Салбарууд',
-              ),
-              const _MenuTile(
-                icon: Icons.emoji_people_outlined,
-                label: 'Бараа очиж авах',
-              ),
-              const _MenuTile(
-                icon: Icons.language_rounded,
-                label: 'Хэл',
-                trailingText: 'Монгол',
-              ),
+              _MenuTile(icon: Icons.local_shipping_outlined, label: 'Хүргэлт'),
+              _MenuTile(icon: Icons.location_on_outlined, label: 'Салбарууд'),
               _SwitchTile(
                 icon: Icons.dark_mode_outlined,
                 label: 'Харанхуй горим',
@@ -122,25 +116,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
-              const _MenuTile(
-                icon: Icons.info_outline_rounded,
-                label: 'Тусламж',
-              ),
-              const _MenuTile(
-                icon: Icons.calculate_outlined,
-                label: 'Тооцоолуур',
-              ),
+              _MenuTile(icon: Icons.info_outline_rounded, label: 'Тусламж'),
+              _MenuTile(icon: Icons.calculate_outlined, label: 'Тооцоолуур'),
               const SizedBox(height: 12),
               TextButton.icon(
                 onPressed: context.read<AuthProvider>().logout,
                 icon: const Icon(
                   Icons.logout_rounded,
-                  color: Color(0xFFEE5A5A),
+                  color: BrandPalette.errorRed,
                 ),
                 label: Text(
                   'Гарах',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: const Color(0xFFEE5A5A),
+                    color: BrandPalette.errorRed,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -162,14 +150,27 @@ class _MenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final tileColor = isDark
+        ? theme.colorScheme.surface.withValues(alpha: 0.86)
+        : BrandPalette.white.withValues(alpha: 0.82);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : BrandPalette.electricBlue.withValues(alpha: 0.14);
+    final iconColor = isDark
+        ? theme.colorScheme.onSurface
+        : BrandPalette.primaryText;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.62),
+        color: tileColor,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
       ),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF1E2532), size: 32),
+        leading: Icon(icon, color: iconColor, size: 30),
         title: Text(
           label,
           style: Theme.of(
@@ -183,7 +184,11 @@ class _MenuTile extends StatelessWidget {
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               )
-            : const Icon(Icons.chevron_right_rounded, size: 36),
+            : const Icon(
+                Icons.chevron_right_rounded,
+                size: 36,
+                color: BrandPalette.electricBlue,
+              ),
       ),
     );
   }
@@ -204,21 +209,39 @@ class _SwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final tileColor = isDark
+        ? theme.colorScheme.surface.withValues(alpha: 0.86)
+        : BrandPalette.white.withValues(alpha: 0.82);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : BrandPalette.electricBlue.withValues(alpha: 0.14);
+    final iconColor = isDark
+        ? theme.colorScheme.onSurface
+        : BrandPalette.primaryText;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.62),
+        color: tileColor,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
       ),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF1E2532), size: 32),
+        leading: Icon(icon, color: iconColor, size: 30),
         title: Text(
           label,
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
-        trailing: Switch.adaptive(value: value, onChanged: onChanged),
+        trailing: Switch.adaptive(
+          value: value,
+          activeThumbColor: BrandPalette.white,
+          activeTrackColor: BrandPalette.electricBlue,
+          onChanged: onChanged,
+        ),
       ),
     );
   }

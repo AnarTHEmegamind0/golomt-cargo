@@ -88,6 +88,28 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  Future<Order?> createOrder({
+    required String trackingCode,
+    String? productName,
+  }) async {
+    _error = null;
+
+    try {
+      final order = await _service.createOrder(
+        trackingCode: trackingCode,
+        productName: productName,
+      );
+      _allOrders = [order, ..._allOrders];
+      _applyFilters();
+      notifyListeners();
+      return order;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return null;
+    }
+  }
+
   Future<void> deleteOrder(String id) async {
     try {
       await _service.delete(id);
@@ -103,12 +125,13 @@ class OrderProvider extends ChangeNotifier {
   Future<void> markAsPaid(String id) async {
     try {
       await _service.markAsPaid(id);
+      final refreshed = await _service.fetchById(id);
       final index = _allOrders.indexWhere((o) => o.id == id);
-      if (index != -1) {
-        _allOrders[index] = _allOrders[index].copyWith(isPaid: true);
-        _applyFilters();
-        notifyListeners();
+      if (index != -1 && refreshed != null) {
+        _allOrders[index] = refreshed;
       }
+      _applyFilters();
+      notifyListeners();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -129,6 +152,23 @@ class OrderProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       notifyListeners();
+    }
+  }
+
+  Future<void> updateStatus(String id, OrderStatus status) async {
+    try {
+      await _service.updateStatus(id, status);
+      final refreshed = await _service.fetchById(id);
+      final index = _allOrders.indexWhere((o) => o.id == id);
+      if (index != -1 && refreshed != null) {
+        _allOrders[index] = refreshed;
+      }
+      _applyFilters();
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
     }
   }
 }

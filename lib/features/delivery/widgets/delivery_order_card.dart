@@ -54,27 +54,36 @@ class _DeliveryOrderCardState extends State<DeliveryOrderCard> {
                     ),
                     child: Stack(
                       children: [
+                        // Decorative circles wrapped in ExcludeSemantics
                         Positioned(
                           right: -16,
                           top: 20,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.18),
+                          child: ExcludeSemantics(
+                            child: IgnorePointer(
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                         Positioned(
                           left: -30,
                           bottom: -30,
-                          child: Container(
-                            width: 130,
-                            height: 130,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.2),
+                          child: ExcludeSemantics(
+                            child: IgnorePointer(
+                              child: Container(
+                                width: 130,
+                                height: 130,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                ),
+                              ),
                             ),
                           ),
                         ),

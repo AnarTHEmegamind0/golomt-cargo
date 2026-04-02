@@ -1,7 +1,7 @@
-import 'package:core/features/auth/providers/auth_provider.dart';
+import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
+import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:core/features/settings/providers/settings_provider.dart';
-import 'package:core/features/settings/widgets/design_version_picker.dart';
 import 'package:core/features/settings/widgets/theme_mode_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,9 +21,6 @@ class _SettingsPageState extends State<SettingsPage> {
     final themeMode = context.select(
       (SettingsProvider p) => p.settings.themeMode,
     );
-    final designVersion = context.select(
-      (SettingsProvider p) => p.settings.designVersion,
-    );
 
     return CargoBackdrop(
       light: true,
@@ -32,14 +29,14 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
           children: [
             Text(
-              'Тохиргоо',
+              'Профайл',
               style: Theme.of(
                 context,
               ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             Text(
-              'Загвар, хүртээмж, болон бүртгэлийн удирдлага.',
+              'Хувийн тохиргоо болон бүртгэлийн удирдлага.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -57,30 +54,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   ThemeModePicker(
                     value: themeMode,
                     onChanged: context.read<SettingsProvider>().setThemeMode,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            _GlassCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Дизайн хувилбар',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '5 өөр дизайн загвараас сонгоно уу.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  DesignVersionPicker(
-                    value: designVersion,
-                    onChanged: context
-                        .read<SettingsProvider>()
-                        .setDesignVersion,
                   ),
                 ],
               ),
@@ -142,9 +115,11 @@ class _GlassCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.62),
+        color: BrandPalette.white.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFDCE0E8)),
+        border: Border.all(
+          color: BrandPalette.electricBlue.withValues(alpha: 0.16),
+        ),
       ),
       child: child,
     );

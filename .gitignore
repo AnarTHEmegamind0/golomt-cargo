@@ -43,3 +43,26 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local agent/tool directories
+.agents/
+.claude/
+.codex/
+
+# Local editor settings
+.vscode/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Signing keys / local Android key config
+*.jks
+*.keystore
+android/key.properties
+
+# Temp merge/tool files
+*.tmp
+*.temp
+*.orig

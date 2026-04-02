@@ -1,5 +1,4 @@
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
-import 'package:core/core/design_system/components/empty_state.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsPage extends StatelessWidget {

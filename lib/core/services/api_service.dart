@@ -10,7 +10,7 @@ class ApiService {
     String path, {
     Map<String, dynamic>? query,
   }) async {
-    return _retry(() => _dio.get(path, queryParameters: query));
+    return request('GET', path, query: query);
   }
 
   Future<Response<dynamic>> post(
@@ -18,7 +18,7 @@ class ApiService {
     dynamic data,
     Map<String, dynamic>? query,
   }) async {
-    return _retry(() => _dio.post(path, data: data, queryParameters: query));
+    return request('POST', path, data: data, query: query);
   }
 
   Future<Response<dynamic>> patch(
@@ -26,7 +26,39 @@ class ApiService {
     dynamic data,
     Map<String, dynamic>? query,
   }) async {
-    return _retry(() => _dio.patch(path, data: data, queryParameters: query));
+    return request('PATCH', path, data: data, query: query);
+  }
+
+  Future<Response<dynamic>> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? query,
+  }) async {
+    return request('PUT', path, data: data, query: query);
+  }
+
+  Future<Response<dynamic>> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? query,
+  }) async {
+    return request('DELETE', path, data: data, query: query);
+  }
+
+  Future<Response<dynamic>> request(
+    String method,
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? query,
+  }) async {
+    return _retry(
+      () => _dio.request(
+        path,
+        data: data,
+        queryParameters: query,
+        options: Options(method: method),
+      ),
+    );
   }
 
   Future<Response<dynamic>> _retry(
