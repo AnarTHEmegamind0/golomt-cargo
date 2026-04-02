@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cargo-back",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-15",
+  "compatibility_flags": ["nodejs_als"],
+  "assets": {
+    "directory": "public"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "elysia-cf-starter-db",
+      "database_id": "2634d9b1-4e1b-48d4-9639-8907005f80b8",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "elysia-cf-starter-bucket"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "62d696ccea4a4616ab628babdb27817e",
+      "preview_id": "57a8d314e6584ffdb07c8ae27b3dac1a"
+    }
+  ]
+}
