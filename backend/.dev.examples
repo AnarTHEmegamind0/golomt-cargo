@@ -1,4 +1,0 @@
-BETTER_AUTH_SECRET=your-auth-secret-token
-CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id
-CLOUDFLARE_DATABASE_ID=your-d1-database-id
-CLOUDFLARE_D1_TOKEN=your-cloudflare-api-token
