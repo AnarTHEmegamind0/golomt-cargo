@@ -17,6 +17,18 @@ import {
 import { withAudience } from "~/lib/openapi";
 import { insertStatusEvent, isCustomer, roleGuard } from "~/routes/_shared/auth";
 
+const cargoSummarySelection = {
+  id: cargo.id,
+  trackingNumber: cargo.trackingNumber,
+  description: cargo.description,
+  status: cargo.status,
+  paymentStatus: cargo.paymentStatus,
+  receivedImageUrl: cargo.receivedImageUrl,
+  customerId: user.id,
+  customerName: user.name,
+  customerEmail: user.email,
+};
+
 const toCargoSummary = (row: any) => ({
   id: row.id,
   trackingNumber: row.trackingNumber,
@@ -24,6 +36,13 @@ const toCargoSummary = (row: any) => ({
   status: row.status,
   paymentStatus: row.paymentStatus,
   receivedImageUrl: row.receivedImageUrl ?? null,
+  customer: row.customerId
+    ? {
+        id: row.customerId,
+        name: row.customerName,
+        email: row.customerEmail,
+      }
+    : null,
 });
 
 const toCargoEvent = (row: any) => ({
@@ -33,6 +52,27 @@ const toCargoEvent = (row: any) => ({
   note: row.note ?? null,
   createdAt: new Date(row.createdAt).toISOString(),
 });
+
+const getPagination = (query: Record<string, any>) => {
+  const page = query.page ?? 1;
+  const limit = query.limit ?? 20;
+  return {
+    page,
+    limit,
+    offset: (page - 1) * limit,
+  };
+};
+
+const toPaginationMeta = (page: number, limit: number, total: number) => ({
+  page,
+  limit,
+  total,
+  totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+});
+
+const normalizedDeliveryPhone = sql<string>`replace(replace(replace(replace(replace(coalesce(${cargo.deliveryPhone}, ''), ' ', ''), '-', ''), '+', ''), '(', ''), ')', '')`;
+
+const normalizePhoneTerm = (value?: string | null) => value?.replace(/[^\d]/g, "") ?? "";
 
 export const customerCargoRoutes = new Elysia()
   .guard(roleGuard(["customer", "admin"]), (app) =>
@@ -65,7 +105,12 @@ export const customerCargoRoutes = new Elysia()
           changedByUserId: authUser.id,
         });
 
-        const [created] = await db.select().from(cargo).where(eq(cargo.id, cargoId)).limit(1);
+        const [created] = await db
+          .select(cargoSummarySelection)
+          .from(cargo)
+          .leftJoin(user, eq(user.id, cargo.customerId))
+          .where(eq(cargo.id, cargoId))
+          .limit(1);
         return {
           message: "Cargo created successfully",
           data: toCargoSummary(created),
@@ -156,6 +201,7 @@ export const customerCargoRoutes = new Elysia()
       .get("/cargos", async (ctx: any) => {
         const { db, authUser, query } = ctx;
         const filters = query ?? {};
+        const { page, limit, offset } = getPagination(filters);
 
         const conditions: any[] = [];
 
@@ -181,15 +227,29 @@ export const customerCargoRoutes = new Elysia()
               ? conditions[0]
               : and(...conditions);
 
+        const [totalRow] = whereClause
+          ? await db
+              .select({ count: sql<number>`count(*)` })
+              .from(cargo)
+              .where(whereClause)
+          : await db.select({ count: sql<number>`count(*)` }).from(cargo);
+
         const queryBuilder = whereClause
-          ? db.select().from(cargo).where(whereClause)
-          : db.select().from(cargo);
+          ? db
+              .select(cargoSummarySelection)
+              .from(cargo)
+              .leftJoin(user, eq(user.id, cargo.customerId))
+              .where(whereClause)
+          : db.select(cargoSummarySelection).from(cargo).leftJoin(user, eq(user.id, cargo.customerId));
 
         return queryBuilder
           .orderBy(desc(cargo.createdAt))
+          .limit(limit)
+          .offset(offset)
           .then((rows: any[]) => ({
             message: "Cargos retrieved successfully",
             data: rows.map(toCargoSummary),
+            meta: toPaginationMeta(page, limit, Number(totalRow?.count ?? 0)),
           }));
       }, {
         detail: withAudience("shared", {
@@ -206,6 +266,9 @@ export const customerCargoRoutes = new Elysia()
         const { db, authUser, query, status } = ctx;
         const filters = query;
         const isAdmin = authUser.role === "admin";
+        const { page, limit, offset } = getPagination(filters);
+        const phoneQuery = normalizePhoneTerm(filters.q);
+        const phoneFilter = normalizePhoneTerm(filters.phone);
 
         if (!isAdmin && (filters.customerName || filters.customerEmail)) {
           return status(403, {
@@ -222,7 +285,8 @@ export const customerCargoRoutes = new Elysia()
           or(
             like(cargo.trackingNumber, `%${filters.q}%`),
             like(sql`coalesce(${cargo.description}, '')`, `%${filters.q}%`),
-            like(sql`coalesce(${cargo.deliveryPhone}, '')`, `%${filters.q}%`)
+            like(sql`coalesce(${cargo.deliveryPhone}, '')`, `%${filters.q}%`),
+            ...(phoneQuery ? [like(normalizedDeliveryPhone, `%${phoneQuery}%`)] : [])
           )
         );
 
@@ -231,7 +295,12 @@ export const customerCargoRoutes = new Elysia()
         }
 
         if (filters.phone) {
-          conditions.push(like(sql`coalesce(${cargo.deliveryPhone}, '')`, `%${filters.phone}%`));
+          conditions.push(
+            or(
+              like(sql`coalesce(${cargo.deliveryPhone}, '')`, `%${filters.phone}%`),
+              ...(phoneFilter ? [like(normalizedDeliveryPhone, `%${phoneFilter}%`)] : [])
+            )
+          );
         }
 
         if (filters.status) conditions.push(eq(cargo.status, filters.status));
@@ -263,6 +332,7 @@ export const customerCargoRoutes = new Elysia()
             return {
               message: "Cargo search completed successfully",
               data: [],
+              meta: toPaginationMeta(page, limit, 0),
             };
           }
 
@@ -271,15 +341,25 @@ export const customerCargoRoutes = new Elysia()
 
         const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions);
 
-        const rows = await db
-          .select()
+        const [totalRow] = await db
+          .select({ count: sql<number>`count(*)` })
           .from(cargo)
+          .leftJoin(user, eq(user.id, cargo.customerId))
+          .where(whereClause);
+
+        const rows = await db
+          .select(cargoSummarySelection)
+          .from(cargo)
+          .leftJoin(user, eq(user.id, cargo.customerId))
           .where(whereClause)
-          .orderBy(desc(cargo.createdAt));
+          .orderBy(desc(cargo.createdAt))
+          .limit(limit)
+          .offset(offset);
 
         return {
           message: "Cargo search completed successfully",
           data: rows.map(toCargoSummary),
+          meta: toPaginationMeta(page, limit, Number(totalRow?.count ?? 0)),
         };
       }, {
         detail: withAudience("shared", {
@@ -374,7 +454,12 @@ export const customerCargoRoutes = new Elysia()
       })
       .get("/cargos/:cargoId", async (ctx: any) => {
         const { params, db, authUser, status } = ctx;
-        const [item] = await db.select().from(cargo).where(eq(cargo.id, params.cargoId)).limit(1);
+        const [item] = await db
+          .select(cargoSummarySelection)
+          .from(cargo)
+          .leftJoin(user, eq(user.id, cargo.customerId))
+          .where(eq(cargo.id, params.cargoId))
+          .limit(1);
         if (!item) return status(404, { message: "Cargo not found" });
 
         if (isCustomer(authUser.role) && item.customerId !== authUser.id) {

@@ -117,6 +117,26 @@ enum FulfillmentType {
 }
 
 /// Cargo model from API
+class CargoCustomerModel {
+  const CargoCustomerModel({
+    required this.id,
+    required this.name,
+    required this.email,
+  });
+
+  final String id;
+  final String name;
+  final String email;
+
+  factory CargoCustomerModel.fromJson(Map<String, dynamic> json) {
+    return CargoCustomerModel(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+    );
+  }
+}
+
 class CargoModel {
   const CargoModel({
     required this.id,
@@ -133,6 +153,7 @@ class CargoModel {
     this.totalFeeMnt,
     this.createdAt,
     this.updatedAt,
+    this.customer,
   });
 
   final String id;
@@ -149,6 +170,7 @@ class CargoModel {
   final int? totalFeeMnt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final CargoCustomerModel? customer;
 
   factory CargoModel.fromJson(Map<String, dynamic> json) {
     return CargoModel(
@@ -173,6 +195,11 @@ class CargoModel {
           : null,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      customer: json['customer'] is Map<String, dynamic>
+          ? CargoCustomerModel.fromJson(
+              json['customer'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
@@ -209,6 +236,7 @@ class CargoModel {
     int? totalFeeMnt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    CargoCustomerModel? customer,
   }) {
     return CargoModel(
       id: id ?? this.id,
@@ -225,6 +253,30 @@ class CargoModel {
       totalFeeMnt: totalFeeMnt ?? this.totalFeeMnt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      customer: customer ?? this.customer,
+    );
+  }
+}
+
+class CargoPaginationMeta {
+  const CargoPaginationMeta({
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.totalPages,
+  });
+
+  final int page;
+  final int limit;
+  final int total;
+  final int totalPages;
+
+  factory CargoPaginationMeta.fromJson(Map<String, dynamic> json) {
+    return CargoPaginationMeta(
+      page: _asInt(json['page']) ?? 1,
+      limit: _asInt(json['limit']) ?? 20,
+      total: _asInt(json['total']) ?? 0,
+      totalPages: _asInt(json['totalPages']) ?? 1,
     );
   }
 }
@@ -279,10 +331,15 @@ class CargoStatsModel {
 
 /// API response wrapper for cargo list
 class CargoListResponse {
-  const CargoListResponse({required this.message, required this.data});
+  const CargoListResponse({
+    required this.message,
+    required this.data,
+    required this.meta,
+  });
 
   final String message;
   final List<CargoModel> data;
+  final CargoPaginationMeta meta;
 
   factory CargoListResponse.fromJson(Map<String, dynamic> json) {
     return CargoListResponse(
@@ -290,6 +347,7 @@ class CargoListResponse {
       data: (json['data'] as List)
           .map((e) => CargoModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      meta: CargoPaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }
 }

@@ -130,7 +130,7 @@ class _AdminCargosPageState extends State<AdminCargosPage>
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Трак код, барааны нэрээр хайх...',
+                  hintText: 'Трак код, утас, барааны нэрээр хайх...',
                   prefixIcon: const Icon(Icons.search_rounded),
                   suffixIcon: Row(
                     mainAxisSize: MainAxisSize.min,

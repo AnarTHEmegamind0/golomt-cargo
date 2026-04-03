@@ -65,6 +65,8 @@ class Order {
     this.deliveredAt,
     this.imageUrl,
     this.isPaid = false,
+    this.customerName,
+    this.customerEmail,
   });
 
   final String id;
@@ -79,6 +81,8 @@ class Order {
   final DateTime? deliveredAt;
   final String? imageUrl;
   final bool isPaid;
+  final String? customerName;
+  final String? customerEmail;
 
   Order copyWith({
     String? trackingCode,
@@ -92,6 +96,8 @@ class Order {
     DateTime? deliveredAt,
     String? imageUrl,
     bool? isPaid,
+    String? customerName,
+    String? customerEmail,
   }) {
     return Order(
       id: id,
@@ -106,6 +112,8 @@ class Order {
       deliveredAt: deliveredAt ?? this.deliveredAt,
       imageUrl: imageUrl ?? this.imageUrl,
       isPaid: isPaid ?? this.isPaid,
+      customerName: customerName ?? this.customerName,
+      customerEmail: customerEmail ?? this.customerEmail,
     );
   }
 

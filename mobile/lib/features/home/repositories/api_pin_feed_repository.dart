@@ -10,6 +10,7 @@ class ApiPinFeedRepository implements PinFeedRepository {
     : _openApiClient = openApiClient;
 
   final OpenApiClient _openApiClient;
+  static const int _pageSize = 100;
 
   static const _statusColorMap = <String, List<Color>>{
     'CREATED': [Color(0xFFF08A1A), Color(0xFFE85D04)],
@@ -26,10 +27,7 @@ class ApiPinFeedRepository implements PinFeedRepository {
   @override
   Future<List<PinItem>> fetchPins() async {
     try {
-      final response = await _openApiClient.call(AppApiOperations.listCargos);
-      final body = asJsonMap(response.data, context: 'cargo list response');
-      final items = asJsonMapList(body['data'], context: 'cargo list data');
-
+      final items = await _fetchAllCargoItems();
       return items.map(_mapCargoToPin).toList();
     } catch (error) {
       throw Exception(extractApiErrorMessage(error));
@@ -59,5 +57,28 @@ class ApiPinFeedRepository implements PinFeedRepository {
       primaryColor: colors.first,
       secondaryColor: colors.last,
     );
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAllCargoItems() async {
+    final items = <Map<String, dynamic>>[];
+    var page = 1;
+
+    while (true) {
+      final response = await _openApiClient.call(
+        AppApiOperations.listCargos,
+        query: {'page': page, 'limit': _pageSize},
+      );
+      final body = asJsonMap(response.data, context: 'cargo list response');
+      items.addAll(asJsonMapList(body['data'], context: 'cargo list data'));
+
+      final meta = asPaginationMeta(body['meta'], context: 'cargo list meta');
+      if (meta == null || page >= meta.totalPages) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return items;
   }
 }

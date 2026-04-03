@@ -56,6 +56,8 @@ export const createBatchPaymentSchema = t.Object({
 });
 
 export const cargoListQuerySchema = t.Object({
+  page: t.Optional(t.Integer({ minimum: 1 })),
+  limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
   status: t.Optional(
     t.Union(cargoStatuses.map((status) => t.Literal(status)) as [any, ...any[]])
   ),
@@ -70,6 +72,8 @@ export const cargoListQuerySchema = t.Object({
 
 export const cargoSearchQuerySchema = t.Object({
   q: t.String({ minLength: 1, maxLength: 128 }),
+  page: t.Optional(t.Integer({ minimum: 1 })),
+  limit: t.Optional(t.Integer({ minimum: 1, maximum: 100 })),
   trackingNumber: t.Optional(t.String({ minLength: 1, maxLength: 128 })),
   phone: t.Optional(t.String({ minLength: 1, maxLength: 30 })),
   customerName: t.Optional(t.String({ minLength: 1, maxLength: 120 })),
@@ -111,9 +115,23 @@ export const cargoSummarySchema = t.Object({
   status: t.String(),
   paymentStatus: t.String(),
   receivedImageUrl: t.Nullable(t.String()),
+  customer: t.Nullable(
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+      email: t.String(),
+    })
+  ),
 });
 
 export const cargoSummaryListSchema = t.Array(cargoSummarySchema);
+
+export const paginationMetaSchema = t.Object({
+  page: t.Number(),
+  limit: t.Number(),
+  total: t.Number(),
+  totalPages: t.Number(),
+});
 
 export const cargoEventSchema = t.Object({
   id: t.String(),
@@ -184,6 +202,7 @@ export const cargoResponseEnvelopeSchema = t.Object({
 export const cargoListResponseEnvelopeSchema = t.Object({
   message: t.String(),
   data: cargoSummaryListSchema,
+  meta: paginationMetaSchema,
 });
 
 export const cargoEventsResponseEnvelopeSchema = t.Object({

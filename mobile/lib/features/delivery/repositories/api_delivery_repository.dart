@@ -12,6 +12,7 @@ class ApiDeliveryRepository implements DeliveryRepository {
   final OpenApiClient _openApiClient;
   final Map<String, DeliveryStep> _stepOverrides = {};
   final Map<String, String> _proofOverrides = {};
+  static const int _pageSize = 100;
 
   static const _palette = [
     [Color(0xFF8F3F3A), Color(0xFFD79F84)],
@@ -25,10 +26,7 @@ class ApiDeliveryRepository implements DeliveryRepository {
   @override
   Future<List<DeliveryOrder>> fetchActiveOrders() async {
     try {
-      final response = await _openApiClient.call(AppApiOperations.listCargos);
-      final body = asJsonMap(response.data, context: 'cargo list response');
-      final items = asJsonMapList(body['data'], context: 'cargo list data');
-
+      final items = await _fetchAllCargoItems();
       final orders = items.map(_mapCargoToDeliveryOrder).toList();
       return orders
           .where((order) => order.step != DeliveryStep.completed)
@@ -104,10 +102,14 @@ class ApiDeliveryRepository implements DeliveryRepository {
     final remoteStep = _mapDeliveryStep(status);
     final step = _stepOverrides[safeId] ?? remoteStep;
 
+    final customer = json['customer'] is Map<String, dynamic>
+        ? json['customer'] as Map<String, dynamic>
+        : null;
+
     return DeliveryOrder(
       id: safeId,
       restaurantName: description.isEmpty ? 'Cargo $tracking' : description,
-      customerName: 'Хэрэглэгч',
+      customerName: _safeText(customer?['name'], fallback: 'Хэрэглэгч'),
       deliveryAddress: _safeText(
         json['deliveryAddress'],
         fallback: 'Хаяг оруулаагүй',
@@ -160,5 +162,28 @@ class ApiDeliveryRepository implements DeliveryRepository {
       return double.tryParse(raw) ?? 0;
     }
     return 0;
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAllCargoItems() async {
+    final items = <Map<String, dynamic>>[];
+    var page = 1;
+
+    while (true) {
+      final response = await _openApiClient.call(
+        AppApiOperations.listCargos,
+        query: {'page': page, 'limit': _pageSize},
+      );
+      final body = asJsonMap(response.data, context: 'cargo list response');
+      items.addAll(asJsonMapList(body['data'], context: 'cargo list data'));
+
+      final meta = asPaginationMeta(body['meta'], context: 'cargo list meta');
+      if (meta == null || page >= meta.totalPages) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return items;
   }
 }

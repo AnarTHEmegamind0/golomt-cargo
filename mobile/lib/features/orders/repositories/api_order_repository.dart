@@ -11,6 +11,7 @@ class ApiOrderRepository implements OrderRepository {
 
   final OpenApiClient _openApiClient;
   List<Order> _cache = const [];
+  static const int _pageSize = 100;
 
   @override
   Future<Order> createOrder({
@@ -59,8 +60,7 @@ class ApiOrderRepository implements OrderRepository {
   @override
   Future<List<Order>> fetchAll() async {
     try {
-      final response = await _openApiClient.call(AppApiOperations.listCargos);
-      final orders = _parseOrders(response.data);
+      final orders = await _fetchAllOrders();
       _cache = orders;
       return orders;
     } catch (error) {
@@ -96,22 +96,12 @@ class ApiOrderRepository implements OrderRepository {
       return source.where((order) => order.status == status).toList();
     }
 
-    final futures = statuses
-        .map(
-          (apiStatus) => _openApiClient.call(
-            AppApiOperations.listCargos,
-            query: {'status': apiStatus},
-          ),
-        )
-        .toList();
-
     try {
-      final responses = await Future.wait(futures);
       final merged = <Order>[];
       final byId = <String>{};
 
-      for (final response in responses) {
-        final parsed = _parseOrders(response.data);
+      for (final apiStatus in statuses) {
+        final parsed = await _fetchAllOrders(query: {'status': apiStatus});
         for (final order in parsed) {
           if (byId.add(order.id)) {
             merged.add(order);
@@ -134,11 +124,10 @@ class ApiOrderRepository implements OrderRepository {
     }
 
     try {
-      final response = await _openApiClient.call(
-        AppApiOperations.searchCargos,
+      final orders = await _fetchAllOrders(
         query: {'q': normalized},
+        search: true,
       );
-      final orders = _parseOrders(response.data);
       _cache = orders;
       return orders;
     } catch (error) {
@@ -215,10 +204,32 @@ class ApiOrderRepository implements OrderRepository {
     }
   }
 
-  List<Order> _parseOrders(dynamic raw) {
-    final body = asJsonMap(raw, context: 'cargo list response');
-    final items = asJsonMapList(body['data'], context: 'cargo list data');
-    return items.map(_mapCargoToOrder).toList();
+  Future<List<Order>> _fetchAllOrders({
+    Map<String, dynamic>? query,
+    bool search = false,
+  }) async {
+    final orders = <Order>[];
+    var page = 1;
+
+    while (true) {
+      final response = await _openApiClient.call(
+        search ? AppApiOperations.searchCargos : AppApiOperations.listCargos,
+        query: {...?query, 'page': page, 'limit': _pageSize},
+      );
+
+      final body = asJsonMap(response.data, context: 'cargo list response');
+      final items = asJsonMapList(body['data'], context: 'cargo list data');
+      orders.addAll(items.map(_mapCargoToOrder));
+
+      final meta = asPaginationMeta(body['meta'], context: 'cargo list meta');
+      if (meta == null || page >= meta.totalPages) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return orders;
   }
 
   Order _mapCargoToOrder(Map<String, dynamic> json) {
@@ -228,6 +239,9 @@ class ApiOrderRepository implements OrderRepository {
     final statusRaw = ((json['status'] as String?) ?? '').trim();
     final paymentStatusRaw = ((json['paymentStatus'] as String?) ?? '').trim();
     final receivedImage = ((json['receivedImageUrl'] as String?) ?? '').trim();
+    final customer = json['customer'] is Map<String, dynamic>
+        ? json['customer'] as Map<String, dynamic>
+        : null;
 
     final weightGrams = _toDouble(json['weightGrams']);
     final totalFeeMnt = _toDouble(json['totalFeeMnt']);
@@ -248,6 +262,8 @@ class ApiOrderRepository implements OrderRepository {
       deliveredAt: deliveredAt,
       imageUrl: receivedImage.isEmpty ? null : receivedImage,
       isPaid: paymentStatusRaw == 'PAID',
+      customerName: (customer?['name'] as String?)?.trim(),
+      customerEmail: (customer?['email'] as String?)?.trim(),
     );
   }
 

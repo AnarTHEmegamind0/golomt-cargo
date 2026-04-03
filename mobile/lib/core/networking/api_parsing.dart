@@ -2,6 +2,29 @@ import 'package:dio/dio.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
+class PaginationMeta {
+  const PaginationMeta({
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.totalPages,
+  });
+
+  final int page;
+  final int limit;
+  final int total;
+  final int totalPages;
+
+  factory PaginationMeta.fromJson(Map<String, dynamic> json) {
+    return PaginationMeta(
+      page: _asInt(json['page']) ?? 1,
+      limit: _asInt(json['limit']) ?? 20,
+      total: _asInt(json['total']) ?? 0,
+      totalPages: _asInt(json['totalPages']) ?? 1,
+    );
+  }
+}
+
 String extractApiErrorMessage(Object error) {
   if (error is DioException) {
     final data = error.response?.data;
@@ -38,4 +61,23 @@ List<JsonMap> asJsonMapList(dynamic raw, {required String context}) {
       .whereType<Map>()
       .map((entry) => Map<String, dynamic>.from(entry))
       .toList();
+}
+
+PaginationMeta? asPaginationMeta(dynamic raw, {required String context}) {
+  if (raw == null) {
+    return null;
+  }
+
+  if (raw is Map<String, dynamic>) {
+    return PaginationMeta.fromJson(raw);
+  }
+
+  throw FormatException('Expected object for $context');
+}
+
+int? _asInt(dynamic raw) {
+  if (raw is int) return raw;
+  if (raw is num) return raw.toInt();
+  if (raw is String) return int.tryParse(raw);
+  return null;
 }

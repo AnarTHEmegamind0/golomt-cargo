@@ -120,6 +120,27 @@ class AdminCargoCard extends StatelessWidget {
 
           const SizedBox(height: 14),
 
+          if ((cargo.customerName ?? '').isNotEmpty ||
+              (cargo.customerEmail ?? '').isNotEmpty) ...[
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                if ((cargo.customerName ?? '').isNotEmpty)
+                  _InfoChip(
+                    icon: Icons.person_outline_rounded,
+                    label: cargo.customerName!,
+                  ),
+                if ((cargo.customerEmail ?? '').isNotEmpty)
+                  _InfoChip(
+                    icon: Icons.alternate_email_rounded,
+                    label: cargo.customerEmail!,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 14),
+          ],
+
           // Action buttons based on status
           _buildActionButtons(context),
 

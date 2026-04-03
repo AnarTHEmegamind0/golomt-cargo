@@ -29,6 +29,8 @@ class CargoApiRepository {
     PaymentStatus? paymentStatus,
     FulfillmentType? fulfillmentType,
     String? trackingNumber,
+    int? page,
+    int? limit,
   }) async {
     final queryParams = <String, dynamic>{};
     if (status != null) {
@@ -42,6 +44,12 @@ class CargoApiRepository {
     }
     if (trackingNumber != null) {
       queryParams['trackingNumber'] = trackingNumber;
+    }
+    if (page != null) {
+      queryParams['page'] = page;
+    }
+    if (limit != null) {
+      queryParams['limit'] = limit;
     }
 
     return _apiClient.get(
@@ -66,6 +74,8 @@ class CargoApiRepository {
     CargoStatus? status,
     PaymentStatus? paymentStatus,
     FulfillmentType? fulfillmentType,
+    int? page,
+    int? limit,
   }) async {
     final queryParams = <String, dynamic>{'q': query};
     if (status != null) {
@@ -76,6 +86,12 @@ class CargoApiRepository {
     }
     if (fulfillmentType != null) {
       queryParams['fulfillmentType'] = fulfillmentType.value;
+    }
+    if (page != null) {
+      queryParams['page'] = page;
+    }
+    if (limit != null) {
+      queryParams['limit'] = limit;
     }
 
     return _apiClient.get(
