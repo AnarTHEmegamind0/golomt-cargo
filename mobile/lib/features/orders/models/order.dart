@@ -1,3 +1,4 @@
+import 'package:core/core/assets/ship_assets.dart';
 import 'package:flutter/material.dart';
 
 /// Order status enum
@@ -46,6 +47,21 @@ extension OrderStatusExtension on OrderStatus {
         return Icons.check_circle_rounded;
       case OrderStatus.cancelled:
         return Icons.cancel_rounded;
+    }
+  }
+
+  String get shipAsset {
+    switch (this) {
+      case OrderStatus.pending:
+        return ShipAssets.clockAndHome;
+      case OrderStatus.processing:
+        return ShipAssets.delivery;
+      case OrderStatus.transit:
+        return ShipAssets.truck;
+      case OrderStatus.delivered:
+        return ShipAssets.mailArrivedAndHand;
+      case OrderStatus.cancelled:
+        return ShipAssets.packageReturn;
     }
   }
 }

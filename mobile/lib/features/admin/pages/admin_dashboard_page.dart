@@ -1,3 +1,5 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/features/admin/providers/admin_cargos_provider.dart';
 import 'package:core/features/admin/providers/admin_users_provider.dart';
@@ -55,8 +57,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           const SizedBox(height: 20),
 
           // User stats
-          _UserStatsSection(),
-          const SizedBox(height: 16),
+          // _UserStatsSection(),
+          // const SizedBox(height: 16),
 
           // Cargo stats
           _CargoStatsSection(),
@@ -103,7 +105,7 @@ class _UserStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Нийт',
                 value: users.length.toString(),
-                icon: Icons.people_rounded,
+                assetPath: ShipAssets.manDeliveringPackage,
                 color: BrandPalette.electricBlue,
               ),
             ),
@@ -112,7 +114,7 @@ class _UserStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Админ',
                 value: adminCount.toString(),
-                icon: Icons.admin_panel_settings_rounded,
+                assetPath: ShipAssets.handWithCare,
                 color: BrandPalette.logoOrange,
               ),
             ),
@@ -125,7 +127,7 @@ class _UserStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Хэрэглэгч',
                 value: customerCount.toString(),
-                icon: Icons.person_rounded,
+                assetPath: ShipAssets.basket,
                 color: BrandPalette.navyBlue,
               ),
             ),
@@ -134,7 +136,7 @@ class _UserStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Хориглогдсон',
                 value: bannedCount.toString(),
-                icon: Icons.block_rounded,
+                assetPath: ShipAssets.boxReturn,
                 color: BrandPalette.errorRed,
               ),
             ),
@@ -185,7 +187,7 @@ class _CargoStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Хүлээгдэж буй',
                 value: pendingCount.toString(),
-                icon: Icons.schedule_rounded,
+                assetPath: ShipAssets.clockAndHome,
                 color: const Color(0xFFFBBF24),
               ),
             ),
@@ -194,7 +196,7 @@ class _CargoStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Боловсруулж буй',
                 value: processingCount.toString(),
-                icon: Icons.inventory_2_rounded,
+                assetPath: ShipAssets.delivery,
                 color: const Color(0xFF8B5CF6),
               ),
             ),
@@ -207,7 +209,7 @@ class _CargoStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Тээвэрлэж буй',
                 value: transitCount.toString(),
-                icon: Icons.local_shipping_rounded,
+                assetPath: ShipAssets.truck,
                 color: BrandPalette.electricBlue,
               ),
             ),
@@ -216,7 +218,7 @@ class _CargoStatsSection extends StatelessWidget {
               child: AdminStatCard(
                 title: 'Хүргэгдсэн',
                 value: deliveredCount.toString(),
-                icon: Icons.check_circle_rounded,
+                assetPath: ShipAssets.mailArrivedAndHand,
                 color: BrandPalette.successGreen,
               ),
             ),
@@ -239,7 +241,7 @@ class _RecentActivitySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Сүүлийн бараанууд',
+          'Сүүлийн каргонууд',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: BrandPalette.primaryText,
@@ -293,7 +295,11 @@ class _RecentCargoTile extends StatelessWidget {
               color: cargo.status.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(cargo.status.icon, color: cargo.status.color, size: 18),
+            child: ShipIcon(
+              cargo.status.shipAsset,
+              color: cargo.status.color,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

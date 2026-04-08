@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/features/orders/models/order.dart';
+import 'package:flutter/material.dart';
 
 /// Order list card
 class OrderListCard extends StatelessWidget {
@@ -73,8 +74,8 @@ class OrderListCard extends StatelessWidget {
                         color: order.status.color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        order.status.icon,
+                      child: ShipIcon(
+                        order.status.shipAsset,
                         color: order.status.color,
                         size: 22,
                       ),
@@ -184,8 +185,8 @@ class OrderGridCard extends StatelessWidget {
                       color: order.status.color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      order.status.icon,
+                    child: ShipIcon(
+                      order.status.shipAsset,
                       color: order.status.color,
                       size: 20,
                     ),

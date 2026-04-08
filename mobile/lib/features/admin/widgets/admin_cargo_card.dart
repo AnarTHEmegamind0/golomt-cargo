@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/features/orders/models/order.dart';
 import 'package:flutter/material.dart';
@@ -57,8 +58,8 @@ class AdminCargoCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Icon(
-                    cargo.status.icon,
+                  child: ShipIcon(
+                    cargo.status.shipAsset,
                     color: cargo.status.color,
                     size: 22,
                   ),

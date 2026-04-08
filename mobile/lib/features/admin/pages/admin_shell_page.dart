@@ -1,3 +1,5 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/features/admin/pages/admin_cargos_page.dart';
@@ -49,8 +51,8 @@ class _AdminShellPageState extends State<AdminShellPage> {
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
-                            Icons.admin_panel_settings_rounded,
+                          child: const ShipIcon(
+                            ShipAssets.handWithCare,
                             color: BrandPalette.electricBlue,
                             size: 24,
                           ),
@@ -108,19 +110,19 @@ class _AdminShellPageState extends State<AdminShellPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavItem(
-                  icon: Icons.dashboard_rounded,
+                  assetPath: ShipAssets.clockAndHome,
                   label: 'Тойм',
                   isSelected: _currentIndex == 0,
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
-                  icon: Icons.people_rounded,
+                  assetPath: ShipAssets.manDeliveringPackage,
                   label: 'Хэрэглэгчид',
                   isSelected: _currentIndex == 1,
                   onTap: () => setState(() => _currentIndex = 1),
                 ),
                 _NavItem(
-                  icon: Icons.inventory_2_rounded,
+                  assetPath: ShipAssets.boxReturn,
                   label: 'Бараа',
                   isSelected: _currentIndex == 2,
                   onTap: () => setState(() => _currentIndex = 2),
@@ -136,13 +138,13 @@ class _AdminShellPageState extends State<AdminShellPage> {
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
-    required this.icon,
+    required this.assetPath,
     required this.label,
     required this.isSelected,
     required this.onTap,
   });
 
-  final IconData icon;
+  final String assetPath;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
@@ -164,8 +166,8 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
+            ShipIcon(
+              assetPath,
               color: isSelected
                   ? BrandPalette.electricBlue
                   : BrandPalette.mutedText,

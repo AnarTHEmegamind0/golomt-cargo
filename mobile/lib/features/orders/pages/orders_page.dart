@@ -1,3 +1,4 @@
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/design_system/components/app_search_bar.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/core/design_system/components/empty_state.dart';
@@ -502,8 +503,8 @@ class _OrderDetailSheet extends StatelessWidget {
                     color: order.status.color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    order.status.icon,
+                  child: ShipIcon(
+                    order.status.shipAsset,
                     color: order.status.color,
                     size: 28,
                   ),

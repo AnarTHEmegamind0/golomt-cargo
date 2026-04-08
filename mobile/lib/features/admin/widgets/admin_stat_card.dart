@@ -1,3 +1,4 @@
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:flutter/material.dart';
 
@@ -7,15 +8,17 @@ class AdminStatCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.value,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     this.color,
     this.subtitle,
     this.onTap,
-  });
+  }) : assert(icon != null || assetPath != null);
 
   final String title;
   final String value;
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final Color? color;
   final String? subtitle;
   final VoidCallback? onTap;
@@ -51,7 +54,9 @@ class AdminStatCard extends StatelessWidget {
                     color: cardColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: cardColor, size: 22),
+                  child: assetPath != null
+                      ? ShipIcon(assetPath!, size: 22, color: cardColor)
+                      : Icon(icon, color: cardColor, size: 22),
                 ),
                 const Spacer(),
                 if (onTap != null)
