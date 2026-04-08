@@ -15,16 +15,11 @@ import 'package:core/features/branch/repositories/api_branch_repository.dart';
 import 'package:core/features/branch/repositories/branch_repository.dart';
 import 'package:core/features/branch/repositories/fake_branch_repository.dart';
 import 'package:core/features/branch/services/branch_service.dart';
-import 'package:core/features/delivery/providers/chat_provider.dart';
 import 'package:core/features/delivery/providers/delivery_provider.dart';
-import 'package:core/features/delivery/providers/driver_notification_provider.dart';
 import 'package:core/features/delivery/repositories/api_delivery_repository.dart';
 import 'package:core/features/delivery/repositories/delivery_repository.dart';
 import 'package:core/features/delivery/repositories/fake_delivery_repository.dart';
-import 'package:core/features/delivery/services/chat_service.dart';
 import 'package:core/features/delivery/services/delivery_service.dart';
-import 'package:core/features/delivery/services/earning_service.dart';
-import 'package:core/features/delivery/services/location_service.dart';
 import 'package:core/features/orders/providers/order_provider.dart';
 import 'package:core/features/orders/repositories/api_order_repository.dart';
 import 'package:core/features/orders/repositories/fake_order_repository.dart';
@@ -107,20 +102,11 @@ class AppProviders {
       Provider<DeliveryService>(
         create: (context) => DeliveryService(repository: context.read()),
       ),
-      Provider<LocationService>(create: (_) => LocationService()),
-      Provider<EarningService>(create: (_) => const EarningService()),
-      Provider<ChatService>(
-        create: (_) => ChatService(),
-        dispose: (_, service) => service.dispose(),
-      ),
       ChangeNotifierProvider<DeliveryProvider>(
-        create: (context) => DeliveryProvider(service: context.read()),
-      ),
-      ChangeNotifierProvider<DriverNotificationProvider>(
-        create: (_) => DriverNotificationProvider(),
-      ),
-      ChangeNotifierProvider<ChatProvider>(
-        create: (context) => ChatProvider(chatService: context.read()),
+        create: (context) => DeliveryProvider(
+          service: context.read(),
+          customerIdResolver: () => context.read<AuthProvider>().user?.id,
+        ),
       ),
 
       // Orders
@@ -133,7 +119,10 @@ class AppProviders {
         create: (context) => OrderService(repository: context.read()),
       ),
       ChangeNotifierProvider<OrderProvider>(
-        create: (context) => OrderProvider(service: context.read()),
+        create: (context) => OrderProvider(
+          service: context.read(),
+          customerIdResolver: () => context.read<AuthProvider>().user?.id,
+        ),
       ),
 
       // Branch

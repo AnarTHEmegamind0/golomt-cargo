@@ -37,7 +37,7 @@ abstract interface class AdminRepository {
   Future<void> unbanUser(String userId);
 
   // Cargo management
-  Future<void> receiveCargo({required String cargoId, String? imageBase64});
+  Future<void> receiveCargo({required String cargoId, String? imagePath});
 
   Future<void> recordCargoWeight({
     required String cargoId,

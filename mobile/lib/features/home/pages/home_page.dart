@@ -1,11 +1,14 @@
 import 'package:core/core/animations/page_transitions.dart';
+import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/app_card.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
-import 'package:core/core/design_system/components/icon_badge.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
+import 'package:core/features/address/pages/address_page.dart';
 import 'package:core/features/notifications/pages/notifications_page.dart';
+import 'package:core/features/delivery/providers/delivery_provider.dart';
 import 'package:core/features/orders/providers/order_provider.dart';
+import 'package:core/features/profile/providers/profile_provider.dart';
 import 'package:core/features/shell/service/navigation_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +27,9 @@ class _HomePageState extends State<HomePage> {
     // Load orders data for statistics
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OrderProvider>().load();
+      context.read<DeliveryProvider>().load();
+      context.read<DeliveryProvider>().loadEligibleCargos();
+      context.read<ProfileProvider>().load();
     });
   }
 
@@ -112,39 +118,9 @@ class _TopBar extends StatelessWidget {
             ],
           ),
         ),
-        Stack(
-          children: [
-            IconButton.filledTonal(
-              onPressed: onNotificationsTap,
-              style: IconButton.styleFrom(
-                backgroundColor: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.92),
-                foregroundColor: isDark
-                    ? const Color(0xFFE8ECF4)
-                    : const Color(0xFF1E2638),
-              ),
-              icon: const Icon(Icons.notifications_rounded),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: ExcludeSemantics(
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF1A2234) : Colors.white,
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+        IconButton(
+          onPressed: onNotificationsTap,
+          icon: Image.asset(ShipAssets.bell, width: 32, height: 32),
         ),
       ],
     );
@@ -296,45 +272,37 @@ class _WorkflowGrid extends StatelessWidget {
 
     final workflows = [
       _WorkflowData(
-        icon: Icons.storefront_rounded,
-        title: 'Салбар сонгох',
-        color: const Color(0xFF8B5CF6),
-        step: 1,
+        assetPath: ShipAssets.locationMaps,
+        title: 'Салбар',
         onTap: () => navController.setIndex(3), // Branch tab
       ),
       _WorkflowData(
-        icon: Icons.qr_code_scanner_rounded,
-        title: 'Трак код бүртгэх',
-        color: const Color(0xFF3B82F6),
-        step: 2,
+        assetPath: ShipAssets.basket,
+        title: 'Трак код',
         onTap: () => navController.setIndex(1), // Orders tab
       ),
       _WorkflowData(
-        icon: Icons.payment_rounded,
-        title: 'Төлбөр төлөх',
-        color: const Color(0xFF10B981),
-        step: 3,
-        onTap: () => navController.setIndex(1), // Orders tab (pay from there)
+        assetPath: ShipAssets.clockAndHome,
+        title: 'Хаяг',
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(PageTransitions.slideFade(const AddressPage()));
+        },
       ),
       _WorkflowData(
-        icon: Icons.local_shipping_rounded,
-        title: 'Хүргэлт захиалах',
-        color: const Color(0xFFF59E0B),
-        step: 4,
+        assetPath: ShipAssets.truck,
+        title: 'Хүргэлт',
         onTap: () => navController.setIndex(2), // Delivery tab
       ),
       _WorkflowData(
-        icon: Icons.check_circle_rounded,
+        assetPath: ShipAssets.handWithCare,
         title: 'Заавар',
-        color: const Color(0xFFEC4899),
-        step: 5,
         onTap: () => navController.setIndex(2), // Delivery tab
       ),
       _WorkflowData(
-        icon: Icons.support_agent_rounded,
+        assetPath: ShipAssets.manDeliveringPackage,
         title: 'Тусламж',
-        color: const Color(0xFF06B6D4),
-        step: 6,
         onTap: () => _showSupportDialog(context),
       ),
     ];
@@ -342,25 +310,23 @@ class _WorkflowGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 360;
-        final crossAxisCount = isNarrow ? 2 : 3;
+        final crossAxisCount = isNarrow ? 3 : 6;
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            mainAxisExtent: 112,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            mainAxisExtent: 90,
           ),
           itemCount: workflows.length,
           itemBuilder: (context, index) {
             final workflow = workflows[index];
-            return WorkflowIconItem(
-              icon: workflow.icon,
+            return _CompactWorkflowItem(
+              assetPath: workflow.assetPath!,
               title: workflow.title,
-              subtitle: '0${workflow.step}',
-              color: workflow.color,
               onTap: workflow.onTap,
             );
           },
@@ -410,18 +376,89 @@ class _WorkflowGrid extends StatelessWidget {
 
 class _WorkflowData {
   const _WorkflowData({
-    required this.icon,
+    this.icon,
+    this.assetPath,
     required this.title,
-    required this.color,
-    required this.step,
+    required this.onTap,
+  }) : assert(
+         icon != null || assetPath != null,
+         'Either icon or assetPath must be provided',
+       );
+
+  final IconData? icon;
+  final String? assetPath;
+  final String title;
+  final VoidCallback onTap;
+}
+
+class _CompactWorkflowItem extends StatelessWidget {
+  const _CompactWorkflowItem({
+    required this.assetPath,
+    required this.title,
     required this.onTap,
   });
 
-  final IconData icon;
+  final String assetPath;
   final String title;
-  final Color color;
-  final int step;
   final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.white.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : const Color(0xFFE4E8EE),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                assetPath,
+                width: 40,
+                height: 40,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.broken_image_outlined,
+                  size: 40,
+                  color: primaryColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? const Color(0xFFE8ECF4)
+                      : const Color(0xFF293247),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _StatsRow extends StatelessWidget {

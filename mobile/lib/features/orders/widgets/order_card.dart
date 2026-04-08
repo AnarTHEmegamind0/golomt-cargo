@@ -10,6 +10,7 @@ class OrderListCard extends StatelessWidget {
     this.onDelete,
     this.onPay,
     this.onRequestDelivery,
+    this.isPaying = false,
   });
 
   final Order order;
@@ -17,6 +18,7 @@ class OrderListCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onPay;
   final VoidCallback? onRequestDelivery;
+  final bool isPaying;
 
   @override
   Widget build(BuildContext context) {
@@ -112,35 +114,19 @@ class OrderListCard extends StatelessWidget {
                   children: [
                     _InfoPill(
                       icon: Icons.scale_rounded,
-                      label: _formatWeight(order.uiWeight),
-                    ),
-                    const SizedBox(width: 8),
-                    _InfoPill(
-                      icon: Icons.payments_rounded,
-                      label: _formatPrice(order.uiPrice),
-                      color: order.isPaid
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFF59E0B),
+                      label: order.hasWeight
+                          ? _formatWeight(order.uiWeight)
+                          : '-кг',
                     ),
                     const Spacer(),
-                    if (!order.isPaid && onPay != null)
-                      _ActionButton(
-                        label: 'Төлөх',
-                        icon: Icons.payment_rounded,
-                        color: const Color(0xFF10B981),
-                        onTap: onPay,
-                      ),
-                    if (order.isPaid &&
-                        order.status == OrderStatus.processing &&
-                        onRequestDelivery != null) ...[
-                      const SizedBox(width: 8),
+                    if (order.status == OrderStatus.processing &&
+                        onRequestDelivery != null)
                       _ActionButton(
                         label: 'Хүргүүлэх',
                         icon: Icons.local_shipping_rounded,
                         color: Theme.of(context).colorScheme.primary,
                         onTap: onRequestDelivery,
                       ),
-                    ],
                   ],
                 ),
               ],
@@ -149,15 +135,6 @@ class OrderListCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    if (price >= 1000000) {
-      return '${(price / 1000000).toStringAsFixed(1)}M₮';
-    } else if (price >= 1000) {
-      return '${(price / 1000).toStringAsFixed(0)}K₮';
-    }
-    return '${price.toStringAsFixed(0)}₮';
   }
 
   String _formatWeight(double weight) {
@@ -242,22 +219,13 @@ class OrderGridCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    _formatPrice(order.uiPrice),
+                    order.status.label,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: order.isPaid
-                          ? const Color(0xFF10B981)
-                          : Theme.of(context).colorScheme.primary,
+                      color: order.status.color,
                     ),
                   ),
-                  const Spacer(),
-                  if (order.isPaid)
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      size: 16,
-                      color: Color(0xFF10B981),
-                    ),
                 ],
               ),
             ],
@@ -265,15 +233,6 @@ class OrderGridCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatPrice(double price) {
-    if (price >= 1000000) {
-      return '${(price / 1000000).toStringAsFixed(1)}M₮';
-    } else if (price >= 1000) {
-      return '${(price / 1000).toStringAsFixed(0)}K₮';
-    }
-    return '${price.toStringAsFixed(0)}₮';
   }
 }
 
@@ -350,12 +309,14 @@ class _ActionButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String label;
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -375,14 +336,24 @@ class _ActionButton extends StatelessWidget {
             children: [
               Icon(icon, size: 14, color: color),
               const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: color,
+              if (isLoading)
+                SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(color),
+                  ),
+                )
+              else
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
-              ),
             ],
           ),
         ),

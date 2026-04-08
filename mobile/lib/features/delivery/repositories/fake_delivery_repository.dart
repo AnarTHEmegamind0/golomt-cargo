@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:core/features/delivery/models/delivery_candidate.dart';
 import 'package:core/features/delivery/models/delivery_order.dart';
 import 'package:core/features/delivery/repositories/delivery_repository.dart';
 import 'package:flutter/material.dart';
@@ -50,9 +51,39 @@ class FakeDeliveryRepository implements DeliveryRepository {
   ];
 
   @override
-  Future<List<DeliveryOrder>> fetchActiveOrders() async {
+  Future<List<DeliveryOrder>> fetchActiveOrders({String? customerId}) async {
     await Future<void>.delayed(const Duration(milliseconds: 550));
     return List<DeliveryOrder>.from(_orders);
+  }
+
+  @override
+  Future<List<DeliveryCandidate>> fetchEligibleCargos({
+    String? customerId,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    return const [
+      DeliveryCandidate(
+        id: 'ORD-31057',
+        trackingCode: 'BD202400057',
+        productName: 'Arka Бэйкхаус',
+        status: 'READY_FOR_PICKUP',
+      ),
+      DeliveryCandidate(
+        id: 'ORD-31063',
+        trackingCode: 'BD202400063',
+        productName: 'Urban Грилл',
+        status: 'ARRIVED_MN',
+      ),
+    ];
+  }
+
+  @override
+  Future<void> createDeliveryRequest({
+    required String cargoId,
+    required String deliveryAddress,
+    String? deliveryPhone,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 260));
   }
 
   @override

@@ -3,6 +3,8 @@ import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/core/design_system/components/empty_state.dart';
 import 'package:core/core/design_system/components/filter_chips.dart';
 import 'package:core/core/design_system/components/view_toggle.dart';
+import 'package:core/core/networking/api_client.dart';
+import 'package:core/core/config/api_config.dart';
 import 'package:core/features/orders/models/order.dart';
 import 'package:core/features/orders/providers/order_provider.dart';
 import 'package:core/features/orders/widgets/order_card.dart';
@@ -94,24 +96,24 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 14)),
-              SliverToBoxAdapter(
-                child: FilterChipsRow(
-                  chips: filterChips,
-                  selectedValue: provider.selectedStatus?.name ?? 'all',
-                  onSelected: (value) {
-                    if (value == 'all') {
-                      provider.setFilter(null);
-                    } else {
-                      provider.setFilter(
-                        OrderStatus.values.firstWhere(
-                          (s) => s.name == value,
-                          orElse: () => OrderStatus.pending,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
+              // SliverToBoxAdapter(
+              //   child: FilterChipsRow(
+              //     chips: filterChips,
+              //     selectedValue: provider.selectedStatus?.name ?? 'all',
+              //     onSelected: (value) {
+              //       if (value == 'all') {
+              //         provider.setFilter(null);
+              //       } else {
+              //         provider.setFilter(
+              //           OrderStatus.values.firstWhere(
+              //             (s) => s.name == value,
+              //             orElse: () => OrderStatus.pending,
+              //           ),
+              //         );
+              //       }
+              //     },
+              //   ),
+              // ),
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               SliverToBoxAdapter(
                 child: Padding(
@@ -178,9 +180,6 @@ class _OrdersPageState extends State<OrdersPage> {
                           order: order,
                           onTap: () => _showOrderDetail(context, order),
                           onDelete: () => _confirmDelete(context, order.id),
-                          onPay: order.isPaid
-                              ? null
-                              : () => provider.markAsPaid(order.id),
                           onRequestDelivery:
                               order.status == OrderStatus.processing
                               ? () => provider.requestDelivery(order.id)
@@ -469,6 +468,8 @@ class _OrderDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final imageUrl = _resolveImageUrl(context);
+    final imageHeaders = _resolveImageHeaders(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
@@ -534,6 +535,32 @@ class _OrderDetailSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
+          if (imageUrl != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    headers: imageHeaders,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFE9EDF5),
+                      child: const Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 32,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (imageUrl != null) const SizedBox(height: 20),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -544,16 +571,14 @@ class _OrderDetailSheet extends StatelessWidget {
                   valueColor: order.status.color,
                 ),
                 _DetailRow(
-                  label: 'Үнэ',
-                  value: '${order.uiPrice.toStringAsFixed(0)}₮',
+                  label: 'Системийн төлөв',
+                  value: order.rawStatus ?? '-',
                 ),
-                _DetailRow(label: 'Жин', value: _formatWeight(order.uiWeight)),
                 _DetailRow(
-                  label: 'Төлбөр',
-                  value: order.isPaid ? 'Төлөгдсөн' : 'Төлөгдөөгүй',
-                  valueColor: order.isPaid
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFFF59E0B),
+                  label: 'Жин',
+                  value: order.hasWeight
+                      ? _formatWeight(order.uiWeight)
+                      : '-кг',
                 ),
                 if (order.deliveryAddress != null)
                   _DetailRow(
@@ -573,22 +598,7 @@ class _OrderDetailSheet extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                if (!order.isPaid)
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () {
-                        context.read<OrderProvider>().markAsPaid(order.id);
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.payment_rounded),
-                      label: const Text('Төлбөр төлөх'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                      ),
-                    ),
-                  ),
-                if (order.isPaid && order.status == OrderStatus.processing) ...[
-                  if (!order.isPaid) const SizedBox(width: 12),
+                if (order.status == OrderStatus.processing)
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () {
@@ -599,7 +609,6 @@ class _OrderDetailSheet extends StatelessWidget {
                       label: const Text('Хүргэлт захиалах'),
                     ),
                   ),
-                ],
               ],
             ),
           ),
@@ -610,6 +619,25 @@ class _OrderDetailSheet extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
+  }
+
+  String? _resolveImageUrl(BuildContext context) {
+    final directUrl = (order.imageUrl ?? '').trim();
+    if (directUrl.isNotEmpty) {
+      return directUrl;
+    }
+
+    final apiClient = context.read<ApiClient>();
+    final baseUrl = apiClient.dio.options.baseUrl;
+    return '$baseUrl${CargoEndpoints.receivedImage(order.id)}';
+  }
+
+  Map<String, String>? _resolveImageHeaders(BuildContext context) {
+    final token = context.read<ApiClient>().authToken;
+    if (token == null || token.trim().isEmpty) {
+      return null;
+    }
+    return {'Authorization': 'Bearer $token'};
   }
 
   String _formatWeight(double weight) {

@@ -76,16 +76,13 @@ class AdminCargosProvider extends ChangeNotifier {
   }
 
   /// Mark cargo as received (pending -> processing)
-  Future<bool> receiveCargo(String cargoId, {String? imageBase64}) async {
+  Future<bool> receiveCargo(String cargoId, {String? imagePath}) async {
     _processingCargoId = cargoId;
     _error = null;
     notifyListeners();
 
     try {
-      await _adminService.receiveCargo(
-        cargoId: cargoId,
-        imageBase64: imageBase64,
-      );
+      await _adminService.receiveCargo(cargoId: cargoId, imagePath: imagePath);
       _updateCargoStatus(cargoId, OrderStatus.processing);
       return true;
     } catch (e) {

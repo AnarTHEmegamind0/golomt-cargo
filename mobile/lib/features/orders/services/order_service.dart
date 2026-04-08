@@ -15,7 +15,8 @@ class OrderService {
     trackingCode: trackingCode,
     productName: productName,
   );
-  Future<List<Order>> fetchAll() => _repository.fetchAll();
+  Future<List<Order>> fetchAll({String? customerId}) =>
+      _repository.fetchAll(customerId: customerId);
   Future<Order?> fetchById(String id) => _repository.fetchById(id);
   Future<List<Order>> fetchByStatus(OrderStatus status) =>
       _repository.fetchByStatus(status);

@@ -6,7 +6,7 @@ abstract interface class OrderRepository {
     required String trackingCode,
     String? productName,
   });
-  Future<List<Order>> fetchAll();
+  Future<List<Order>> fetchAll({String? customerId});
   Future<Order?> fetchById(String id);
   Future<List<Order>> fetchByStatus(OrderStatus status);
   Future<List<Order>> search(String query);

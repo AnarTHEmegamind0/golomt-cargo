@@ -11,7 +11,7 @@ extension OrderStatusExtension on OrderStatus {
       case OrderStatus.processing:
         return 'Боловсруулж буй';
       case OrderStatus.transit:
-        return 'Тээвэрлэгдэж буй';
+        return 'Замд';
       case OrderStatus.delivered:
         return 'Хүргэгдсэн';
       case OrderStatus.cancelled:
@@ -60,6 +60,7 @@ class Order {
     required this.createdAt,
     required this.price,
     required this.weight,
+    this.rawStatus,
     this.deliveryAddress,
     this.estimatedDelivery,
     this.deliveredAt,
@@ -76,6 +77,7 @@ class Order {
   final DateTime createdAt;
   final double price;
   final double weight; // in kg
+  final String? rawStatus;
   final String? deliveryAddress;
   final DateTime? estimatedDelivery;
   final DateTime? deliveredAt;
@@ -91,6 +93,7 @@ class Order {
     DateTime? createdAt,
     double? price,
     double? weight,
+    String? rawStatus,
     String? deliveryAddress,
     DateTime? estimatedDelivery,
     DateTime? deliveredAt,
@@ -107,6 +110,7 @@ class Order {
       createdAt: createdAt ?? this.createdAt,
       price: price ?? this.price,
       weight: weight ?? this.weight,
+      rawStatus: rawStatus ?? this.rawStatus,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
       estimatedDelivery: estimatedDelivery ?? this.estimatedDelivery,
       deliveredAt: deliveredAt ?? this.deliveredAt,
@@ -117,30 +121,9 @@ class Order {
     );
   }
 
-  double get uiWeight {
-    if (weight > 0) {
-      return weight;
-    }
-    final seed = _stableSeed('weight');
-    final grams = 350 + (seed % 4950);
-    return grams / 1000;
-  }
+  bool get hasWeight => weight > 0;
+  bool get hasPrice => price > 0;
 
-  double get uiPrice {
-    if (price > 0) {
-      return price;
-    }
-    final seed = _stableSeed('price');
-    final amount = 1000 + (seed % 9001);
-    return amount.toDouble();
-  }
-
-  int _stableSeed(String salt) {
-    final source = '$id|$trackingCode|$productName|$salt';
-    var hash = 0;
-    for (final codeUnit in source.codeUnits) {
-      hash = ((hash * 31) + codeUnit) & 0x7fffffff;
-    }
-    return hash;
-  }
+  double get uiWeight => weight;
+  double get uiPrice => price;
 }

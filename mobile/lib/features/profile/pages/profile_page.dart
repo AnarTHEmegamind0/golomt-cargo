@@ -1,3 +1,5 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
@@ -100,12 +102,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 18),
-              _MenuTile(
-                icon: Icons.person_outline_rounded,
+              _MenuTileWithAsset(
+                assetPath: ShipAssets.manDeliveringPackage,
                 label: 'Миний мэдээлэл',
               ),
-              _MenuTile(icon: Icons.local_shipping_outlined, label: 'Хүргэлт'),
-              _MenuTile(icon: Icons.location_on_outlined, label: 'Салбарууд'),
+              _MenuTileWithAsset(assetPath: ShipAssets.truck, label: 'Хүргэлт'),
+              _MenuTileWithAsset(assetPath: ShipAssets.locationMaps, label: 'Салбарууд'),
               _SwitchTile(
                 icon: Icons.dark_mode_outlined,
                 label: 'Харанхуй горим',
@@ -116,8 +118,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
-              _MenuTile(icon: Icons.info_outline_rounded, label: 'Тусламж'),
-              _MenuTile(icon: Icons.calculate_outlined, label: 'Тооцоолуур'),
+              _MenuTileWithAsset(assetPath: ShipAssets.handWithCare, label: 'Тусламж'),
+              _MenuTileWithAsset(assetPath: ShipAssets.wallet, label: 'Тооцоолуур'),
               const SizedBox(height: 12),
               TextButton.icon(
                 onPressed: context.read<AuthProvider>().logout,
@@ -136,59 +138,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MenuTile extends StatelessWidget {
-  const _MenuTile({required this.icon, required this.label, this.trailingText});
-
-  final IconData icon;
-  final String label;
-  final String? trailingText;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final tileColor = isDark
-        ? theme.colorScheme.surface.withValues(alpha: 0.86)
-        : BrandPalette.white.withValues(alpha: 0.82);
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : BrandPalette.electricBlue.withValues(alpha: 0.14);
-    final iconColor = isDark
-        ? theme.colorScheme.onSurface
-        : BrandPalette.primaryText;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: tileColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: iconColor, size: 30),
-        title: Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        trailing: trailingText != null
-            ? Text(
-                trailingText!,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              )
-            : const Icon(
-                Icons.chevron_right_rounded,
-                size: 36,
-                color: BrandPalette.electricBlue,
-              ),
       ),
     );
   }
@@ -242,6 +191,59 @@ class _SwitchTile extends StatelessWidget {
           activeTrackColor: BrandPalette.electricBlue,
           onChanged: onChanged,
         ),
+      ),
+    );
+  }
+}
+
+class _MenuTileWithAsset extends StatelessWidget {
+  const _MenuTileWithAsset({required this.assetPath, required this.label, this.trailingText});
+
+  final String assetPath;
+  final String label;
+  final String? trailingText;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final tileColor = isDark
+        ? theme.colorScheme.surface.withValues(alpha: 0.86)
+        : BrandPalette.white.withValues(alpha: 0.82);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : BrandPalette.electricBlue.withValues(alpha: 0.14);
+    final iconColor = isDark
+        ? theme.colorScheme.onSurface
+        : BrandPalette.primaryText;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: tileColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+      ),
+      child: ListTile(
+        leading: ShipIcon(assetPath, size: 30, color: iconColor),
+        title: Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        trailing: trailingText != null
+            ? Text(
+                trailingText!,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              )
+            : const Icon(
+                Icons.chevron_right_rounded,
+                size: 36,
+                color: BrandPalette.electricBlue,
+              ),
       ),
     );
   }

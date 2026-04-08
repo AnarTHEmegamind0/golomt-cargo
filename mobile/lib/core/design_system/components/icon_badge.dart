@@ -1,18 +1,21 @@
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:flutter/material.dart';
 
 /// Colored icon badge for workflow items
 class IconBadge extends StatelessWidget {
   const IconBadge({
     super.key,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     this.color,
     this.backgroundColor,
     this.size = 48,
     this.iconSize,
     this.onTap,
-  });
+  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
 
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final Color? color;
   final Color? backgroundColor;
   final double size;
@@ -24,6 +27,7 @@ class IconBadge extends StatelessWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final badgeColor = color ?? primaryColor;
     final bgColor = backgroundColor ?? badgeColor.withValues(alpha: 0.15);
+    final effectiveIconSize = iconSize ?? size * 0.5;
 
     final content = Container(
       width: size,
@@ -32,7 +36,11 @@ class IconBadge extends StatelessWidget {
         color: bgColor,
         borderRadius: BorderRadius.circular(size * 0.32),
       ),
-      child: Icon(icon, size: iconSize ?? size * 0.5, color: badgeColor),
+      child: Center(
+        child: assetPath != null
+            ? ShipIcon(assetPath!, size: effectiveIconSize, color: badgeColor)
+            : Icon(icon, size: effectiveIconSize, color: badgeColor),
+      ),
     );
 
     if (onTap != null) {
@@ -54,16 +62,16 @@ class IconBadge extends StatelessWidget {
 class WorkflowIconItem extends StatelessWidget {
   const WorkflowIconItem({
     super.key,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     required this.title,
-    this.subtitle,
     this.color,
     this.onTap,
-  });
+  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
 
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final String title;
-  final String? subtitle;
   final Color? color;
   final VoidCallback? onTap;
 
@@ -89,7 +97,7 @@ class WorkflowIconItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconBadge(icon: icon, color: itemColor, size: 42),
+              IconBadge(icon: icon, assetPath: assetPath, color: itemColor, size: 42),
               const SizedBox(height: 8),
               Text(
                 title,
@@ -105,20 +113,6 @@ class WorkflowIconItem extends StatelessWidget {
                   height: 1.2,
                 ),
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 1),
-                Text(
-                  subtitle!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? const Color(0xFF8B95A8)
-                        : const Color(0xFF7D8799),
-                  ),
-                ),
-              ],
             ],
           ),
         ),

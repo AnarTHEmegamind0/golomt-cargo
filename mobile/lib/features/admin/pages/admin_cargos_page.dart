@@ -364,7 +364,8 @@ class _CargoList extends StatelessWidget {
             cargo: cargo,
             isProcessing: isProcessing,
             onReceive: cargo.status == OrderStatus.pending
-                ? () => provider.receiveCargo(cargo.id)
+                ? (imagePath) =>
+                      provider.receiveCargo(cargo.id, imagePath: imagePath)
                 : null,
             onRecordWeight: cargo.status == OrderStatus.processing
                 ? (weightGrams, fee) =>

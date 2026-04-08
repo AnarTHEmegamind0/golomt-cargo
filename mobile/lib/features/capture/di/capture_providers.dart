@@ -8,16 +8,12 @@ import 'package:core/features/branch/repositories/branch_repository.dart';
 import 'package:core/features/branch/repositories/fake_branch_repository.dart';
 import 'package:core/features/branch/services/branch_service.dart';
 import 'package:core/features/capture/models/capture_request.dart';
+import 'package:core/features/delivery/models/delivery_candidate.dart';
 import 'package:core/features/delivery/models/delivery_order.dart';
-import 'package:core/features/delivery/providers/chat_provider.dart';
 import 'package:core/features/delivery/providers/delivery_provider.dart';
-import 'package:core/features/delivery/providers/driver_notification_provider.dart';
 import 'package:core/features/delivery/repositories/delivery_repository.dart';
 import 'package:core/features/delivery/repositories/fake_delivery_repository.dart';
-import 'package:core/features/delivery/services/chat_service.dart';
 import 'package:core/features/delivery/services/delivery_service.dart';
-import 'package:core/features/delivery/services/earning_service.dart';
-import 'package:core/features/delivery/services/location_service.dart';
 import 'package:core/features/home/models/pin_item.dart';
 import 'package:core/features/home/providers/pin_feed_provider.dart';
 import 'package:core/features/home/repositories/fake_pin_feed_repository.dart';
@@ -61,20 +57,11 @@ List<SingleChildWidget> buildCaptureProviders({
     Provider<DeliveryService>(
       create: (context) => DeliveryService(repository: context.read()),
     ),
-    Provider<LocationService>(create: (_) => LocationService()),
-    Provider<EarningService>(create: (_) => const EarningService()),
-    Provider<ChatService>(
-      create: (_) => ChatService(),
-      dispose: (_, service) => service.dispose(),
-    ),
     ChangeNotifierProvider<DeliveryProvider>(
-      create: (context) => DeliveryProvider(service: context.read()),
-    ),
-    ChangeNotifierProvider<DriverNotificationProvider>(
-      create: (_) => DriverNotificationProvider(),
-    ),
-    ChangeNotifierProvider<ChatProvider>(
-      create: (context) => ChatProvider(chatService: context.read()),
+      create: (context) => DeliveryProvider(
+        service: context.read(),
+        customerIdResolver: () => context.read<AuthProvider>().user?.id,
+      ),
     ),
 
     // Orders
@@ -247,8 +234,10 @@ class _CaptureOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<List<Order>> fetchAll() =>
-      _run(emptyValue: const [], onDefault: _delegate.fetchAll);
+  Future<List<Order>> fetchAll({String? customerId}) => _run(
+    emptyValue: const [],
+    onDefault: () => _delegate.fetchAll(customerId: customerId),
+  );
 
   @override
   Future<Order?> fetchById(String id) =>
@@ -343,8 +332,30 @@ class _CaptureDeliveryRepository implements DeliveryRepository {
   final FakeDeliveryRepository _delegate = FakeDeliveryRepository();
 
   @override
-  Future<List<DeliveryOrder>> fetchActiveOrders() =>
-      _run(emptyValue: const [], onDefault: _delegate.fetchActiveOrders);
+  Future<List<DeliveryOrder>> fetchActiveOrders({String? customerId}) => _run(
+    emptyValue: const [],
+    onDefault: () => _delegate.fetchActiveOrders(customerId: customerId),
+  );
+
+  @override
+  Future<List<DeliveryCandidate>> fetchEligibleCargos({String? customerId}) =>
+      _run(
+        emptyValue: const [],
+        onDefault: () => _delegate.fetchEligibleCargos(customerId: customerId),
+      );
+
+  @override
+  Future<void> createDeliveryRequest({
+    required String cargoId,
+    required String deliveryAddress,
+    String? deliveryPhone,
+  }) async {
+    await _delegate.createDeliveryRequest(
+      cargoId: cargoId,
+      deliveryAddress: deliveryAddress,
+      deliveryPhone: deliveryPhone,
+    );
+  }
 
   @override
   Future<void> updateOrderStep({

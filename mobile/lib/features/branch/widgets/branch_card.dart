@@ -1,6 +1,6 @@
+import 'package:core/core/assets/ship_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:core/features/branch/models/branch.dart';
-import 'package:core/core/design_system/components/icon_badge.dart';
 
 /// Branch card for list view
 class BranchListCard extends StatelessWidget {
@@ -33,10 +33,23 @@ class BranchListCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              IconBadge(
-                icon: Icons.storefront_rounded,
-                color: branch.iconColor,
-                size: 50,
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : const Color(0xFFF5F7FA),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    ShipAssets.locationMaps,
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -124,10 +137,23 @@ class BranchGridCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  IconBadge(
-                    icon: Icons.storefront_rounded,
-                    color: branch.iconColor,
-                    size: 44,
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        ShipAssets.locationMaps,
+                        width: 26,
+                        height: 26,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                   const Spacer(),
                   Container(

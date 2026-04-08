@@ -1,3 +1,5 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/features/branch/pages/branch_list_page.dart';
 import 'package:core/features/delivery/pages/delivery_tracking_page.dart';
 import 'package:core/features/home/pages/home_page.dart';
@@ -92,57 +94,30 @@ class AppShellPage extends StatelessWidget {
               onDestinationSelected: context
                   .read<NavigationController>()
                   .setIndex,
-              destinations: const [
+              destinations: [
                 NavigationDestination(
-                  icon: Icon(Icons.home_outlined, key: ValueKey('nav_home')),
-                  selectedIcon: Icon(
-                    Icons.home_rounded,
-                    key: ValueKey('nav_home_selected'),
-                  ),
+                  icon: ShipIcon(ShipAssets.clockAndHome, size: 28, key: const ValueKey('nav_home')),
+                  selectedIcon: ShipIcon(ShipAssets.clockAndHome, size: 32, key: const ValueKey('nav_home_selected')),
                   label: 'Нүүр',
                 ),
                 NavigationDestination(
-                  icon: Icon(
-                    Icons.inventory_2_outlined,
-                    key: ValueKey('nav_orders'),
-                  ),
-                  selectedIcon: Icon(
-                    Icons.inventory_2_rounded,
-                    key: ValueKey('nav_orders_selected'),
-                  ),
+                  icon: ShipIcon(ShipAssets.basket, size: 28, key: const ValueKey('nav_orders')),
+                  selectedIcon: ShipIcon(ShipAssets.basket, size: 32, key: const ValueKey('nav_orders_selected')),
                   label: 'Захиалга',
                 ),
                 NavigationDestination(
-                  icon: Icon(
-                    Icons.local_shipping_outlined,
-                    key: ValueKey('nav_delivery'),
-                  ),
-                  selectedIcon: Icon(
-                    Icons.local_shipping_rounded,
-                    key: ValueKey('nav_delivery_selected'),
-                  ),
+                  icon: ShipIcon(ShipAssets.truck, size: 28, key: const ValueKey('nav_delivery')),
+                  selectedIcon: ShipIcon(ShipAssets.truck, size: 32, key: const ValueKey('nav_delivery_selected')),
                   label: 'Хүргэлт',
                 ),
                 NavigationDestination(
-                  icon: Icon(
-                    Icons.storefront_outlined,
-                    key: ValueKey('nav_branch'),
-                  ),
-                  selectedIcon: Icon(
-                    Icons.storefront_rounded,
-                    key: ValueKey('nav_branch_selected'),
-                  ),
+                  icon: ShipIcon(ShipAssets.locationMaps, size: 28, key: const ValueKey('nav_branch')),
+                  selectedIcon: ShipIcon(ShipAssets.locationMaps, size: 32, key: const ValueKey('nav_branch_selected')),
                   label: 'Салбар',
                 ),
                 NavigationDestination(
-                  icon: Icon(
-                    Icons.person_outline_rounded,
-                    key: ValueKey('nav_settings'),
-                  ),
-                  selectedIcon: Icon(
-                    Icons.person_rounded,
-                    key: ValueKey('nav_settings_selected'),
-                  ),
+                  icon: ShipIcon(ShipAssets.manDeliveringPackage, size: 28, key: const ValueKey('nav_settings')),
+                  selectedIcon: ShipIcon(ShipAssets.manDeliveringPackage, size: 32, key: const ValueKey('nav_settings_selected')),
                   label: 'Профайл',
                 ),
               ],

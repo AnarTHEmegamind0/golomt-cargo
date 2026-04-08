@@ -71,8 +71,8 @@ class AdminService {
   }
 
   // Cargo management
-  Future<void> receiveCargo({required String cargoId, String? imageBase64}) {
-    return _repository.receiveCargo(cargoId: cargoId, imageBase64: imageBase64);
+  Future<void> receiveCargo({required String cargoId, String? imagePath}) {
+    return _repository.receiveCargo(cargoId: cargoId, imagePath: imagePath);
   }
 
   Future<void> recordCargoWeight({

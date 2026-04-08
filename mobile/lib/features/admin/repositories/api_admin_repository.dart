@@ -4,6 +4,7 @@ import 'package:core/core/networking/openapi_client.dart';
 import 'package:core/features/admin/models/admin_user.dart';
 import 'package:core/features/admin/repositories/admin_repository.dart';
 import 'package:core/features/auth/models/user.dart';
+import 'package:dio/dio.dart';
 
 class ApiAdminRepository implements AdminRepository {
   ApiAdminRepository({required OpenApiClient openApiClient})
@@ -159,13 +160,18 @@ class ApiAdminRepository implements AdminRepository {
   @override
   Future<void> receiveCargo({
     required String cargoId,
-    String? imageBase64,
+    String? imagePath,
   }) async {
     try {
+      final data = imagePath == null
+          ? <String, dynamic>{}
+          : FormData.fromMap({
+              'image': await MultipartFile.fromFile(imagePath),
+            });
       await _openApiClient.call(
         AppApiOperations.receiveCargo,
         pathParams: {'cargoId': cargoId},
-        data: {if (imageBase64 != null) 'image': imageBase64},
+        data: data,
       );
     } catch (error) {
       throw Exception(extractApiErrorMessage(error));

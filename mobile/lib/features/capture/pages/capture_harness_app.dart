@@ -4,19 +4,9 @@ import 'package:core/features/branch/pages/branch_detail_page.dart';
 import 'package:core/features/branch/pages/branch_list_page.dart';
 import 'package:core/features/capture/di/capture_providers.dart';
 import 'package:core/features/capture/models/capture_request.dart';
-import 'package:core/features/delivery/pages/chat_page.dart';
-import 'package:core/features/delivery/pages/delivery_home_page.dart';
-import 'package:core/features/delivery/pages/delivery_proof_page.dart';
 import 'package:core/features/delivery/pages/delivery_tracking_page.dart';
-import 'package:core/features/delivery/pages/earnings_page.dart';
-import 'package:core/features/delivery/pages/notifications_page.dart'
-    as delivery_notifications;
-import 'package:core/features/delivery/pages/onboarding_page.dart';
-import 'package:core/features/delivery/pages/order_detail_page.dart';
-import 'package:core/features/delivery/pages/order_map_navigation_page.dart';
 import 'package:core/features/home/pages/home_page.dart';
-import 'package:core/features/notifications/pages/notifications_page.dart'
-    as app_notifications;
+import 'package:core/features/notifications/pages/notifications_page.dart';
 import 'package:core/features/orders/pages/orders_page.dart';
 import 'package:core/features/profile/pages/profile_page.dart';
 import 'package:core/features/settings/pages/settings_page.dart';
@@ -71,14 +61,6 @@ class CaptureHarnessPage extends StatelessWidget {
     'settings',
     'profile',
     'notifications',
-    'delivery_notifications',
-    'delivery_home',
-    'order_detail',
-    'delivery_proof',
-    'chat',
-    'earnings',
-    'order_map',
-    'onboarding',
   ];
 
   @override
@@ -140,16 +122,7 @@ class CaptureHarnessPage extends StatelessWidget {
       'branch_detail' => BranchDetailPage(branch: sampleBranch),
       'settings' => const SettingsPage(),
       'profile' => const ProfilePage(),
-      'notifications' => const app_notifications.NotificationsPage(),
-      'delivery_notifications' =>
-        const delivery_notifications.NotificationsPage(),
-      'delivery_home' => const DeliveryHomePage(),
-      'order_detail' => const OrderDetailPage(orderId: 'ORD-31041'),
-      'delivery_proof' => const DeliveryProofPage(orderId: 'ORD-31041'),
-      'chat' => const ChatPage(orderId: 'ORD-31041'),
-      'earnings' => const EarningsPage(),
-      'order_map' => const OrderMapNavigationPage(orderId: 'ORD-31041'),
-      'onboarding' => OnboardingPage(onFinish: () {}),
+      'notifications' => const NotificationsPage(),
       _ => null,
     };
   }

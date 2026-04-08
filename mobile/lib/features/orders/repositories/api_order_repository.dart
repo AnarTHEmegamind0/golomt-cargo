@@ -58,9 +58,14 @@ class ApiOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<List<Order>> fetchAll() async {
+  Future<List<Order>> fetchAll({String? customerId}) async {
+    final normalizedCustomerId = customerId?.trim();
     try {
-      final orders = await _fetchAllOrders();
+      final orders = await _fetchAllOrders(
+        query: (normalizedCustomerId == null || normalizedCustomerId.isEmpty)
+            ? null
+            : {'customerId': normalizedCustomerId},
+      );
       _cache = orders;
       return orders;
     } catch (error) {
@@ -248,6 +253,7 @@ class ApiOrderRepository implements OrderRepository {
     final createdAt = _toDateTime(json['createdAt']) ?? DateTime.now();
     final estimatedDelivery = _toDateTime(json['estimatedDeliveryAt']);
     final deliveredAt = _toDateTime(json['completedAt']);
+    final normalizedStatus = statusRaw.isEmpty ? null : statusRaw;
 
     return Order(
       id: id.isEmpty ? tracking : id,
@@ -257,6 +263,7 @@ class ApiOrderRepository implements OrderRepository {
       createdAt: createdAt,
       price: totalFeeMnt,
       weight: weightGrams <= 0 ? 0 : (weightGrams / 1000),
+      rawStatus: normalizedStatus,
       deliveryAddress: (json['deliveryAddress'] as String?)?.trim(),
       estimatedDelivery: estimatedDelivery,
       deliveredAt: deliveredAt,

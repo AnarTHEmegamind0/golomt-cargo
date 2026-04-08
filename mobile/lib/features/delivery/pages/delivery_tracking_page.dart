@@ -1,8 +1,10 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/design_system/components/app_card.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/core/design_system/components/empty_state.dart';
 import 'package:core/core/design_system/components/filter_chips.dart';
-import 'package:core/core/design_system/components/process_timeline.dart';
+import 'package:core/features/delivery/models/delivery_order.dart';
 import 'package:core/features/delivery/providers/delivery_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +34,17 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final provider = context.watch<DeliveryProvider>();
+    final visibleOrders = provider.orders
+        .where((order) {
+          if (_selectedFilter == 'completed') {
+            return order.step == DeliveryStep.completed;
+          }
+          if (_selectedFilter == 'transit') {
+            return order.step != DeliveryStep.pending;
+          }
+          return true;
+        })
+        .toList(growable: false);
 
     final filterChips = [
       const FilterChipData(
@@ -101,7 +114,7 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage> {
                     icon: Icons.error_outline_rounded,
                   ),
                 )
-              else if (provider.orders.isEmpty)
+              else if (visibleOrders.isEmpty)
                 const SliverFillRemaining(
                   child: EmptyState(
                     title: 'Хүргэлт олдсонгүй',
@@ -114,7 +127,7 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final order = provider.orders[index];
+                      final order = visibleOrders[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 14),
                         child: _DeliveryCard(
@@ -124,7 +137,7 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage> {
                           currentStep: order.step.index,
                         ),
                       );
-                    }, childCount: provider.orders.length),
+                    }, childCount: visibleOrders.length),
                   ),
                 ),
             ],
@@ -156,11 +169,12 @@ class _DeliveryTrackingPageState extends State<DeliveryTrackingPage> {
   }
 
   void _showAddDeliverySheet(BuildContext context) {
+    context.read<DeliveryProvider>().loadEligibleCargos();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const _AddDeliverySheet(),
+      builder: (context) => _AddDeliverySheet(),
     );
   }
 }
@@ -227,24 +241,18 @@ class _DeliveryCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(18),
-      onTap: () => _showDeliveryDetail(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.local_shipping_rounded,
-                  color: primaryColor,
-                  size: 24,
-                ),
+              ShipIconCircle(
+                ShipAssets.truck,
+                size: 48,
+                iconSize: 24,
+                backgroundColor: primaryColor.withValues(alpha: 0.15),
+                iconColor: primaryColor,
+                borderRadius: 14,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -301,19 +309,6 @@ class _DeliveryCard extends StatelessWidget {
     if (step >= 3) return const Color(0xFF3B82F6);
     if (step >= 1) return const Color(0xFFF59E0B);
     return const Color(0xFF8B95A8);
-  }
-
-  void _showDeliveryDetail(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _DeliveryDetailSheet(
-        trackingCode: trackingCode,
-        productName: productName,
-        currentStep: currentStep,
-      ),
-    );
   }
 }
 
@@ -395,250 +390,209 @@ class _MiniTimeline extends StatelessWidget {
   }
 }
 
-class _DeliveryDetailSheet extends StatelessWidget {
-  const _DeliveryDetailSheet({
-    required this.trackingCode,
-    required this.productName,
-    required this.currentStep,
-  });
+class _AddDeliverySheet extends StatefulWidget {
+  const _AddDeliverySheet({super.key});
 
-  final String trackingCode;
-  final String productName;
-  final int currentStep;
+  @override
+  State<_AddDeliverySheet> createState() => _AddDeliverySheetState();
+}
+
+class _AddDeliverySheetState extends State<_AddDeliverySheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _addressController = TextEditingController();
+  final _phoneController = TextEditingController();
+  String? _selectedCargoId;
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final timelineSteps = [
-      TimelineStepData(
-        title: 'Захиалга үүссэн',
-        subtitle: 'Захиалга амжилттай бүртгэгдлээ',
-        icon: Icons.inventory_2_rounded,
-        dateTime: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      TimelineStepData(
-        title: 'Ачаа бэлтгэгдэж байна',
-        subtitle: 'Хятад агуулахад хүлээн авсан',
-        icon: Icons.warehouse_rounded,
-        dateTime: DateTime.now().subtract(const Duration(days: 4)),
-      ),
-      TimelineStepData(
-        title: 'Ачаа ачигдаж байна',
-        subtitle: 'Тээврийн хэрэгсэлд ачиж байна',
-        icon: Icons.local_shipping_rounded,
-        dateTime: DateTime.now().subtract(const Duration(days: 3)),
-      ),
-      TimelineStepData(
-        title: 'Хүргэлтэд гарсан',
-        subtitle: 'Монгол руу явж байна',
-        icon: Icons.flight_takeoff_rounded,
-        dateTime: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      const TimelineStepData(
-        title: 'Гаалийн шалгалт',
-        subtitle: 'Гааль дээр шалгагдаж байна',
-        icon: Icons.security_rounded,
-      ),
-      const TimelineStepData(
-        title: 'Хүргэгдсэн',
-        subtitle: 'Ачаа амжилттай хүргэгдлээ',
-        icon: Icons.check_circle_rounded,
-      ),
-    ];
+    final provider = context.watch<DeliveryProvider>();
+    final cargos = provider.eligibleCargos;
+    final isSubmitting = provider.isSubmittingDelivery;
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.8,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.72,
+      ),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1A2234) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : const Color(0xFFD1D5DB),
-              borderRadius: BorderRadius.circular(2),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : const Color(0xFFD1D5DB),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Хүргэлт нэмэх',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedCargoId,
+                    decoration: const InputDecoration(
+                      labelText: 'Карго сонгох',
+                      hintText: 'Хүргэлтэд гаргах карго',
+                      prefixIcon: Icon(Icons.inventory_2_rounded),
+                    ),
+                    items: cargos
+                        .map(
+                          (cargo) => DropdownMenuItem<String>(
+                            value: cargo.id,
+                            child: Text(
+                              '${cargo.trackingCode} • ${cargo.productName}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                    onChanged: isSubmitting
+                        ? null
+                        : (value) => setState(() => _selectedCargoId = value),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Карго сонгоно уу';
+                      }
+                      return null;
+                    },
                   ),
-                  child: Icon(
-                    Icons.local_shipping_rounded,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trackingCode,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        productName,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  if (cargos.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        'Хүргэлтэд гаргаж болох карго алга байна.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isDark
                               ? const Color(0xFF8B95A8)
                               : const Color(0xFF677186),
                         ),
                       ),
-                    ],
+                    ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _addressController,
+                    minLines: 2,
+                    maxLines: 3,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isSubmitting,
+                    decoration: const InputDecoration(
+                      labelText: 'Гэрийн хаяг',
+                      hintText: 'Дүүрэг, хороо, байр/тоот, орц, давхар...',
+                      prefixIcon: Icon(Icons.location_on_rounded),
+                    ),
+                    validator: (value) {
+                      final text = (value ?? '').trim();
+                      if (text.isEmpty) {
+                        return 'Гэрийн хаяг оруулна уу';
+                      }
+                      if (text.length < 8) {
+                        return 'Хаяг хангалттай дэлгэрэнгүй оруулна уу';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ProcessTimeline(
-                steps: timelineSteps,
-                currentStep: currentStep,
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    enabled: !isSubmitting,
+                    decoration: const InputDecoration(
+                      labelText: 'Утас (заавал биш)',
+                      hintText: '99112233',
+                      prefixIcon: Icon(Icons.phone_rounded),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.phone_rounded),
-                    label: const Text('Холбоо барих'),
-                  ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: FilledButton(
+                onPressed: (isSubmitting || cargos.isEmpty)
+                    ? null
+                    : _submitDelivery,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.map_rounded),
-                    label: const Text('Байршил харах'),
-                  ),
-                ),
-              ],
+                child: isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Хүргэлтэд гаргах'),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-}
 
-class _AddDeliverySheet extends StatelessWidget {
-  const _AddDeliverySheet();
+  Future<void> _submitDelivery() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    if (_selectedCargoId == null || _selectedCargoId!.isEmpty) {
+      return;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final provider = context.read<DeliveryProvider>();
+    final success = await provider.createDeliveryRequest(
+      cargoId: _selectedCargoId!,
+      deliveryAddress: _addressController.text.trim(),
+      deliveryPhone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+    );
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.5,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A2234) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : const Color(0xFFD1D5DB),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Хүргэлт нэмэх',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Трак код',
-                hintText: 'BD2024XXXXXX',
-                prefixIcon: const Icon(Icons.qr_code_rounded),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    // Scan QR code
-                  },
-                  icon: const Icon(Icons.qr_code_scanner_rounded),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Хүргэлтийн хаяг',
-                hintText: 'Хаягаа оруулна уу',
-                prefixIcon: Icon(Icons.location_on_rounded),
-              ),
-            ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Хүргэлт амжилттай нэмэгдлээ'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(52),
-              ),
-              child: const Text('Хүргэлт нэмэх'),
-            ),
-          ),
-        ],
+    if (!mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Хүргэлт амжилттай үүслээ'
+              : (provider.error ?? 'Хүргэлт үүсгэхэд алдаа гарлаа'),
+        ),
+        behavior: SnackBarBehavior.floating,
       ),
     );
+
+    if (success) {
+      Navigator.pop(context);
+    }
   }
 }

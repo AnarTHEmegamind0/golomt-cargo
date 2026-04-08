@@ -4,9 +4,14 @@ import 'package:core/features/orders/services/order_service.dart';
 
 /// Order state provider with filtering and search
 class OrderProvider extends ChangeNotifier {
-  OrderProvider({required OrderService service}) : _service = service;
+  OrderProvider({
+    required OrderService service,
+    String? Function()? customerIdResolver,
+  }) : _service = service,
+       _customerIdResolver = customerIdResolver;
 
   final OrderService _service;
+  final String? Function()? _customerIdResolver;
 
   bool _isLoading = false;
   String? _error;
@@ -16,6 +21,7 @@ class OrderProvider extends ChangeNotifier {
   String _searchQuery = '';
   bool _isGridView = false;
   bool _hasLoaded = false;
+  String? _processingPaymentOrderId;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -24,6 +30,7 @@ class OrderProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isGridView => _isGridView;
   bool get hasLoaded => _hasLoaded;
+  String? get processingPaymentOrderId => _processingPaymentOrderId;
 
   int get pendingCount =>
       _allOrders.where((o) => o.status == OrderStatus.pending).length;
@@ -77,7 +84,7 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _allOrders = await _service.fetchAll();
+      _allOrders = await _service.fetchAll(customerId: _resolveCustomerId());
       _applyFilters();
       _hasLoaded = true;
     } catch (e) {
@@ -86,6 +93,15 @@ class OrderProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  String? _resolveCustomerId() {
+    final userId = _customerIdResolver?.call()?.trim();
+    if (userId == null || userId.isEmpty) {
+      return null;
+    }
+
+    return userId;
   }
 
   Future<Order?> createOrder({
@@ -122,7 +138,11 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> markAsPaid(String id) async {
+  Future<bool> markAsPaid(String id) async {
+    _processingPaymentOrderId = id;
+    _error = null;
+    notifyListeners();
+
     try {
       await _service.markAsPaid(id);
       final refreshed = await _service.fetchById(id);
@@ -131,9 +151,12 @@ class OrderProvider extends ChangeNotifier {
         _allOrders[index] = refreshed;
       }
       _applyFilters();
-      notifyListeners();
+      return true;
     } catch (e) {
       _error = e.toString();
+      return false;
+    } finally {
+      _processingPaymentOrderId = null;
       notifyListeners();
     }
   }

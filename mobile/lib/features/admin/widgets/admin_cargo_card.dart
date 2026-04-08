@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:core/core/brand_palette.dart';
 import 'package:core/features/orders/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Cargo card for admin cargo management
 class AdminCargoCard extends StatelessWidget {
@@ -16,7 +19,7 @@ class AdminCargoCard extends StatelessWidget {
   });
 
   final Order cargo;
-  final VoidCallback? onReceive;
+  final Future<bool> Function(String imagePath)? onReceive;
   final void Function(int weightGrams, int baseShippingFeeMnt)? onRecordWeight;
   final VoidCallback? onShip;
   final VoidCallback? onArrive;
@@ -98,12 +101,16 @@ class AdminCargoCard extends StatelessWidget {
             children: [
               _InfoChip(
                 icon: Icons.scale_rounded,
-                label: '${cargo.uiWeight.toStringAsFixed(2)} кг',
+                label: cargo.hasWeight
+                    ? '${cargo.uiWeight.toStringAsFixed(2)} кг'
+                    : '-кг',
               ),
               const SizedBox(width: 10),
               _InfoChip(
                 icon: Icons.attach_money_rounded,
-                label: '${cargo.uiPrice.toStringAsFixed(0)}₮',
+                label: cargo.hasPrice
+                    ? '${cargo.uiPrice.toStringAsFixed(0)}₮'
+                    : '-₮',
               ),
               const SizedBox(width: 10),
               _InfoChip(
@@ -171,7 +178,9 @@ class AdminCargoCard extends StatelessWidget {
                 label: 'Хүлээн авах',
                 icon: Icons.archive_rounded,
                 color: BrandPalette.electricBlue,
-                onPressed: isProcessing ? null : onReceive,
+                onPressed: isProcessing
+                    ? null
+                    : () => _showReceiveDialog(context),
               ),
             ),
           );
@@ -316,6 +325,162 @@ class AdminCargoCard extends StatelessWidget {
             child: const Text('Хадгалах'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showReceiveDialog(BuildContext context) {
+    final onReceive = this.onReceive;
+    if (onReceive == null) return;
+
+    final picker = ImagePicker();
+    XFile? selectedImage;
+    var isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final canSubmit = selectedImage != null && !isSubmitting;
+
+          return Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A2234) : Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : const Color(0xFFD1D5DB),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Бараа хүлээн авах зураг',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (selectedImage != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.file(
+                      File(selectedImage!.path),
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                else
+                  Container(
+                    height: 160,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.photo_camera_outlined,
+                          size: 32,
+                          color: Color(0xFF94A3B8),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Зураг дарж оруулна уу',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: isDark
+                                    ? const Color(0xFF8B95A8)
+                                    : const Color(0xFF677186),
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: isSubmitting
+                            ? null
+                            : () async {
+                                final image = await picker.pickImage(
+                                  source: ImageSource.camera,
+                                  imageQuality: 80,
+                                );
+                                if (image == null) return;
+                                setState(() => selectedImage = image);
+                              },
+                        icon: const Icon(Icons.camera_alt_rounded),
+                        label: const Text('Зураг авах'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: !canSubmit
+                            ? null
+                            : () async {
+                                setState(() => isSubmitting = true);
+                                final success = await onReceive(
+                                  selectedImage!.path,
+                                );
+                                if (!context.mounted) return;
+                                setState(() => isSubmitting = false);
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      success
+                                          ? 'Бараа хүлээн авлаа'
+                                          : 'Хүлээн авахад алдаа гарлаа',
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                        child: isSubmitting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Хадгалах'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

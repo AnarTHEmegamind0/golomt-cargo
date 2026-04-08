@@ -124,7 +124,7 @@ class FakeOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<List<Order>> fetchAll() async {
+  Future<List<Order>> fetchAll({String? customerId}) async {
     await Future.delayed(const Duration(milliseconds: 500));
     return List.from(_orders);
   }

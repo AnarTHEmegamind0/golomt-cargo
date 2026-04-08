@@ -1,3 +1,5 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:flutter/material.dart';
 
@@ -114,7 +116,11 @@ class _NotificationCard extends StatelessWidget {
               color: notification.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(notification.icon, color: notification.color, size: 22),
+            child: Center(
+              child: notification.assetPath != null
+                  ? ShipIcon(notification.assetPath!, size: 22, color: notification.color)
+                  : Icon(notification.icon, color: notification.color, size: 22),
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -175,59 +181,61 @@ class _NotificationData {
     required this.title,
     required this.message,
     required this.time,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     required this.color,
     this.isRead = false,
-  });
+  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
 
   final String title;
   final String message;
   final String time;
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final Color color;
   final bool isRead;
 }
 
 final _fakeNotifications = [
-  const _NotificationData(
+  _NotificationData(
     title: 'Ачаа хүргэгдлээ',
     message: 'BD2024031501 дугаартай ачаа Улаанбаатар салбарт хүргэгдлээ.',
     time: '5 минутын өмнө',
-    icon: Icons.check_circle_rounded,
-    color: Color(0xFF10B981),
+    assetPath: ShipAssets.mailArrivedAndHand,
+    color: const Color(0xFF10B981),
     isRead: false,
   ),
-  const _NotificationData(
+  _NotificationData(
     title: 'Төлбөр амжилттай',
     message: 'Таны BD2024031502 захиалгын төлбөр амжилттай төлөгдлөө.',
     time: '2 цагийн өмнө',
-    icon: Icons.payment_rounded,
-    color: Color(0xFF8B5CF6),
+    assetPath: ShipAssets.wallet,
+    color: const Color(0xFF8B5CF6),
     isRead: false,
   ),
-  const _NotificationData(
+  _NotificationData(
     title: 'Ачаа замдаа гарлаа',
     message:
         'BD2024031503 дугаартай ачаа Хятадаас гарлаа. Хүлээгдэж буй хугацаа: 5 хоног',
     time: '1 өдрийн өмнө',
-    icon: Icons.local_shipping_rounded,
-    color: Color(0xFF3B82F6),
+    assetPath: ShipAssets.truck,
+    color: const Color(0xFF3B82F6),
     isRead: true,
   ),
-  const _NotificationData(
+  _NotificationData(
     title: 'Шинэ захиалга',
     message: 'BD2024031504 дугаартай захиалга амжилттай бүртгэгдлээ.',
     time: '2 өдрийн өмнө',
-    icon: Icons.inventory_2_rounded,
-    color: Color(0xFFF59E0B),
+    assetPath: ShipAssets.basket,
+    color: const Color(0xFFF59E0B),
     isRead: true,
   ),
-  const _NotificationData(
+  _NotificationData(
     title: 'Урамшуулал',
     message: 'Таны дараагийн захиалгад 10% хөнгөлөлт эдлээрэй!',
     time: '3 өдрийн өмнө',
-    icon: Icons.local_offer_rounded,
-    color: Color(0xFFEC4899),
+    assetPath: ShipAssets.moneyBack,
+    color: const Color(0xFFEC4899),
     isRead: true,
   ),
 ];
