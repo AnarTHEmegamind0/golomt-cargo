@@ -1,4 +1,5 @@
 import 'package:core/core/assets/ship_icon.dart';
+import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/app_search_bar.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
 import 'package:core/core/design_system/components/empty_state.dart';
@@ -7,6 +8,7 @@ import 'package:core/core/design_system/components/view_toggle.dart';
 import 'package:core/core/networking/api_client.dart';
 import 'package:core/core/config/api_config.dart';
 import 'package:core/features/orders/models/order.dart';
+import 'package:core/features/orders/pages/pricing_calculator_page.dart';
 import 'package:core/features/orders/providers/order_provider.dart';
 import 'package:core/features/orders/widgets/order_card.dart';
 import 'package:flutter/material.dart';
@@ -455,6 +457,19 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        IconButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const PricingCalculatorPage()),
+          ),
+          icon: const Icon(Icons.calculate_outlined),
+          tooltip: 'Үнийн тооцоолуур',
+          style: IconButton.styleFrom(
+            backgroundColor: BrandPalette.electricBlue.withValues(alpha: 0.1),
+            foregroundColor: BrandPalette.electricBlue,
+          ),
+        ),
+        const SizedBox(width: 8),
         ViewToggle(isGridView: isGridView, onToggle: onToggle),
       ],
     );

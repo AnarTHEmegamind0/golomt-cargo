@@ -9,6 +9,7 @@ import 'package:core/features/auth/models/user.dart';
 import 'package:core/features/auth/pages/login_page.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:core/features/capture/pages/capture_harness_app.dart';
+import 'package:core/features/china_staff/pages/china_staff_shell_page.dart';
 import 'package:core/features/settings/providers/settings_provider.dart';
 import 'package:core/features/shell/pages/app_shell_page.dart';
 
@@ -73,6 +74,8 @@ class _MyAppState extends State<MyApp> {
           ? const LoginPage()
           : role == UserRole.customer
           ? const AppShellPage()
+          : role == UserRole.chinaStaff
+          ? const ChinaStaffShellPage()
           : const AdminShellPage(),
       // home:AppShellPage()
     );

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:core/core/brand_palette.dart';
 import 'package:flutter/material.dart';
 
 /// Beautiful animated gradient background
@@ -41,8 +42,8 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final defaultColors = isDark
-        ? const [Color(0xFF0F172A), Color(0xFF1E1B4B), Color(0xFF0F172A)]
-        : const [Color(0xFFF0F7FF), Color(0xFFE0F2FE), Color(0xFFEFF6FF)];
+        ? const [Color(0xFF0E1B33), Color(0xFF12396F), Color(0xFF0E1B33)]
+        : const [Color(0xFFF5F9FF), Color(0xFFE3EEFF), Color(0xFFF0F6FF)];
 
     final colors = widget.colors ?? defaultColors;
 
@@ -120,9 +121,7 @@ class _FloatingShapesState extends State<FloatingShapes>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor =
-        widget.color ??
-        (isDark ? const Color(0xFF6366F1) : const Color(0xFF3B82F6));
+    final baseColor = widget.color ?? BrandPalette.electricBlue;
 
     return ExcludeSemantics(
       child: IgnorePointer(
@@ -148,7 +147,9 @@ class _FloatingShapesState extends State<FloatingShapes>
                       width: shape.size,
                       height: shape.size,
                       decoration: BoxDecoration(
-                        shape: index.isEven ? BoxShape.circle : BoxShape.rectangle,
+                        shape: index.isEven
+                            ? BoxShape.circle
+                            : BoxShape.rectangle,
                         borderRadius: index.isOdd
                             ? BorderRadius.circular(shape.size * 0.3)
                             : null,
@@ -206,8 +207,8 @@ class MeshGradientBackground extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? const [Color(0xFF0F172A), Color(0xFF1E293B)]
-                  : const [Color(0xFFF8FBFF), Color(0xFFE0F2FE)],
+                  ? const [Color(0xFF0B1A33), Color(0xFF0F2C58)]
+                  : const [Color(0xFFF7FBFF), Color(0xFFE1EDFF)],
             ),
           ),
         ),
@@ -224,7 +225,9 @@ class MeshGradientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(0xFF3B82F6).withValues(alpha: isDark ? 0.3 : 0.4),
+                      BrandPalette.electricBlue.withValues(
+                        alpha: isDark ? 0.3 : 0.35,
+                      ),
                       Colors.transparent,
                     ],
                   ),
@@ -245,9 +248,9 @@ class MeshGradientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(
-                        0xFF8B5CF6,
-                      ).withValues(alpha: isDark ? 0.25 : 0.3),
+                      BrandPalette.navyBlue.withValues(
+                        alpha: isDark ? 0.22 : 0.28,
+                      ),
                       Colors.transparent,
                     ],
                   ),
@@ -268,9 +271,9 @@ class MeshGradientBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(
-                        0xFF06B6D4,
-                      ).withValues(alpha: isDark ? 0.2 : 0.25),
+                      BrandPalette.logoOrange.withValues(
+                        alpha: isDark ? 0.18 : 0.22,
+                      ),
                       Colors.transparent,
                     ],
                   ),

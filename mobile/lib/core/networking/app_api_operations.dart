@@ -47,4 +47,35 @@ class AppApiOperations {
   // Admin - Cargo management
   static const receiveCargo = 'POST /api/cargos/{cargoId}/receive';
   static const recordCargoWeight = 'POST /api/cargos/{cargoId}/record-weight';
+  static const recordCargoDimensions =
+      'POST /api/cargos/{cargoId}/record-dimensions';
+  static const adminImportTrackCodes = 'POST /api/cargos/import';
+
+  // Admin - Vehicle management
+  static const adminListVehicles = 'GET /api/vehicles';
+  static const adminCreateVehicle = 'POST /api/vehicles';
+  static const adminUpdateVehicle = 'PUT /api/vehicles/{vehicleId}';
+  static const adminDeleteVehicle = 'DELETE /api/vehicles/{vehicleId}';
+
+  // Admin - Shipment management
+  static const adminListShipments = 'GET /api/shipments';
+  static const adminGetShipment = 'GET /api/shipments/{shipmentId}';
+  static const adminCreateShipment = 'POST /api/shipments';
+  static const adminAddCargosToShipment =
+      'POST /api/shipments/{shipmentId}/cargos';
+  static const adminRemoveCargosFromShipment =
+      'DELETE /api/shipments/{shipmentId}/cargos';
+  static const adminUpdateShipmentStatus =
+      'POST /api/shipments/{shipmentId}/status';
+
+  // Admin - Activity logs
+  static const adminListActivityLogs = 'GET /api/admin/logs';
+
+  // Admin - Finance
+  static const adminFinanceSummary = 'GET /api/admin/finance/summary';
+
+  // Admin - Branch management
+  static const adminCreateBranch = 'POST /api/branches';
+  static const adminUpdateBranch = 'PUT /api/branches/{branchId}';
+  static const adminDeleteBranch = 'DELETE /api/branches/{branchId}';
 }

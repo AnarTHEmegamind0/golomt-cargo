@@ -385,7 +385,7 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
               items: UserRole.values.map((role) {
                 return DropdownMenuItem(
                   value: role,
-                  child: Text(role == UserRole.admin ? 'Админ' : 'Хэрэглэгч'),
+                  child: Text(role.label),
                 );
               }).toList(),
               onChanged: (role) {

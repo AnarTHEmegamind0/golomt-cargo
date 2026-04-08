@@ -1,3 +1,4 @@
+import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/animated_background.dart';
 import 'package:core/core/design_system/components/auth_text_field.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
@@ -95,6 +96,20 @@ class _SignUpPageState extends State<SignUpPage>
     final isLoading = context.select((AuthProvider p) => p.isLoading);
     final error = context.select((AuthProvider p) => p.error);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final linkStyle = ButtonStyle(
+      foregroundColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.pressed)) {
+          return BrandPalette.navyBlue;
+        }
+        return BrandPalette.electricBlue;
+      }),
+      overlayColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.pressed)) {
+          return BrandPalette.navyBlue.withValues(alpha: 0.12);
+        }
+        return BrandPalette.electricBlue.withValues(alpha: 0.08);
+      }),
+    );
 
     return Scaffold(
       body: MeshGradientBackground(
@@ -117,18 +132,14 @@ class _SignUpPageState extends State<SignUpPage>
                               onPressed: () => Navigator.of(context).pop(),
                               icon: Icon(
                                 Icons.arrow_back_ios_new_rounded,
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF1A202C),
+                                color: BrandPalette.electricBlue,
                               ),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Буцах',
                               style: TextStyle(
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF1A202C),
+                                color: BrandPalette.electricBlue,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -278,12 +289,10 @@ class _SignUpPageState extends State<SignUpPage>
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.of(context).pop(),
+                                          style: linkStyle,
                                           child: Text(
                                             'Нэвтрэх',
                                             style: TextStyle(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -318,8 +327,8 @@ class _SignUpPageState extends State<SignUpPage>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+            BrandPalette.electricBlue,
+            BrandPalette.electricBlue.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -327,7 +336,7 @@ class _SignUpPageState extends State<SignUpPage>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+            color: BrandPalette.electricBlue.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -378,7 +387,7 @@ class _SignUpPageState extends State<SignUpPage>
                   TextSpan(
                     text: 'үйлчилгээний нөхцөл',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: BrandPalette.electricBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -386,7 +395,7 @@ class _SignUpPageState extends State<SignUpPage>
                   TextSpan(
                     text: 'нууцлалын бодлого',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: BrandPalette.electricBlue,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

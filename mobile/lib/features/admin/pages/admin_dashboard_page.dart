@@ -1,10 +1,12 @@
 import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
+import 'package:core/features/admin/models/shipment.dart';
 import 'package:core/features/admin/providers/admin_cargos_provider.dart';
-import 'package:core/features/admin/providers/admin_users_provider.dart';
+import 'package:core/features/admin/providers/admin_finance_provider.dart';
+import 'package:core/features/admin/providers/admin_shipments_provider.dart';
+import 'package:core/features/admin/providers/admin_vehicles_provider.dart';
 import 'package:core/features/admin/widgets/admin_stat_card.dart';
-import 'package:core/features/auth/models/user.dart';
 import 'package:core/features/orders/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,20 +24,34 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminUsersProvider>().loadUsers();
-      context.read<AdminCargosProvider>().loadCargos();
+      _loadAllData();
     });
+  }
+
+  Future<void> _loadAllData() async {
+    final futures = <Future>[
+      context.read<AdminCargosProvider>().loadCargos(),
+      context.read<AdminShipmentsProvider>().loadShipments(),
+      context.read<AdminVehiclesProvider>().loadVehicles(),
+      context.read<AdminFinanceProvider>().loadSummary(),
+    ];
+    await Future.wait(futures);
+  }
+
+  Future<void> _refreshAllData() async {
+    final futures = <Future>[
+      context.read<AdminCargosProvider>().loadCargos(forceRefresh: true),
+      context.read<AdminShipmentsProvider>().loadShipments(forceRefresh: true),
+      context.read<AdminVehiclesProvider>().loadVehicles(forceRefresh: true),
+      context.read<AdminFinanceProvider>().loadSummary(forceRefresh: true),
+    ];
+    await Future.wait(futures);
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () async {
-        await Future.wait([
-          context.read<AdminUsersProvider>().loadUsers(forceRefresh: true),
-          context.read<AdminCargosProvider>().loadCargos(forceRefresh: true),
-        ]);
-      },
+      onRefresh: _refreshAllData,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -50,104 +66,269 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           const SizedBox(height: 4),
           Text(
             'Өнөөдрийн байдал',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: BrandPalette.mutedText),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: BrandPalette.mutedText,
+            ),
           ),
           const SizedBox(height: 20),
 
-          // User stats
-          // _UserStatsSection(),
-          // const SizedBox(height: 16),
+          // Financial overview
+          const _FinanceOverviewSection(),
+          const SizedBox(height: 24),
+
+          // Quick stats row
+          const _QuickStatsRow(),
+          const SizedBox(height: 24),
 
           // Cargo stats
-          _CargoStatsSection(),
+          const _CargoStatsSection(),
+          const SizedBox(height: 24),
+
+          // Shipment stats
+          const _ShipmentStatsSection(),
           const SizedBox(height: 24),
 
           // Recent activity
-          _RecentActivitySection(),
+          const _RecentActivitySection(),
         ],
       ),
     );
   }
 }
 
-class _UserStatsSection extends StatelessWidget {
+/// Financial overview cards
+class _FinanceOverviewSection extends StatelessWidget {
+  const _FinanceOverviewSection();
+
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AdminUsersProvider>();
+    final provider = context.watch<AdminFinanceProvider>();
+    final summary = provider.summary;
 
-    if (provider.isLoading && provider.users.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            BrandPalette.electricBlue,
+            BrandPalette.electricBlue.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const ShipIcon(ShipAssets.wallet, color: Colors.white, size: 24),
+              const SizedBox(width: 10),
+              Text(
+                'Санхүүгийн тойм',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (provider.isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            )
+          else ...[
+            Text(
+              summary.totalRevenueDisplay,
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Нийт орлого',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _FinanceMiniCard(
+                    label: 'Төлсөн',
+                    value: summary.paidAmountDisplay,
+                    icon: Icons.check_circle_outline,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _FinanceMiniCard(
+                    label: 'Төлөөгүй',
+                    value: summary.unpaidAmountDisplay,
+                    icon: Icons.pending_outlined,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _FinanceMiniCard(
+                    label: 'Цуглуулалт',
+                    value: '${summary.collectionRate.toStringAsFixed(0)}%',
+                    icon: Icons.pie_chart_outline,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
 
-    final users = provider.users;
-    final adminCount = users.where((u) => u.role == UserRole.admin).length;
-    final customerCount = users
-        .where((u) => u.role == UserRole.customer)
-        .length;
-    final bannedCount = users.where((u) => u.banned).length;
+class _FinanceMiniCard extends StatelessWidget {
+  const _FinanceMiniCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  final String label;
+  final String value;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.white70, size: 18),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white70, fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Quick stats row (vehicles, total cargos, shipments)
+class _QuickStatsRow extends StatelessWidget {
+  const _QuickStatsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final vehiclesProvider = context.watch<AdminVehiclesProvider>();
+    final cargosProvider = context.watch<AdminCargosProvider>();
+    final shipmentsProvider = context.watch<AdminShipmentsProvider>();
+
+    return Row(
       children: [
-        Text(
-          'Хэрэглэгчид',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: BrandPalette.primaryText,
+        Expanded(
+          child: _QuickStatCard(
+            icon: ShipAssets.car,
+            value: '${vehiclesProvider.activeVehicles.length}',
+            label: 'Машин',
+            color: BrandPalette.navyBlue,
           ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: AdminStatCard(
-                title: 'Нийт',
-                value: users.length.toString(),
-                assetPath: ShipAssets.manDeliveringPackage,
-                color: BrandPalette.electricBlue,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: AdminStatCard(
-                title: 'Админ',
-                value: adminCount.toString(),
-                assetPath: ShipAssets.handWithCare,
-                color: BrandPalette.logoOrange,
-              ),
-            ),
-          ],
+        const SizedBox(width: 12),
+        Expanded(
+          child: _QuickStatCard(
+            icon: ShipAssets.boxReturn,
+            value: '${cargosProvider.cargos.length}',
+            label: 'Нийт карго',
+            color: BrandPalette.logoOrange,
+          ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: AdminStatCard(
-                title: 'Хэрэглэгч',
-                value: customerCount.toString(),
-                assetPath: ShipAssets.basket,
-                color: BrandPalette.navyBlue,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: AdminStatCard(
-                title: 'Хориглогдсон',
-                value: bannedCount.toString(),
-                assetPath: ShipAssets.boxReturn,
-                color: BrandPalette.errorRed,
-              ),
-            ),
-          ],
+        const SizedBox(width: 12),
+        Expanded(
+          child: _QuickStatCard(
+            icon: ShipAssets.truck,
+            value: '${shipmentsProvider.shipments.length}',
+            label: 'Ачилт',
+            color: const Color(0xFF8B5CF6),
+          ),
         ),
       ],
     );
   }
 }
 
+class _QuickStatCard extends StatelessWidget {
+  const _QuickStatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  final String icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E9F2)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ShipIcon(icon, size: 22, color: color),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: BrandPalette.primaryText,
+            ),
+          ),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: BrandPalette.mutedText,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cargo stats by status
 class _CargoStatsSection extends StatelessWidget {
+  const _CargoStatsSection();
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AdminCargosProvider>();
@@ -157,24 +338,16 @@ class _CargoStatsSection extends StatelessWidget {
     }
 
     final cargos = provider.cargos;
-    final pendingCount = cargos
-        .where((c) => c.status == OrderStatus.pending)
-        .length;
-    final processingCount = cargos
-        .where((c) => c.status == OrderStatus.processing)
-        .length;
-    final transitCount = cargos
-        .where((c) => c.status == OrderStatus.transit)
-        .length;
-    final deliveredCount = cargos
-        .where((c) => c.status == OrderStatus.delivered)
-        .length;
+    final pendingCount = cargos.where((c) => c.status == OrderStatus.pending).length;
+    final processingCount = cargos.where((c) => c.status == OrderStatus.processing).length;
+    final transitCount = cargos.where((c) => c.status == OrderStatus.transit).length;
+    final deliveredCount = cargos.where((c) => c.status == OrderStatus.delivered).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Бараа',
+          'Бараа төлөв',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: BrandPalette.primaryText,
@@ -229,12 +402,106 @@ class _CargoStatsSection extends StatelessWidget {
   }
 }
 
+/// Shipment stats by status
+class _ShipmentStatsSection extends StatelessWidget {
+  const _ShipmentStatsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<AdminShipmentsProvider>();
+
+    if (provider.isLoading && provider.shipments.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ачилт төлөв',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: BrandPalette.primaryText,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: ShipmentStatus.values.map((status) {
+            final count = provider.getByStatus(status).length;
+            return _ShipmentStatusChip(status: status, count: count);
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _ShipmentStatusChip extends StatelessWidget {
+  const _ShipmentStatusChip({required this.status, required this.count});
+
+  final ShipmentStatus status;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: status.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: status.color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: status.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            status.label,
+            style: TextStyle(
+              color: status.color,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: status.color,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              count.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Recent cargo activity
 class _RecentActivitySection extends StatelessWidget {
+  const _RecentActivitySection();
+
   @override
   Widget build(BuildContext context) {
     final cargosProvider = context.watch<AdminCargosProvider>();
-
-    // Get recent cargos (last 5)
     final recentCargos = cargosProvider.cargos.take(5).toList();
 
     return Column(
@@ -258,9 +525,9 @@ class _RecentActivitySection extends StatelessWidget {
             child: Center(
               child: Text(
                 'Бараа байхгүй байна',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: BrandPalette.mutedText),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: BrandPalette.mutedText,
+                ),
               ),
             ),
           )

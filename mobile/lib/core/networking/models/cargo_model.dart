@@ -154,6 +154,16 @@ class CargoModel {
     this.createdAt,
     this.updatedAt,
     this.customer,
+    // Dimension fields
+    this.heightCm,
+    this.widthCm,
+    this.lengthCm,
+    this.isFragile = false,
+    // Pricing fields
+    this.calculatedFeeMnt,
+    this.overrideFeeMnt,
+    // Shipment reference
+    this.shipmentId,
   });
 
   final String id;
@@ -171,6 +181,39 @@ class CargoModel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final CargoCustomerModel? customer;
+  // Dimension fields
+  final int? heightCm;
+  final int? widthCm;
+  final int? lengthCm;
+  final bool isFragile;
+  // Pricing fields
+  final int? calculatedFeeMnt;
+  final int? overrideFeeMnt;
+  // Shipment reference
+  final String? shipmentId;
+
+  /// Check if cargo has dimensions recorded
+  bool get hasDimensions =>
+      heightCm != null && widthCm != null && lengthCm != null;
+
+  /// Calculate volume in cubic meters
+  double get volumeCbm {
+    if (!hasDimensions) return 0;
+    return (heightCm! * widthCm! * lengthCm!) / 1000000.0;
+  }
+
+  /// Weight in kilograms
+  double get weightKg => (weightGrams ?? 0) / 1000.0;
+
+  /// Dimensions display string
+  String get dimensionsDisplay {
+    if (!hasDimensions) return '-';
+    return '${lengthCm}x${widthCm}x${heightCm}см';
+  }
+
+  /// Final fee to display (override or calculated or base)
+  int get finalFeeMnt =>
+      overrideFeeMnt ?? calculatedFeeMnt ?? totalFeeMnt ?? baseShippingFeeMnt ?? 0;
 
   factory CargoModel.fromJson(Map<String, dynamic> json) {
     return CargoModel(
@@ -201,6 +244,16 @@ class CargoModel {
               json['customer'] as Map<String, dynamic>,
             )
           : null,
+      // Dimension fields
+      heightCm: _asInt(json['heightCm']),
+      widthCm: _asInt(json['widthCm']),
+      lengthCm: _asInt(json['lengthCm']),
+      isFragile: json['isFragile'] as bool? ?? false,
+      // Pricing fields
+      calculatedFeeMnt: _asInt(json['calculatedFeeMnt']),
+      overrideFeeMnt: _asInt(json['overrideFeeMnt']),
+      // Shipment reference
+      shipmentId: json['shipmentId'] as String?,
     );
   }
 
@@ -218,6 +271,16 @@ class CargoModel {
       if (weightGrams != null) 'weightGrams': weightGrams,
       if (baseShippingFeeMnt != null) 'baseShippingFeeMnt': baseShippingFeeMnt,
       if (totalFeeMnt != null) 'totalFeeMnt': totalFeeMnt,
+      // Dimension fields
+      if (heightCm != null) 'heightCm': heightCm,
+      if (widthCm != null) 'widthCm': widthCm,
+      if (lengthCm != null) 'lengthCm': lengthCm,
+      'isFragile': isFragile,
+      // Pricing fields
+      if (calculatedFeeMnt != null) 'calculatedFeeMnt': calculatedFeeMnt,
+      if (overrideFeeMnt != null) 'overrideFeeMnt': overrideFeeMnt,
+      // Shipment reference
+      if (shipmentId != null) 'shipmentId': shipmentId,
     };
   }
 
@@ -237,6 +300,16 @@ class CargoModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     CargoCustomerModel? customer,
+    // Dimension fields
+    int? heightCm,
+    int? widthCm,
+    int? lengthCm,
+    bool? isFragile,
+    // Pricing fields
+    int? calculatedFeeMnt,
+    int? overrideFeeMnt,
+    // Shipment reference
+    String? shipmentId,
   }) {
     return CargoModel(
       id: id ?? this.id,
@@ -254,6 +327,16 @@ class CargoModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       customer: customer ?? this.customer,
+      // Dimension fields
+      heightCm: heightCm ?? this.heightCm,
+      widthCm: widthCm ?? this.widthCm,
+      lengthCm: lengthCm ?? this.lengthCm,
+      isFragile: isFragile ?? this.isFragile,
+      // Pricing fields
+      calculatedFeeMnt: calculatedFeeMnt ?? this.calculatedFeeMnt,
+      overrideFeeMnt: overrideFeeMnt ?? this.overrideFeeMnt,
+      // Shipment reference
+      shipmentId: shipmentId ?? this.shipmentId,
     );
   }
 }

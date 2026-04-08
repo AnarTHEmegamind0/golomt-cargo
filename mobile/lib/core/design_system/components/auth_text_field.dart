@@ -1,3 +1,4 @@
+import 'package:core/core/brand_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -73,7 +74,7 @@ class _AuthTextFieldState extends State<AuthTextField>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    const primaryColor = BrandPalette.electricBlue;
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
@@ -277,6 +278,7 @@ class _AuthButtonState extends State<AuthButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
   late final Animation<double> _scaleAnimation;
+  bool _isPressed = false;
 
   @override
   void initState() {
@@ -299,7 +301,8 @@ class _AuthButtonState extends State<AuthButton>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    const primaryColor = BrandPalette.electricBlue;
+    const pressedColor = BrandPalette.navyBlue;
     final isEnabled = widget.enabled && !widget.isLoading;
 
     return AnimatedBuilder(
@@ -308,13 +311,33 @@ class _AuthButtonState extends State<AuthButton>
         return Transform.scale(scale: _scaleAnimation.value, child: child);
       },
       child: GestureDetector(
-        onTapDown: isEnabled ? (_) => _animController.forward() : null,
-        onTapUp: isEnabled ? (_) => _animController.reverse() : null,
-        onTapCancel: isEnabled ? () => _animController.reverse() : null,
+        onTapDown: isEnabled
+            ? (_) {
+                setState(() => _isPressed = true);
+                _animController.forward();
+              }
+            : null,
+        onTapUp: isEnabled
+            ? (_) {
+                setState(() => _isPressed = false);
+                _animController.reverse();
+              }
+            : null,
+        onTapCancel: isEnabled
+            ? () {
+                setState(() => _isPressed = false);
+                _animController.reverse();
+              }
+            : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           height: 56,
-          decoration: _getDecoration(isDark, primaryColor, isEnabled),
+          decoration: _getDecoration(
+            isDark,
+            primaryColor,
+            pressedColor,
+            isEnabled,
+          ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -362,13 +385,19 @@ class _AuthButtonState extends State<AuthButton>
     );
   }
 
-  BoxDecoration _getDecoration(bool isDark, Color primaryColor, bool enabled) {
+  BoxDecoration _getDecoration(
+    bool isDark,
+    Color primaryColor,
+    Color pressedColor,
+    bool enabled,
+  ) {
     switch (widget.variant) {
       case AuthButtonVariant.primary:
+        final baseColor = _isPressed ? pressedColor : primaryColor;
         return BoxDecoration(
           gradient: enabled
               ? LinearGradient(
-                  colors: [primaryColor, primaryColor.withValues(alpha: 0.85)],
+                  colors: [baseColor, baseColor.withValues(alpha: 0.85)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
@@ -378,7 +407,7 @@ class _AuthButtonState extends State<AuthButton>
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.4),
+                    color: baseColor.withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),

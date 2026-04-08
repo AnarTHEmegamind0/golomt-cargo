@@ -2,58 +2,46 @@ import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/cargo_backdrop.dart';
-import 'package:core/features/admin/pages/admin_branches_page.dart';
-import 'package:core/features/admin/pages/admin_cargos_page.dart';
-import 'package:core/features/admin/pages/admin_dashboard_page.dart';
-import 'package:core/features/admin/pages/admin_finance_page.dart';
-import 'package:core/features/admin/pages/admin_logs_page.dart';
-import 'package:core/features/admin/pages/admin_shipments_page.dart';
-import 'package:core/features/admin/pages/admin_users_page.dart';
-import 'package:core/features/admin/pages/admin_vehicles_page.dart';
-import 'package:core/features/admin/widgets/admin_drawer.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
+import 'package:core/features/china_staff/pages/china_dashboard_page.dart';
+import 'package:core/features/china_staff/pages/china_cargo_import_page.dart';
+import 'package:core/features/china_staff/pages/china_vehicles_page.dart';
+import 'package:core/features/china_staff/pages/china_shipments_page.dart';
+import 'package:core/features/china_staff/widgets/china_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// Admin shell with drawer navigation (8 sections)
-class AdminShellPage extends StatefulWidget {
-  const AdminShellPage({super.key});
+/// China staff shell with drawer navigation
+class ChinaStaffShellPage extends StatefulWidget {
+  const ChinaStaffShellPage({super.key});
 
   @override
-  State<AdminShellPage> createState() => _AdminShellPageState();
+  State<ChinaStaffShellPage> createState() => _ChinaStaffShellPageState();
 }
 
-class _AdminShellPageState extends State<AdminShellPage> {
+class _ChinaStaffShellPageState extends State<ChinaStaffShellPage> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _pages = const [
-    AdminDashboardPage(), // 0: Тойм
-    AdminCargosPage(), // 1: Бараа
-    AdminShipmentsPage(), // 2: Ачилт
-    AdminVehiclesPage(), // 3: Машин
-    AdminUsersPage(), // 4: Хэрэглэгчид
-    AdminBranchesPage(), // 5: Салбар
-    AdminFinancePage(), // 6: Санхүү
-    AdminLogsPage(), // 7: Лог
+    ChinaDashboardPage(), // 0: Тойм
+    ChinaCargoImportPage(), // 1: Бараа бүртгэл
+    ChinaVehiclesPage(), // 2: Машин
+    ChinaShipmentsPage(), // 3: Ачилт
   ];
 
   final _titles = const [
     'Тойм',
-    'Бараа',
-    'Ачилт',
+    'Бараа бүртгэл',
     'Машин',
-    'Хэрэглэгчид',
-    'Салбар',
-    'Санхүү',
-    'Лог',
+    'Ачилт',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AdminDrawer(
+      drawer: ChinaDrawer(
         currentIndex: _currentIndex,
         onItemSelected: (index) {
           setState(() => _currentIndex = index);
@@ -76,8 +64,8 @@ class _AdminShellPageState extends State<AdminShellPage> {
                       icon: const Icon(Icons.menu_rounded),
                       style: IconButton.styleFrom(
                         backgroundColor:
-                            BrandPalette.electricBlue.withValues(alpha: 0.1),
-                        foregroundColor: BrandPalette.electricBlue,
+                            BrandPalette.logoOrange.withValues(alpha: 0.1),
+                        foregroundColor: BrandPalette.logoOrange,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -87,14 +75,14 @@ class _AdminShellPageState extends State<AdminShellPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: BrandPalette.electricBlue.withValues(
+                            color: BrandPalette.logoOrange.withValues(
                               alpha: 0.1,
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const ShipIcon(
                             ShipAssets.handWithCare,
-                            color: BrandPalette.electricBlue,
+                            color: BrandPalette.logoOrange,
                             size: 22,
                           ),
                         ),
@@ -113,7 +101,7 @@ class _AdminShellPageState extends State<AdminShellPage> {
                                   ),
                             ),
                             Text(
-                              'Админ панел',
+                              'Хятад агуулах',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall

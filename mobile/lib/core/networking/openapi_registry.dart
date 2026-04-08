@@ -228,4 +228,78 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     method: "POST",
     path: "/auth/admin/has-permission",
   ),
+  // Cargo dimensions
+  "POST /api/cargos/{cargoId}/record-dimensions": OpenApiOperation(
+    method: "POST",
+    path: "/api/cargos/{cargoId}/record-dimensions",
+  ),
+  "POST /api/cargos/import": OpenApiOperation(
+    method: "POST",
+    path: "/api/cargos/import",
+  ),
+  // Vehicle management
+  "GET /api/vehicles": OpenApiOperation(
+    method: "GET",
+    path: "/api/vehicles",
+  ),
+  "POST /api/vehicles": OpenApiOperation(
+    method: "POST",
+    path: "/api/vehicles",
+  ),
+  "PUT /api/vehicles/{vehicleId}": OpenApiOperation(
+    method: "PUT",
+    path: "/api/vehicles/{vehicleId}",
+  ),
+  "DELETE /api/vehicles/{vehicleId}": OpenApiOperation(
+    method: "DELETE",
+    path: "/api/vehicles/{vehicleId}",
+  ),
+  // Shipment management
+  "GET /api/shipments": OpenApiOperation(
+    method: "GET",
+    path: "/api/shipments",
+  ),
+  "GET /api/shipments/{shipmentId}": OpenApiOperation(
+    method: "GET",
+    path: "/api/shipments/{shipmentId}",
+  ),
+  "POST /api/shipments": OpenApiOperation(
+    method: "POST",
+    path: "/api/shipments",
+  ),
+  "POST /api/shipments/{shipmentId}/cargos": OpenApiOperation(
+    method: "POST",
+    path: "/api/shipments/{shipmentId}/cargos",
+  ),
+  "DELETE /api/shipments/{shipmentId}/cargos": OpenApiOperation(
+    method: "DELETE",
+    path: "/api/shipments/{shipmentId}/cargos",
+  ),
+  "POST /api/shipments/{shipmentId}/status": OpenApiOperation(
+    method: "POST",
+    path: "/api/shipments/{shipmentId}/status",
+  ),
+  // Activity logs
+  "GET /api/admin/logs": OpenApiOperation(
+    method: "GET",
+    path: "/api/admin/logs",
+  ),
+  // Finance
+  "GET /api/admin/finance/summary": OpenApiOperation(
+    method: "GET",
+    path: "/api/admin/finance/summary",
+  ),
+  // Branch management
+  "POST /api/branches": OpenApiOperation(
+    method: "POST",
+    path: "/api/branches",
+  ),
+  "PUT /api/branches/{branchId}": OpenApiOperation(
+    method: "PUT",
+    path: "/api/branches/{branchId}",
+  ),
+  "DELETE /api/branches/{branchId}": OpenApiOperation(
+    method: "DELETE",
+    path: "/api/branches/{branchId}",
+  ),
 };

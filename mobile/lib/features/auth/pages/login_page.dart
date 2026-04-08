@@ -1,3 +1,4 @@
+import 'package:core/core/brand_palette.dart';
 import 'package:core/core/design_system/components/animated_background.dart';
 import 'package:core/core/design_system/components/auth_text_field.dart';
 import 'package:core/features/auth/pages/signup_page.dart';
@@ -91,6 +92,20 @@ class _LoginPageState extends State<LoginPage>
     final isLoading = context.select((AuthProvider p) => p.isLoading);
     final error = context.select((AuthProvider p) => p.error);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final linkStyle = ButtonStyle(
+      foregroundColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.pressed)) {
+          return BrandPalette.navyBlue;
+        }
+        return BrandPalette.electricBlue;
+      }),
+      overlayColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.pressed)) {
+          return BrandPalette.navyBlue.withValues(alpha: 0.12);
+        }
+        return BrandPalette.electricBlue.withValues(alpha: 0.08);
+      }),
+    );
 
     return Scaffold(
       body: MeshGradientBackground(
@@ -180,12 +195,10 @@ class _LoginPageState extends State<LoginPage>
                                   onPressed: () {
                                     // TODO: Navigate to forgot password
                                   },
+                                  style: linkStyle,
                                   child: Text(
                                     'Нууц үг мартсан?',
                                     style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -224,12 +237,10 @@ class _LoginPageState extends State<LoginPage>
                                   ),
                                   TextButton(
                                     onPressed: _navigateToSignUp,
+                                    style: linkStyle,
                                     child: Text(
                                       'Бүртгүүлэх',
                                       style: TextStyle(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -261,8 +272,8 @@ class _LoginPageState extends State<LoginPage>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+            BrandPalette.electricBlue,
+            BrandPalette.electricBlue.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -270,7 +281,7 @@ class _LoginPageState extends State<LoginPage>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+            color: BrandPalette.electricBlue.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),

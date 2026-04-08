@@ -190,6 +190,8 @@ class AdminUserCard extends StatelessWidget {
   Color _roleColor(UserRole role) {
     return switch (role) {
       UserRole.admin => BrandPalette.logoOrange,
+      UserRole.chinaStaff => const Color(0xFFEF4444),
+      UserRole.mongoliaStaff => const Color(0xFF8B5CF6),
       UserRole.customer => BrandPalette.electricBlue,
     };
   }
@@ -202,10 +204,12 @@ class _RoleBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = role == UserRole.admin
-        ? BrandPalette.logoOrange
-        : BrandPalette.electricBlue;
-    final label = role == UserRole.admin ? 'Админ' : 'Хэрэглэгч';
+    final color = switch (role) {
+      UserRole.admin => BrandPalette.logoOrange,
+      UserRole.chinaStaff => const Color(0xFFEF4444),
+      UserRole.mongoliaStaff => const Color(0xFF8B5CF6),
+      UserRole.customer => BrandPalette.electricBlue,
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -214,7 +218,7 @@ class _RoleBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        label,
+        role.label,
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.w700,
@@ -252,7 +256,7 @@ class _RoleDropdown extends StatelessWidget {
           items: UserRole.values.map((role) {
             return DropdownMenuItem(
               value: role,
-              child: Text(role == UserRole.admin ? 'Админ' : 'Хэрэглэгч'),
+              child: Text(role.label),
             );
           }).toList(),
           onChanged: onChanged == null
