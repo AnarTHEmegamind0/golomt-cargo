@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import type { AppRole } from "~/lib/constants/roles";
+import { normalizeAppRole, type AppRole } from "~/lib/constants/roles";
 import { auth } from "~/lib/auth";
 import { cargoStatusEvent } from "~/db/schema";
 import { logAuthFailure } from "~/lib/runtime-logging";
@@ -19,19 +19,22 @@ export const roleGuard = (roles: AppRole[]) => ({
       return ctx.status(401, { message: "Unauthorized" });
     }
 
-    const role = session.user.role as AppRole | undefined;
+    const role = normalizeAppRole(session.user.role);
     if (!role || !roles.includes(role)) {
       logAuthFailure(ctx, {
         status: 403,
         reason: "insufficient_role",
         requiredRoles: roles,
-        resolvedRole: role ?? null,
+        resolvedRole: session.user.role ?? null,
         userId: session.user.id,
       });
       return ctx.status(403, { message: "Forbidden" });
     }
 
-    ctx.authUser = session.user;
+    ctx.authUser = {
+      ...session.user,
+      role,
+    };
   },
 });
 

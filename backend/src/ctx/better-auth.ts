@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { auth } from "~/lib/auth";
-import type { AppRole } from "~/lib/constants/roles";
+import { normalizeAppRole, type AppRole } from "~/lib/constants/roles";
 import { logAuthFailure } from "~/lib/runtime-logging";
 
 export const betterAuth = new Elysia({ name: "@[better-auth]" })
@@ -27,7 +27,7 @@ export const betterAuth = new Elysia({ name: "@[better-auth]" })
             return status(401, "Unauthorized");
           }
 
-          const role = session.user.role as AppRole | undefined;
+          const role = normalizeAppRole(session.user.role);
           const requiredRoles = options?.roles;
 
           if (requiredRoles?.length && (!role || !requiredRoles.includes(role))) {
@@ -35,14 +35,17 @@ export const betterAuth = new Elysia({ name: "@[better-auth]" })
               status: 403,
               reason: "insufficient_role",
               requiredRoles,
-              resolvedRole: role ?? null,
+              resolvedRole: session.user.role ?? null,
               userId: session.user.id,
             });
             return status(403, "Forbidden");
           }
 
           return {
-            user: session.user,
+            user: {
+              ...session.user,
+              role,
+            },
             session: session.session,
           };
         },
