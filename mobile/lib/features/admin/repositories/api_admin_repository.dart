@@ -82,7 +82,7 @@ class ApiAdminRepository implements AdminRepository {
           'email': email,
           'password': password,
           'name': name,
-          'role': role.name,
+          'role': role.value,
         },
       );
 
@@ -125,7 +125,7 @@ class ApiAdminRepository implements AdminRepository {
     try {
       await _openApiClient.call(
         AppApiOperations.adminSetRole,
-        data: {'userId': userId, 'role': role.name},
+        data: {'userId': userId, 'role': role.value},
       );
     } catch (error) {
       throw Exception(extractApiErrorMessage(error));

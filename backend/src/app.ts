@@ -8,6 +8,7 @@ import { cfBindings } from "~/ctx/cf-bindings";
 import { betterAuth } from "~/ctx/better-auth";
 import { OpenAPI } from "./lib/auth";
 import { openApiSecuritySchemes, openApiTags } from "~/lib/openapi";
+import { beginRequestLog, completeRequestLog, logRequestError } from "~/lib/runtime-logging";
 import { apiRoutes } from "~/routes";
 
 type AppOpenAPIConfig = Partial<ElysiaOpenAPIConfig<boolean, string>>;
@@ -24,6 +25,15 @@ export const createApp = async ({ openapiConfig = defaultOpenAPIConfig }: AppOpt
   let app = new Elysia({
     adapter: CloudflareAdapter,
   })
+    .onRequest((ctx: any) => {
+      beginRequestLog(ctx);
+    })
+    .onError((ctx: any) => {
+      logRequestError(ctx, ctx.error, ctx.code);
+    })
+    .onAfterResponse((ctx: any) => {
+      completeRequestLog(ctx);
+    })
     .use(
       cors({
         origin: "*",
