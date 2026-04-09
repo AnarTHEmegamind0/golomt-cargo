@@ -1,0 +1,104 @@
+name: Android APK Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: Override versionName. Defaults to `mobile/pubspec.yaml`.
+        required: false
+        type: string
+      build_number:
+        description: Override versionCode. Defaults to `mobile/pubspec.yaml`.
+        required: false
+        type: string
+
+concurrency:
+  group: android-apk-release
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          RAW_VERSION="$(grep '^version:' pubspec.yaml | awk '{print $2}')"
+          DEFAULT_NAME="${RAW_VERSION%%+*}"
+          DEFAULT_NUMBER="${RAW_VERSION##*+}"
+          VERSION_NAME="${{ github.event.inputs.version_name }}"
+          BUILD_NUMBER="${{ github.event.inputs.build_number }}"
+
+          if [ -z "$VERSION_NAME" ]; then
+            VERSION_NAME="$DEFAULT_NAME"
+          fi
+
+          if [ -z "$BUILD_NUMBER" ]; then
+            BUILD_NUMBER="$DEFAULT_NUMBER"
+          fi
+
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "tag=android-v$VERSION_NAME-b$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Decode Android keystore
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "Missing ANDROID_KEYSTORE_BASE64 secret" >&2
+            exit 1
+          fi
+
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      - name: Build signed release APK
+        run: >
+          flutter build apk
+          --release
+          --build-name=${{ steps.version.outputs.version_name }}
+          --build-number=${{ steps.version.outputs.build_number }}
+        env:
+          ANDROID_KEYSTORE_PATH: android/upload-keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.build_number }}
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Android APK ${{ steps.version.outputs.version_name }} (${{ steps.version.outputs.build_number }})
+          generate_release_notes: true
+          files: mobile/build/app/outputs/flutter-apk/app-release.apk
