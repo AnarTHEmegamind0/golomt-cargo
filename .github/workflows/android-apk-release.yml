@@ -77,6 +77,25 @@ jobs:
 
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
 
+      - name: Verify signing inputs
+        shell: bash
+        run: |
+          test -s android/upload-keystore.jks || {
+            echo "Decoded keystore file is missing or empty" >&2
+            exit 1
+          }
+
+          for secret_name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!secret_name}" ]; then
+              echo "Missing $secret_name secret" >&2
+              exit 1
+            fi
+          done
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
       - name: Build signed release APK
         run: >
           flutter build apk
@@ -84,7 +103,7 @@ jobs:
           --build-name=${{ steps.version.outputs.version_name }}
           --build-number=${{ steps.version.outputs.build_number }}
         env:
-          ANDROID_KEYSTORE_PATH: android/upload-keystore.jks
+          ANDROID_KEYSTORE_PATH: upload-keystore.jks
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
