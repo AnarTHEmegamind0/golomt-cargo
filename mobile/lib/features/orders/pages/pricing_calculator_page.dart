@@ -108,7 +108,10 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
                 label: const Text('Тооцоолох'),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(56),
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -138,7 +141,9 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BrandPalette.electricBlue.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: BrandPalette.electricBlue.withValues(alpha: 0.2),
+        ),
       ),
       child: Row(
         children: [
@@ -150,7 +155,11 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: ShipIcon(ShipAssets.wallet, color: BrandPalette.electricBlue, size: 24),
+              child: ShipIcon(
+                ShipAssets.wallet,
+                color: BrandPalette.electricBlue,
+                size: 24,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -199,24 +208,45 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
         children: [
           Row(
             children: [
-              const Icon(Icons.price_change_outlined, color: BrandPalette.electricBlue, size: 20),
+              const Icon(
+                Icons.price_change_outlined,
+                color: BrandPalette.electricBlue,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Үнийн тариф',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _RateRow(icon: Icons.scale, label: 'Жингээр', value: '${PricingRates.pricePerKg}₮/кг'),
+          _RateRow(
+            icon: Icons.scale,
+            label: 'Жингээр',
+            value: '${PricingRates.pricePerKg}₮/кг',
+          ),
           const SizedBox(height: 8),
-          _RateRow(icon: Icons.view_in_ar, label: 'Эзлэхүүнээр', value: '${PricingRates.pricePerCbm}₮/м³'),
+          _RateRow(
+            icon: Icons.view_in_ar,
+            label: 'Эзлэхүүнээр',
+            value: '${PricingRates.pricePerCbm}₮/м³',
+          ),
           const SizedBox(height: 8),
-          _RateRow(icon: Icons.warning_amber, label: 'Эмзэг бараа', value: '${PricingRates.pricePerCbmFragile}₮/м³', color: BrandPalette.logoOrange),
+          _RateRow(
+            icon: Icons.warning_amber,
+            label: 'Эмзэг бараа',
+            value: '${PricingRates.pricePerCbmFragile}₮/м³',
+            color: BrandPalette.logoOrange,
+          ),
           const SizedBox(height: 8),
-          _RateRow(icon: Icons.info_outline, label: 'Доод хязгаар', value: '${PricingRates.minimumFee}₮'),
+          _RateRow(
+            icon: Icons.info_outline,
+            label: 'Доод хязгаар',
+            value: '${PricingRates.minimumFee}₮',
+          ),
         ],
       ),
     );
@@ -243,23 +273,29 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
           children: [
             Text(
               'Барааны мэдээлэл',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
 
             // Weight input
             TextFormField(
               controller: _weightController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              ],
               decoration: InputDecoration(
                 labelText: 'Жин (кг)',
                 hintText: '0.5',
                 prefixIcon: const Icon(Icons.scale_outlined),
                 suffixText: 'кг',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -277,7 +313,11 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
             // Dimensions header
             Row(
               children: [
-                const Icon(Icons.straighten, size: 16, color: BrandPalette.mutedText),
+                const Icon(
+                  Icons.straighten,
+                  size: 16,
+                  color: BrandPalette.mutedText,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Хэмжээс (см)',
@@ -302,7 +342,9 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
                       labelText: 'Урт',
                       hintText: '30',
                       suffixText: 'см',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Оруулна уу';
@@ -322,7 +364,9 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
                       labelText: 'Өргөн',
                       hintText: '20',
                       suffixText: 'см',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Оруулна уу';
@@ -342,7 +386,9 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
                       labelText: 'Өндөр',
                       hintText: '15',
                       suffixText: 'см',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Оруулна уу';
@@ -359,23 +405,44 @@ class _PricingCalculatorPageState extends State<PricingCalculatorPage> {
             // Fragile toggle
             Container(
               decoration: BoxDecoration(
-                color: _isFragile ? BrandPalette.logoOrange.withValues(alpha: 0.1) : BrandPalette.softBlueBackground,
+                color: _isFragile
+                    ? BrandPalette.logoOrange.withValues(alpha: 0.1)
+                    : BrandPalette.softBlueBackground,
                 borderRadius: BorderRadius.circular(12),
-                border: _isFragile ? Border.all(color: BrandPalette.logoOrange.withValues(alpha: 0.3)) : null,
+                border: _isFragile
+                    ? Border.all(
+                        color: BrandPalette.logoOrange.withValues(alpha: 0.3),
+                      )
+                    : null,
               ),
               child: SwitchListTile(
-                title: const Text('Эмзэг бараа', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('Шил, цахилгаан бараа гэх мэт', style: TextStyle(fontSize: 12)),
+                title: const Text(
+                  'Эмзэг бараа',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(
+                  'Шил, цахилгаан бараа гэх мэт',
+                  style: TextStyle(fontSize: 12),
+                ),
                 secondary: Icon(
                   Icons.warning_amber_rounded,
-                  color: _isFragile ? BrandPalette.logoOrange : BrandPalette.mutedText,
+                  color: _isFragile
+                      ? BrandPalette.logoOrange
+                      : BrandPalette.mutedText,
                 ),
                 value: _isFragile,
                 onChanged: (value) => setState(() => _isFragile = value),
-                activeTrackColor: BrandPalette.logoOrange.withValues(alpha: 0.5),
-                thumbColor: WidgetStateProperty.resolveWith((states) =>
-                  states.contains(WidgetState.selected) ? BrandPalette.logoOrange : null),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                activeTrackColor: BrandPalette.logoOrange.withValues(
+                  alpha: 0.5,
+                ),
+                thumbColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected)
+                      ? BrandPalette.logoOrange
+                      : null,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],
@@ -404,7 +471,10 @@ class _RateRow extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: color ?? BrandPalette.mutedText),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(color: BrandPalette.mutedText, fontSize: 13)),
+        Text(
+          label,
+          style: TextStyle(color: BrandPalette.mutedText, fontSize: 13),
+        ),
         const Spacer(),
         Text(
           value,

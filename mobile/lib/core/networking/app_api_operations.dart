@@ -67,9 +67,14 @@ class AppApiOperations {
       'DELETE /api/shipments/{shipmentId}/cargos';
   static const adminUpdateShipmentStatus =
       'POST /api/shipments/{shipmentId}/status';
+  static const adminExportShipmentPdf =
+      'GET /api/shipments/{shipmentId}/export.pdf';
+  static const adminExportShipmentXlsx =
+      'GET /api/shipments/{shipmentId}/export.xlsx';
 
   // Admin - Activity logs
   static const adminListActivityLogs = 'GET /api/admin/logs';
+  static const adminExportActivityLogsXlsx = 'GET /api/admin/logs/export.xlsx';
 
   // Admin - Finance
   static const adminFinanceSummary = 'GET /api/admin/finance/summary';

@@ -85,20 +85,23 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
           child: provider.isLoading && provider.vehicles.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : provider.vehicles.isEmpty
-                  ? _EmptyState(onAdd: () => _showCreateDialog(context))
-                  : RefreshIndicator(
-                      onRefresh: () => provider.loadVehicles(forceRefresh: true),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                        itemCount: provider.vehicles.length,
-                        itemBuilder: (context, index) => _VehicleCard(
-                          vehicle: provider.vehicles[index],
-                          onEdit: () => _showEditDialog(context, provider.vehicles[index]),
-                          onToggle: () => provider.toggleActive(provider.vehicles[index].id),
-                          onDelete: () => _confirmDelete(context, provider.vehicles[index]),
-                        ),
-                      ),
+              ? _EmptyState(onAdd: () => _showCreateDialog(context))
+              : RefreshIndicator(
+                  onRefresh: () => provider.loadVehicles(forceRefresh: true),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: provider.vehicles.length,
+                    itemBuilder: (context, index) => _VehicleCard(
+                      vehicle: provider.vehicles[index],
+                      onEdit: () =>
+                          _showEditDialog(context, provider.vehicles[index]),
+                      onToggle: () =>
+                          provider.toggleActive(provider.vehicles[index].id),
+                      onDelete: () =>
+                          _confirmDelete(context, provider.vehicles[index]),
                     ),
+                  ),
+                ),
         ),
       ],
     );
@@ -139,10 +142,9 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
                   value: selectedType,
                   decoration: const InputDecoration(labelText: 'Төрөл'),
                   items: VehicleType.values
-                      .map((t) => DropdownMenuItem(
-                            value: t,
-                            child: Text(t.label),
-                          ))
+                      .map(
+                        (t) => DropdownMenuItem(value: t, child: Text(t.label)),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => selectedType = v!),
                 ),
@@ -171,7 +173,9 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
                   type: selectedType,
                 );
               },
-              style: FilledButton.styleFrom(backgroundColor: BrandPalette.logoOrange),
+              style: FilledButton.styleFrom(
+                backgroundColor: BrandPalette.logoOrange,
+              ),
               child: const Text('Бүртгэх'),
             ),
           ],
@@ -209,7 +213,9 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
                   value: selectedType,
                   decoration: const InputDecoration(labelText: 'Төрөл'),
                   items: VehicleType.values
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t.label)))
+                      .map(
+                        (t) => DropdownMenuItem(value: t, child: Text(t.label)),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => selectedType = v!),
                 ),
@@ -231,7 +237,9 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
                   type: selectedType,
                 );
               },
-              style: FilledButton.styleFrom(backgroundColor: BrandPalette.logoOrange),
+              style: FilledButton.styleFrom(
+                backgroundColor: BrandPalette.logoOrange,
+              ),
               child: const Text('Хадгалах'),
             ),
           ],
@@ -254,9 +262,13 @@ class _ChinaVehiclesPageState extends State<ChinaVehiclesPage> {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              this.context.read<AdminVehiclesProvider>().deleteVehicle(vehicle.id);
+              this.context.read<AdminVehiclesProvider>().deleteVehicle(
+                vehicle.id,
+              );
             },
-            style: FilledButton.styleFrom(backgroundColor: BrandPalette.errorRed),
+            style: FilledButton.styleFrom(
+              backgroundColor: BrandPalette.errorRed,
+            ),
             child: const Text('Устгах'),
           ),
         ],
@@ -339,7 +351,10 @@ class _VehicleCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: vehicle.isActive
                       ? BrandPalette.successGreen.withValues(alpha: 0.1)
@@ -431,9 +446,9 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Машин бүртгэгдээгүй',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText),
           ),
           const SizedBox(height: 8),
           FilledButton.icon(

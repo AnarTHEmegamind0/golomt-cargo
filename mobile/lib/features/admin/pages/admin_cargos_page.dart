@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:core/core/brand_palette.dart';
+import 'package:core/core/networking/models/cargo_model.dart';
 import 'package:core/features/admin/providers/admin_cargos_provider.dart';
 import 'package:core/features/admin/widgets/admin_cargo_card.dart';
-import 'package:core/features/orders/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -316,7 +316,7 @@ class _CargoList extends StatelessWidget {
     required this.emptyMessage,
   });
 
-  final List<Order> cargos;
+  final List<CargoModel> cargos;
   final bool isLoading;
   final String? processingCargoId;
   final String emptyMessage;
@@ -363,18 +363,38 @@ class _CargoList extends StatelessWidget {
           return AdminCargoCard(
             cargo: cargo,
             isProcessing: isProcessing,
-            onReceive: cargo.status == OrderStatus.pending
+            onReceive: cargo.status == CargoStatus.created
                 ? (imagePath) =>
                       provider.receiveCargo(cargo.id, imagePath: imagePath)
                 : null,
-            onRecordWeight: cargo.status == OrderStatus.processing
+            onRecordWeight: cargo.status == CargoStatus.receivedChina
                 ? (weightGrams, fee) =>
                       provider.recordWeight(cargo.id, weightGrams, fee)
                 : null,
-            onShip: cargo.status == OrderStatus.processing
+            onRecordDimensions:
+                (cargo.status == CargoStatus.receivedChina ||
+                    cargo.status == CargoStatus.inTransitToMn ||
+                    cargo.status == CargoStatus.arrivedMn ||
+                    cargo.status == CargoStatus.awaitingFulfillmentChoice)
+                ? ({
+                    required int heightCm,
+                    required int widthCm,
+                    required int lengthCm,
+                    required bool isFragile,
+                    int? overrideFeeMnt,
+                  }) => provider.recordDimensions(
+                    cargoId: cargo.id,
+                    heightCm: heightCm,
+                    widthCm: widthCm,
+                    lengthCm: lengthCm,
+                    isFragile: isFragile,
+                    overrideFeeMnt: overrideFeeMnt,
+                  )
+                : null,
+            onShip: cargo.status == CargoStatus.receivedChina
                 ? () => provider.shipCargo(cargo.id)
                 : null,
-            onArrive: cargo.status == OrderStatus.transit
+            onArrive: cargo.status == CargoStatus.inTransitToMn
                 ? () => provider.arriveCargo(cargo.id)
                 : null,
           );

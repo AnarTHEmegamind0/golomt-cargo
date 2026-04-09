@@ -11,4 +11,3 @@ class NavigationController extends ChangeNotifier {
     notifyListeners();
   }
 }
-

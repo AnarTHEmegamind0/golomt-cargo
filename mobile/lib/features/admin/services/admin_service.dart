@@ -1,4 +1,5 @@
 import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/core/networking/downloaded_file.dart';
 import 'package:core/features/admin/models/admin_activity_log.dart';
 import 'package:core/features/admin/models/admin_user.dart';
 import 'package:core/features/admin/models/finance_summary.dart';
@@ -240,6 +241,10 @@ class AdminService {
   }
 
   // Branch management
+  Future<List<Branch>> listBranches() {
+    return _repository.listBranches();
+  }
+
   Future<Branch> createBranch({
     required String name,
     required String code,
@@ -278,5 +283,18 @@ class AdminService {
 
   Future<void> deleteBranch(String branchId) {
     return _repository.deleteBranch(branchId);
+  }
+
+  // Exports
+  Future<DownloadedFile> exportShipmentPdf(String shipmentId) {
+    return _repository.exportShipmentPdf(shipmentId);
+  }
+
+  Future<DownloadedFile> exportShipmentXlsx(String shipmentId) {
+    return _repository.exportShipmentXlsx(shipmentId);
+  }
+
+  Future<DownloadedFile> exportAdminLogsXlsx() {
+    return _repository.exportAdminLogsXlsx();
   }
 }

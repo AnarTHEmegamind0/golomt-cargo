@@ -383,10 +383,7 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
               initialValue: _selectedRole,
               decoration: const InputDecoration(labelText: 'Эрх'),
               items: UserRole.values.map((role) {
-                return DropdownMenuItem(
-                  value: role,
-                  child: Text(role.label),
-                );
+                return DropdownMenuItem(value: role, child: Text(role.label));
               }).toList(),
               onChanged: (role) {
                 if (role != null) {

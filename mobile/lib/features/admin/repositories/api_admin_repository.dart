@@ -1,5 +1,6 @@
 import 'package:core/core/networking/api_parsing.dart';
 import 'package:core/core/networking/app_api_operations.dart';
+import 'package:core/core/networking/downloaded_file.dart';
 import 'package:core/core/networking/models/cargo_model.dart';
 import 'package:core/core/networking/openapi_client.dart';
 import 'package:core/features/admin/models/admin_activity_log.dart';
@@ -264,7 +265,7 @@ class ApiAdminRepository implements AdminRepository {
     try {
       final response = await _openApiClient.call(
         AppApiOperations.adminImportTrackCodes,
-        data: {'trackingNumbers': trackCodes},
+        data: {'source_type': 'MANUAL', 'track_codes': trackCodes},
       );
 
       final body = asJsonMap(response.data, context: 'import track codes');
@@ -308,11 +309,7 @@ class ApiAdminRepository implements AdminRepository {
     try {
       final response = await _openApiClient.call(
         AppApiOperations.adminCreateVehicle,
-        data: {
-          'plate_number': plateNumber,
-          'name': name,
-          'type': type.value,
-        },
+        data: {'plate_number': plateNumber, 'name': name, 'type': type.value},
       );
 
       final body = asJsonMap(response.data, context: 'create vehicle');
@@ -545,6 +542,22 @@ class ApiAdminRepository implements AdminRepository {
 
   // Branch management
   @override
+  Future<List<Branch>> listBranches() async {
+    try {
+      final response = await _openApiClient.call(AppApiOperations.listBranches);
+      final body = asJsonMap(response.data, context: 'list branches');
+      final branchesRaw = body['data'] as List<dynamic>? ?? [];
+
+      return branchesRaw
+          .whereType<Map<String, dynamic>>()
+          .map(_parseBranch)
+          .toList();
+    } catch (error) {
+      throw Exception(extractApiErrorMessage(error));
+    }
+  }
+
+  @override
   Future<Branch> createBranch({
     required String name,
     required String code,
@@ -618,20 +631,77 @@ class ApiAdminRepository implements AdminRepository {
     }
   }
 
-  Branch _parseBranch(Map<String, dynamic> json) {
-    return Branch(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      address: json['address'] as String? ?? '',
-      chinaAddress: json['chinaAddress'] as String? ?? '',
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
-      phone: json['phone'] as String? ?? '',
-      workingHours: json['workingHours'] as String? ?? '',
-      iconColor: Colors.blue,
-      description: json['description'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-      isActive: json['isActive'] as bool? ?? true,
+  @override
+  Future<DownloadedFile> exportShipmentPdf(String shipmentId) {
+    return _openApiClient.downloadOperation(
+      AppApiOperations.adminExportShipmentPdf,
+      pathParams: {'shipmentId': shipmentId},
+      fallbackFilename: 'shipment-$shipmentId.pdf',
     );
+  }
+
+  @override
+  Future<DownloadedFile> exportShipmentXlsx(String shipmentId) {
+    return _openApiClient.downloadOperation(
+      AppApiOperations.adminExportShipmentXlsx,
+      pathParams: {'shipmentId': shipmentId},
+      fallbackFilename: 'shipment-$shipmentId.xlsx',
+    );
+  }
+
+  @override
+  Future<DownloadedFile> exportAdminLogsXlsx() {
+    return _openApiClient.downloadOperation(
+      AppApiOperations.adminExportActivityLogsXlsx,
+      fallbackFilename: 'admin-logs.xlsx',
+    );
+  }
+
+  Branch _parseBranch(Map<String, dynamic> json) {
+    final code = _readString(json, 'code');
+    return Branch(
+      id: _readString(json, 'id').isEmpty ? code : _readString(json, 'id'),
+      name: _readString(json, 'name').isEmpty
+          ? 'Салбар'
+          : _readString(json, 'name'),
+      address: _readString(json, 'address').isEmpty
+          ? 'Хаяг оруулаагүй'
+          : _readString(json, 'address'),
+      chinaAddress: _readString(json, 'chinaAddress', 'china_address').isEmpty
+          ? 'Хятад дахь агуулахын хаяг мэдээлэл алга'
+          : _readString(json, 'chinaAddress', 'china_address'),
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 47.9184,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 106.9177,
+      phone: _readString(json, 'phone').isEmpty
+          ? 'Мэдээлэл алга'
+          : _readString(json, 'phone'),
+      workingHours: _readString(json, 'workingHours').isEmpty
+          ? (_readBool(json, 'isActive', 'is_active')
+                ? 'Өдөр бүр 09:00-18:00'
+                : 'Хаалттай')
+          : _readString(json, 'workingHours'),
+      iconColor: Colors.blue,
+      description:
+          (json['description'] as String?) ??
+          (code.isEmpty ? null : 'Код: $code'),
+      imageUrl: json['imageUrl'] as String?,
+      isActive: _readBool(json, 'isActive', 'is_active'),
+    );
+  }
+
+  String _readString(
+    Map<String, dynamic> json,
+    String key, [
+    String? fallbackKey,
+  ]) {
+    return ((json[key] ?? (fallbackKey == null ? null : json[fallbackKey]))
+                as String? ??
+            '')
+        .trim();
+  }
+
+  bool _readBool(Map<String, dynamic> json, String key, [String? fallbackKey]) {
+    return (json[key] ?? (fallbackKey == null ? null : json[fallbackKey])) ==
+        true;
   }
 }

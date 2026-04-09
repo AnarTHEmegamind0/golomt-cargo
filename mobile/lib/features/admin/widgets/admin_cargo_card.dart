@@ -2,32 +2,47 @@ import 'dart:io';
 
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
-import 'package:core/features/orders/models/order.dart';
+import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/features/auth/models/user.dart';
+import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
-/// Cargo card for admin cargo management
 class AdminCargoCard extends StatelessWidget {
   const AdminCargoCard({
     super.key,
     required this.cargo,
     this.onReceive,
     this.onRecordWeight,
+    this.onRecordDimensions,
     this.onShip,
     this.onArrive,
     this.isProcessing = false,
   });
 
-  final Order cargo;
-  final Future<bool> Function(String imagePath)? onReceive;
-  final void Function(int weightGrams, int baseShippingFeeMnt)? onRecordWeight;
+  final CargoModel cargo;
+  final Future<bool> Function(String? imagePath)? onReceive;
+  final Future<bool> Function(int weightGrams, int baseShippingFeeMnt)?
+  onRecordWeight;
+  final Future<bool> Function({
+    required int heightCm,
+    required int widthCm,
+    required int lengthCm,
+    required bool isFragile,
+    int? overrideFeeMnt,
+  })?
+  onRecordDimensions;
   final VoidCallback? onShip;
   final VoidCallback? onArrive;
   final bool isProcessing;
 
   @override
   Widget build(BuildContext context) {
+    final role = context.watch<AuthProvider>().user?.role ?? UserRole.customer;
+    final canPrice = role == UserRole.admin && onRecordDimensions != null;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -46,10 +61,8 @@ class AdminCargoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row
           Row(
             children: [
-              // Status icon
               Container(
                 width: 44,
                 height: 44,
@@ -66,13 +79,14 @@ class AdminCargoCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Product info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      cargo.productName,
+                      cargo.description?.trim().isNotEmpty == true
+                          ? cargo.description!.trim()
+                          : 'Cargo',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: BrandPalette.primaryText,
@@ -81,7 +95,7 @@ class AdminCargoCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      cargo.trackingCode,
+                      cargo.trackingNumber,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: BrandPalette.mutedText,
                         fontFamily: 'monospace',
@@ -90,69 +104,73 @@ class AdminCargoCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Status badge
               _StatusBadge(status: cargo.status),
             ],
           ),
-
           const SizedBox(height: 14),
-
-          // Info row
-          Row(
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
             children: [
               _InfoChip(
                 icon: Icons.scale_rounded,
-                label: cargo.hasWeight
-                    ? '${cargo.uiWeight.toStringAsFixed(2)} кг'
-                    : '-кг',
+                label: cargo.weightGrams != null
+                    ? '${cargo.weightKg.toStringAsFixed(2)} кг'
+                    : '- кг',
               ),
-              const SizedBox(width: 10),
+              _InfoChip(
+                icon: Icons.straighten_rounded,
+                label: cargo.dimensionsDisplay,
+              ),
               _InfoChip(
                 icon: Icons.attach_money_rounded,
-                label: cargo.hasPrice
-                    ? '${cargo.uiPrice.toStringAsFixed(0)}₮'
-                    : '-₮',
+                label: cargo.finalFeeMnt > 0 ? '${cargo.finalFeeMnt}₮' : '-₮',
               ),
-              const SizedBox(width: 10),
               _InfoChip(
-                icon: cargo.isPaid
+                icon: cargo.paymentStatus == PaymentStatus.paid
                     ? Icons.check_circle_rounded
                     : Icons.pending_rounded,
-                label: cargo.isPaid ? 'Төлсөн' : 'Төлөөгүй',
-                color: cargo.isPaid
+                label: cargo.paymentStatus.label,
+                color: cargo.paymentStatus == PaymentStatus.paid
                     ? BrandPalette.successGreen
                     : BrandPalette.logoOrange,
               ),
+              if (cargo.shipmentId != null)
+                _InfoChip(
+                  icon: Icons.local_shipping_outlined,
+                  label: 'Shipment',
+                  color: BrandPalette.navyBlue,
+                ),
+              if (cargo.isFragile)
+                const _InfoChip(
+                  icon: Icons.warning_amber_rounded,
+                  label: 'Эмзэг',
+                  color: BrandPalette.errorRed,
+                ),
             ],
           ),
-
           const SizedBox(height: 14),
-
-          if ((cargo.customerName ?? '').isNotEmpty ||
-              (cargo.customerEmail ?? '').isNotEmpty) ...[
+          if ((cargo.customer?.name ?? '').isNotEmpty ||
+              (cargo.customer?.email ?? '').isNotEmpty) ...[
             Wrap(
               spacing: 10,
               runSpacing: 8,
               children: [
-                if ((cargo.customerName ?? '').isNotEmpty)
+                if ((cargo.customer?.name ?? '').isNotEmpty)
                   _InfoChip(
                     icon: Icons.person_outline_rounded,
-                    label: cargo.customerName!,
+                    label: cargo.customer!.name,
                   ),
-                if ((cargo.customerEmail ?? '').isNotEmpty)
+                if ((cargo.customer?.email ?? '').isNotEmpty)
                   _InfoChip(
                     icon: Icons.alternate_email_rounded,
-                    label: cargo.customerEmail!,
+                    label: cargo.customer!.email,
                   ),
               ],
             ),
             const SizedBox(height: 14),
           ],
-
-          // Action buttons based on status
-          _buildActionButtons(context),
-
-          // Loading overlay - wrapped in ExcludeSemantics to avoid Flutter bug
+          _buildActionButtons(context, canPrice),
           if (isProcessing) ...[
             const SizedBox(height: 8),
             const ExcludeSemantics(
@@ -167,97 +185,86 @@ class AdminCargoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
-    final List<Widget> buttons = [];
+  Widget _buildActionButtons(BuildContext context, bool canPrice) {
+    final buttons = <Widget>[];
 
-    switch (cargo.status) {
-      case OrderStatus.pending:
-        if (onReceive != null) {
-          buttons.add(
-            Expanded(
-              child: _ActionButton(
-                label: 'Хүлээн авах',
-                icon: Icons.archive_rounded,
-                color: BrandPalette.electricBlue,
-                onPressed: isProcessing
-                    ? null
-                    : () => _showReceiveDialog(context),
-              ),
-            ),
-          );
-        }
-        break;
-
-      case OrderStatus.processing:
-        if (onRecordWeight != null) {
-          buttons.add(
-            Expanded(
-              child: _ActionButton(
-                label: 'Жин бүртгэх',
-                icon: Icons.scale_rounded,
-                color: BrandPalette.logoOrange,
-                onPressed: isProcessing
-                    ? null
-                    : () => _showWeightDialog(context),
-              ),
-            ),
-          );
-        }
-        if (onShip != null) {
-          if (buttons.isNotEmpty) buttons.add(const SizedBox(width: 8));
-          buttons.add(
-            Expanded(
-              child: _ActionButton(
-                label: 'Тээвэрлэх',
-                icon: Icons.local_shipping_rounded,
-                color: BrandPalette.navyBlue,
-                onPressed: isProcessing ? null : onShip,
-              ),
-            ),
-          );
-        }
-        break;
-
-      case OrderStatus.transit:
-        if (onArrive != null) {
-          buttons.add(
-            Expanded(
-              child: _ActionButton(
-                label: 'Ирсэн болгох',
-                icon: Icons.check_circle_rounded,
-                color: BrandPalette.successGreen,
-                onPressed: isProcessing ? null : onArrive,
-              ),
-            ),
-          );
-        }
-        break;
-
-      case OrderStatus.delivered:
-      case OrderStatus.cancelled:
-        buttons.add(
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: BrandPalette.softBlueBackground,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(
-                  cargo.status == OrderStatus.delivered
-                      ? 'Хүргэлт дууссан'
-                      : 'Цуцлагдсан',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: BrandPalette.mutedText,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
+    if (cargo.status == CargoStatus.created && onReceive != null) {
+      buttons.add(
+        Expanded(
+          child: _ActionButton(
+            label: 'Хүлээн авах',
+            icon: Icons.archive_rounded,
+            color: BrandPalette.electricBlue,
+            onPressed: isProcessing ? null : () => _showReceiveDialog(context),
           ),
-        );
-        break;
+        ),
+      );
+    }
+
+    if (cargo.status == CargoStatus.receivedChina && onRecordWeight != null) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 8));
+      }
+      buttons.add(
+        Expanded(
+          child: _ActionButton(
+            label: 'Жин бүртгэх',
+            icon: Icons.scale_rounded,
+            color: BrandPalette.logoOrange,
+            onPressed: isProcessing ? null : () => _showWeightDialog(context),
+          ),
+        ),
+      );
+    }
+
+    if (canPrice) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 8));
+      }
+      buttons.add(
+        Expanded(
+          child: _ActionButton(
+            label: 'Хэмжээ / үнэ',
+            icon: Icons.calculate_outlined,
+            color: BrandPalette.navyBlue,
+            onPressed: isProcessing
+                ? null
+                : () => _showDimensionsDialog(context),
+          ),
+        ),
+      );
+    }
+
+    if (cargo.status == CargoStatus.receivedChina && onShip != null) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 8));
+      }
+      buttons.add(
+        Expanded(
+          child: _ActionButton(
+            label: 'Тээвэрлэх',
+            icon: Icons.local_shipping_rounded,
+            color: BrandPalette.navyBlue,
+            onPressed: isProcessing ? null : onShip,
+          ),
+        ),
+      );
+    }
+
+    if (cargo.status == CargoStatus.inTransitToMn && onArrive != null) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 8));
+      }
+      buttons.add(
+        Expanded(
+          child: _ActionButton(
+            label: 'Ирсэн болгох',
+            icon: Icons.check_circle_rounded,
+            color: BrandPalette.successGreen,
+            onPressed: isProcessing ? null : onArrive,
+          ),
+        ),
+      );
     }
 
     if (buttons.isEmpty) {
@@ -269,11 +276,13 @@ class AdminCargoCard extends StatelessWidget {
 
   void _showWeightDialog(BuildContext context) {
     final weightController = TextEditingController(
-      text: cargo.weight > 0 ? cargo.weight.toString() : '',
+      text: cargo.weightGrams != null ? cargo.weightKg.toStringAsFixed(2) : '',
     );
-    final feeController = TextEditingController();
+    final feeController = TextEditingController(
+      text: cargo.baseShippingFeeMnt?.toString() ?? '',
+    );
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Жин бүртгэх'),
@@ -301,7 +310,7 @@ class AdminCargoCard extends StatelessWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
-                labelText: 'Тээврийн төлбөр',
+                labelText: 'Суурь тээврийн төлбөр',
                 hintText: '0',
                 suffixText: '₮',
               ),
@@ -314,13 +323,22 @@ class AdminCargoCard extends StatelessWidget {
             child: const Text('Болих'),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               final weightKg = double.tryParse(weightController.text);
               final fee = int.tryParse(feeController.text);
-              if (weightKg != null && weightKg > 0 && fee != null && fee >= 0) {
+              if (weightKg == null || weightKg <= 0) {
+                return;
+              }
+
+              final computedFee = ((weightKg * 2000).ceil())
+                  .clamp(2000, 1 << 31)
+                  .toInt();
+              final success = await onRecordWeight!(
+                (weightKg * 1000).round(),
+                fee ?? computedFee,
+              );
+              if (context.mounted && success) {
                 Navigator.pop(dialogContext);
-                final weightGrams = (weightKg * 1000).round();
-                onRecordWeight?.call(weightGrams, fee);
               }
             },
             child: const Text('Хадгалах'),
@@ -330,158 +348,172 @@ class AdminCargoCard extends StatelessWidget {
     );
   }
 
-  void _showReceiveDialog(BuildContext context) {
-    final onReceive = this.onReceive;
-    if (onReceive == null) return;
+  void _showDimensionsDialog(BuildContext context) {
+    if (onRecordDimensions == null) {
+      return;
+    }
 
-    final picker = ImagePicker();
-    XFile? selectedImage;
-    var isSubmitting = false;
+    final heightController = TextEditingController(
+      text: cargo.heightCm?.toString() ?? '',
+    );
+    final widthController = TextEditingController(
+      text: cargo.widthCm?.toString() ?? '',
+    );
+    final lengthController = TextEditingController(
+      text: cargo.lengthCm?.toString() ?? '',
+    );
+    final overrideFeeController = TextEditingController(
+      text: cargo.overrideFeeMnt?.toString() ?? '',
+    );
+    var isFragile = cargo.isFragile;
 
-    showModalBottomSheet(
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setState) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          final canSubmit = selectedImage != null && !isSubmitting;
-
-          return Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1A2234) : Colors.white,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-            ),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setState) => AlertDialog(
+          title: const Text('Хэмжээ, үнэ бүртгэх'),
+          content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.2)
-                        : const Color(0xFFD1D5DB),
-                    borderRadius: BorderRadius.circular(2),
+                TextField(
+                  controller: lengthController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(labelText: 'Урт (см)'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: widthController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(labelText: 'Өргөн (см)'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: heightController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(labelText: 'Өндөр (см)'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: overrideFeeController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Эцсийн үнэ override',
+                    hintText: 'Хоосон орхиж болно',
+                    suffixText: '₮',
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Бараа хүлээн авах зураг',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (selectedImage != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.file(
-                      File(selectedImage!.path),
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                else
-                  Container(
-                    height: 160,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : const Color(0xFFE2E8F0),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.photo_camera_outlined,
-                          size: 32,
-                          color: Color(0xFF94A3B8),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Зураг дарж оруулна уу',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: isDark
-                                    ? const Color(0xFF8B95A8)
-                                    : const Color(0xFF677186),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: isSubmitting
-                            ? null
-                            : () async {
-                                final image = await picker.pickImage(
-                                  source: ImageSource.camera,
-                                  imageQuality: 80,
-                                );
-                                if (image == null) return;
-                                setState(() => selectedImage = image);
-                              },
-                        icon: const Icon(Icons.camera_alt_rounded),
-                        label: const Text('Зураг авах'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: !canSubmit
-                            ? null
-                            : () async {
-                                setState(() => isSubmitting = true);
-                                final success = await onReceive(
-                                  selectedImage!.path,
-                                );
-                                if (!context.mounted) return;
-                                setState(() => isSubmitting = false);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      success
-                                          ? 'Бараа хүлээн авлаа'
-                                          : 'Хүлээн авахад алдаа гарлаа',
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                        child: isSubmitting
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text('Хадгалах'),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  value: isFragile,
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Эмзэг бараа'),
+                  onChanged: (value) => setState(() => isFragile = value),
                 ),
               ],
             ),
-          );
-        },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Болих'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final heightCm = int.tryParse(heightController.text);
+                final widthCm = int.tryParse(widthController.text);
+                final lengthCm = int.tryParse(lengthController.text);
+                final overrideFee = overrideFeeController.text.trim().isEmpty
+                    ? null
+                    : int.tryParse(overrideFeeController.text.trim());
+
+                if (heightCm == null ||
+                    widthCm == null ||
+                    lengthCm == null ||
+                    heightCm <= 0 ||
+                    widthCm <= 0 ||
+                    lengthCm <= 0) {
+                  return;
+                }
+
+                final success = await onRecordDimensions!(
+                  heightCm: heightCm,
+                  widthCm: widthCm,
+                  lengthCm: lengthCm,
+                  isFragile: isFragile,
+                  overrideFeeMnt: overrideFee,
+                );
+                if (context.mounted && success) {
+                  Navigator.pop(dialogContext);
+                }
+              },
+              child: const Text('Хадгалах'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReceiveDialog(BuildContext context) {
+    XFile? selectedImage;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setState) => AlertDialog(
+          title: const Text('Бараа хүлээн авах'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Зураг хавсаргах боломжтой.'),
+              const SizedBox(height: 16),
+              if (selectedImage != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(selectedImage!.path),
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final image = await ImagePicker().pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 80,
+                    );
+                    if (image != null) {
+                      setState(() => selectedImage = image);
+                    }
+                  },
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Зураг авах'),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Болих'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final success = await onReceive?.call(selectedImage?.path);
+                if (context.mounted && success == true) {
+                  Navigator.pop(dialogContext);
+                }
+              },
+              child: const Text('Хүлээн авах'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -490,15 +522,15 @@ class AdminCargoCard extends StatelessWidget {
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({required this.status});
 
-  final OrderStatus status;
+  final CargoStatus status;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: status.color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         status.label,
@@ -513,33 +545,35 @@ class _StatusBadge extends StatelessWidget {
 }
 
 class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.label, this.color});
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    this.color = BrandPalette.mutedText,
+  });
 
   final IconData icon;
   final String label;
-  final Color? color;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final chipColor = color ?? BrandPalette.mutedText;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: BrandPalette.softBlueBackground,
-        borderRadius: BorderRadius.circular(6),
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: chipColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              color: chipColor,
-              fontSize: 12,
+              color: color,
               fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ],
@@ -553,7 +587,7 @@ class _ActionButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.color,
-    this.onPressed,
+    required this.onPressed,
   });
 
   final String label;
@@ -563,15 +597,15 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton.icon(
+    return FilledButton.tonalIcon(
       onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
       icon: Icon(icon, size: 18),
-      label: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+      label: Text(label),
+      style: FilledButton.styleFrom(
+        foregroundColor: color,
+        backgroundColor: color.withValues(alpha: 0.12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      ),
     );
   }
 }

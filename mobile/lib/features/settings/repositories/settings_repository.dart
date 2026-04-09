@@ -4,4 +4,3 @@ abstract interface class SettingsRepository {
   Future<AppSettings> read();
   Future<void> write(AppSettings settings);
 }
-

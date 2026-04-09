@@ -64,7 +64,10 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
               ),
               // Show received count
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: BrandPalette.successGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -113,7 +116,16 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
             unselectedLabelColor: BrandPalette.mutedText,
             dividerColor: Colors.transparent,
             tabs: const [
-              Tab(child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.camera_alt, size: 18), SizedBox(width: 6), Text('Камер')])),
+              Tab(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.camera_alt, size: 18),
+                    SizedBox(width: 6),
+                    Text('Камер'),
+                  ],
+                ),
+              ),
               Tab(text: 'Scanner'),
               Tab(text: 'Текст'),
               Tab(text: 'Файл'),
@@ -183,7 +195,8 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
           ),
 
         // Import result display
-        if (provider.importedCargos.isNotEmpty) _ImportResultSection(cargos: provider.importedCargos),
+        if (provider.importedCargos.isNotEmpty)
+          _ImportResultSection(cargos: provider.importedCargos),
       ],
     );
   }
@@ -198,9 +211,9 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
 
   Future<void> _importCodes(List<String> codes) async {
     if (codes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Track code оруулна уу')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Track code оруулна уу')));
       return;
     }
 
@@ -231,9 +244,10 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
 
   Future<void> _importFromFile() async {
     try {
+      final provider = context.read<ChinaCargoProvider>();
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['txt', 'csv', 'xlsx', 'xls'],
+        allowedExtensions: ['txt', 'csv'],
       );
 
       if (result == null || result.files.isEmpty) return;
@@ -241,7 +255,7 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
       final file = File(result.files.single.path!);
       final content = await file.readAsString();
 
-      final provider = context.read<ChinaCargoProvider>();
+      if (!mounted) return;
       final codes = provider.parseTrackCodes(content);
 
       if (codes.isEmpty) {
@@ -256,9 +270,9 @@ class _ChinaCargoImportPageState extends State<ChinaCargoImportPage>
       await _importCodes(codes);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Файл унших алдаа: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Файл унших алдаа: $e')));
       }
     }
   }
@@ -371,10 +385,7 @@ class _CameraScannerTabState extends State<_CameraScannerTab> {
             child: Stack(
               children: [
                 // Scanner
-                MobileScanner(
-                  controller: _controller,
-                  onDetect: _onDetect,
-                ),
+                MobileScanner(controller: _controller, onDetect: _onDetect),
 
                 // Scan overlay
                 Center(
@@ -435,7 +446,10 @@ class _CameraScannerTabState extends State<_CameraScannerTab> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(20),
@@ -443,7 +457,11 @@ class _CameraScannerTabState extends State<_CameraScannerTab> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.qr_code_scanner, color: Colors.white, size: 16),
+                        const Icon(
+                          Icons.qr_code_scanner,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           '${widget.scannedCodes.length}',
@@ -506,10 +524,16 @@ class _CameraScannerTabState extends State<_CameraScannerTab> {
                       : ListView.builder(
                           itemCount: widget.scannedCodes.length,
                           itemBuilder: (context, index) {
-                            final code = widget.scannedCodes[widget.scannedCodes.length - 1 - index];
+                            final code =
+                                widget.scannedCodes[widget.scannedCodes.length -
+                                    1 -
+                                    index];
                             return Container(
                               margin: const EdgeInsets.only(bottom: 6),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: BrandPalette.softBlueBackground,
                                 borderRadius: BorderRadius.circular(8),
@@ -642,12 +666,19 @@ class _BarcodeTab extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: BrandPalette.electricBlue, size: 20),
+                Icon(
+                  Icons.info_outline,
+                  color: BrandPalette.electricBlue,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'USB/Bluetooth barcode scanner ашиглан уншуулна уу',
-                    style: TextStyle(color: BrandPalette.electricBlue, fontSize: 13),
+                    style: TextStyle(
+                      color: BrandPalette.electricBlue,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ],
@@ -696,16 +727,14 @@ class _BarcodeTab extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           'Barcode уншуулна уу',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: BrandPalette.mutedText,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(color: BrandPalette.mutedText),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Уншуулсан code-ууд энд харагдана',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: BrandPalette.mutedText,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: BrandPalette.mutedText),
                         ),
                       ],
                     ),
@@ -718,9 +747,8 @@ class _BarcodeTab extends StatelessWidget {
                         children: [
                           Text(
                             '${scannedCodes.length} код уншуулсан',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                           TextButton.icon(
                             onPressed: onClear,
@@ -734,11 +762,16 @@ class _BarcodeTab extends StatelessWidget {
                           itemCount: scannedCodes.length,
                           itemBuilder: (context, index) => Container(
                             margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFE5E9F2)),
+                              border: Border.all(
+                                color: const Color(0xFFE5E9F2),
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -801,10 +834,7 @@ class _BarcodeTab extends StatelessWidget {
 }
 
 class _TextImportTab extends StatelessWidget {
-  const _TextImportTab({
-    required this.controller,
-    required this.onImport,
-  });
+  const _TextImportTab({required this.controller, required this.onImport});
 
   final TextEditingController controller;
   final VoidCallback onImport;
@@ -824,7 +854,8 @@ class _TextImportTab extends StatelessWidget {
               expands: true,
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
-                hintText: 'Track code-уудыг мөр бүрт нэг эсвэл таслалаар тусгаарлан оруулна уу...\n\nЖишээ:\nTC123456789\nTC987654321\nTC111222333',
+                hintText:
+                    'Track code-уудыг мөр бүрт нэг эсвэл таслалаар тусгаарлан оруулна уу...\n\nЖишээ:\nTC123456789\nTC987654321\nTC111222333',
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -847,10 +878,15 @@ class _TextImportTab extends StatelessWidget {
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.upload),
-              label: Text(provider.isImporting ? 'Бүртгэж байна...' : 'Бүртгэх'),
+              label: Text(
+                provider.isImporting ? 'Бүртгэж байна...' : 'Бүртгэх',
+              ),
               style: FilledButton.styleFrom(
                 backgroundColor: BrandPalette.logoOrange,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -905,13 +941,13 @@ class _FileImportTab extends StatelessWidget {
                 const SizedBox(height: 24),
                 Text(
                   'Файл оруулах',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'TXT, CSV, эсвэл Excel файл сонгоно уу.\nTrack code-ууд мөр бүрт нэг байх ёстой.',
+                  'TXT эсвэл CSV файл сонгоно уу.\nTrack code-ууд мөр бүрт нэг байх ёстой.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: BrandPalette.mutedText,
@@ -924,13 +960,21 @@ class _FileImportTab extends StatelessWidget {
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.folder_open),
-                  label: Text(provider.isImporting ? 'Бүртгэж байна...' : 'Файл сонгох'),
+                  label: Text(
+                    provider.isImporting ? 'Бүртгэж байна...' : 'Файл сонгох',
+                  ),
                   style: FilledButton.styleFrom(
                     backgroundColor: BrandPalette.logoOrange,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                   ),
                 ),
               ],
@@ -972,7 +1016,8 @@ class _ImportResultSection extends StatelessWidget {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => context.read<ChinaCargoProvider>().clearImportedCargos(),
+                onPressed: () =>
+                    context.read<ChinaCargoProvider>().clearImportedCargos(),
                 child: const Text('Хаах'),
               ),
             ],
@@ -981,30 +1026,35 @@ class _ImportResultSection extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: cargos.take(10).map((c) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                c.trackingNumber,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                ),
-              ),
-            )).toList(),
+            children: cargos
+                .take(10)
+                .map(
+                  (c) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      c.trackingNumber,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           if (cargos.length > 10)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
                 '+${cargos.length - 10} бусад...',
-                style: TextStyle(
-                  color: BrandPalette.mutedText,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: BrandPalette.mutedText, fontSize: 12),
               ),
             ),
         ],

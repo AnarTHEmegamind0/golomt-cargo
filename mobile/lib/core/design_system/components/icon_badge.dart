@@ -12,7 +12,10 @@ class IconBadge extends StatelessWidget {
     this.size = 48,
     this.iconSize,
     this.onTap,
-  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
+  }) : assert(
+         icon != null || assetPath != null,
+         'Either icon or assetPath must be provided',
+       );
 
   final IconData? icon;
   final String? assetPath;
@@ -67,7 +70,10 @@ class WorkflowIconItem extends StatelessWidget {
     required this.title,
     this.color,
     this.onTap,
-  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
+  }) : assert(
+         icon != null || assetPath != null,
+         'Either icon or assetPath must be provided',
+       );
 
   final IconData? icon;
   final String? assetPath;
@@ -97,7 +103,12 @@ class WorkflowIconItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconBadge(icon: icon, assetPath: assetPath, color: itemColor, size: 42),
+              IconBadge(
+                icon: icon,
+                assetPath: assetPath,
+                color: itemColor,
+                size: 42,
+              ),
               const SizedBox(height: 8),
               Text(
                 title,

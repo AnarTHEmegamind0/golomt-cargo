@@ -44,12 +44,13 @@ class ApiBranchRepository implements BranchRepository {
   }
 
   Branch _mapBranch(Map<String, dynamic> json) {
-    final id = ((json['id'] as String?) ?? '').trim();
-    final code = ((json['code'] as String?) ?? '').trim();
-    final name = ((json['name'] as String?) ?? '').trim();
-    final address = ((json['address'] as String?) ?? '').trim();
-    final phone = ((json['phone'] as String?) ?? '').trim();
-    final isActive = json['isActive'] == true;
+    final id = _readString(json, 'id');
+    final code = _readString(json, 'code');
+    final name = _readString(json, 'name');
+    final address = _readString(json, 'address');
+    final phone = _readString(json, 'phone');
+    final chinaAddress = _readString(json, 'chinaAddress', 'china_address');
+    final isActive = _readBool(json, 'isActive', 'is_active');
 
     final color = _palette[(id.hashCode.abs()) % _palette.length];
 
@@ -57,7 +58,10 @@ class ApiBranchRepository implements BranchRepository {
       id: id.isEmpty ? code : id,
       name: name.isEmpty ? 'Салбар' : name,
       address: address.isEmpty ? 'Хаяг оруулаагүй' : address,
-      chinaAddress: 'Хятад дахь агуулахын хаяг мэдээлэл алга',
+      // Backend does not provide location/working-hours media metadata yet.
+      chinaAddress: chinaAddress.isEmpty
+          ? 'Хятад дахь агуулахын хаяг мэдээлэл алга'
+          : chinaAddress,
       latitude: 47.9184,
       longitude: 106.9177,
       phone: phone.isEmpty ? 'Мэдээлэл алга' : phone,
@@ -66,5 +70,21 @@ class ApiBranchRepository implements BranchRepository {
       description: code.isEmpty ? null : 'Код: $code',
       isActive: isActive,
     );
+  }
+
+  String _readString(
+    Map<String, dynamic> json,
+    String key, [
+    String? fallbackKey,
+  ]) {
+    return ((json[key] ?? (fallbackKey == null ? null : json[fallbackKey]))
+                as String? ??
+            '')
+        .trim();
+  }
+
+  bool _readBool(Map<String, dynamic> json, String key, [String? fallbackKey]) {
+    return (json[key] ?? (fallbackKey == null ? null : json[fallbackKey])) ==
+        true;
   }
 }

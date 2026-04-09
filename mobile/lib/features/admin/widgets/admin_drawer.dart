@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 
 /// Admin navigation drawer section
 class AdminDrawerSection {
-  const AdminDrawerSection({
-    required this.title,
-    required this.items,
-  });
+  const AdminDrawerSection({required this.title, required this.items});
 
   final String title;
   final List<AdminDrawerItem> items;
@@ -32,8 +29,16 @@ final adminDrawerSections = [
   const AdminDrawerSection(
     title: 'Үйл ажиллагаа',
     items: [
-      AdminDrawerItem(index: 0, label: 'Тойм', assetPath: ShipAssets.clockAndHome),
-      AdminDrawerItem(index: 1, label: 'Бараа', assetPath: ShipAssets.boxReturn),
+      AdminDrawerItem(
+        index: 0,
+        label: 'Тойм',
+        assetPath: ShipAssets.clockAndHome,
+      ),
+      AdminDrawerItem(
+        index: 1,
+        label: 'Бараа',
+        assetPath: ShipAssets.boxReturn,
+      ),
       AdminDrawerItem(index: 2, label: 'Ачилт', assetPath: ShipAssets.truck),
       AdminDrawerItem(index: 3, label: 'Машин', assetPath: ShipAssets.car),
     ],
@@ -104,10 +109,11 @@ class AdminDrawer extends StatelessWidget {
                     children: [
                       Text(
                         'Админ панел',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: BrandPalette.primaryText,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: BrandPalette.primaryText,
+                            ),
                       ),
                       Text(
                         'Голомт Карго',
@@ -151,9 +157,9 @@ class AdminDrawer extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 'v1.0.0',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: BrandPalette.mutedText,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
               ),
             ),
           ],

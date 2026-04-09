@@ -1,13 +1,13 @@
 import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
+import 'package:core/core/networking/models/cargo_model.dart';
 import 'package:core/features/admin/models/shipment.dart';
 import 'package:core/features/admin/providers/admin_cargos_provider.dart';
 import 'package:core/features/admin/providers/admin_finance_provider.dart';
 import 'package:core/features/admin/providers/admin_shipments_provider.dart';
 import 'package:core/features/admin/providers/admin_vehicles_provider.dart';
 import 'package:core/features/admin/widgets/admin_stat_card.dart';
-import 'package:core/features/orders/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,9 +66,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           const SizedBox(height: 4),
           Text(
             'Өнөөдрийн байдал',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: BrandPalette.mutedText),
           ),
           const SizedBox(height: 20),
 
@@ -136,9 +136,7 @@ class _FinanceOverviewSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           if (provider.isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            )
+            const Center(child: CircularProgressIndicator(color: Colors.white))
           else ...[
             Text(
               summary.totalRevenueDisplay,
@@ -150,9 +148,9 @@ class _FinanceOverviewSection extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Нийт орлого',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white70,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.white70),
             ),
             const SizedBox(height: 16),
             Row(
@@ -315,9 +313,9 @@ class _QuickStatCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
           ),
         ],
       ),
@@ -338,10 +336,23 @@ class _CargoStatsSection extends StatelessWidget {
     }
 
     final cargos = provider.cargos;
-    final pendingCount = cargos.where((c) => c.status == OrderStatus.pending).length;
-    final processingCount = cargos.where((c) => c.status == OrderStatus.processing).length;
-    final transitCount = cargos.where((c) => c.status == OrderStatus.transit).length;
-    final deliveredCount = cargos.where((c) => c.status == OrderStatus.delivered).length;
+    final pendingCount = cargos
+        .where((c) => c.status == CargoStatus.created)
+        .length;
+    final processingCount = cargos
+        .where((c) => c.status == CargoStatus.receivedChina)
+        .length;
+    final transitCount = cargos
+        .where((c) => c.status == CargoStatus.inTransitToMn)
+        .length;
+    final deliveredCount = cargos.where((c) {
+      return c.status == CargoStatus.arrivedMn ||
+          c.status == CargoStatus.awaitingFulfillmentChoice ||
+          c.status == CargoStatus.readyForPickup ||
+          c.status == CargoStatus.outForDelivery ||
+          c.status == CargoStatus.completedPickup ||
+          c.status == CargoStatus.completedDelivery;
+    }).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,9 +536,9 @@ class _RecentActivitySection extends StatelessWidget {
             child: Center(
               child: Text(
                 'Бараа байхгүй байна',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: BrandPalette.mutedText,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: BrandPalette.mutedText),
               ),
             ),
           )
@@ -541,7 +552,7 @@ class _RecentActivitySection extends StatelessWidget {
 class _RecentCargoTile extends StatelessWidget {
   const _RecentCargoTile({required this.cargo});
 
-  final Order cargo;
+  final CargoModel cargo;
 
   @override
   Widget build(BuildContext context) {
@@ -574,7 +585,9 @@ class _RecentCargoTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  cargo.productName,
+                  cargo.description?.trim().isNotEmpty == true
+                      ? cargo.description!.trim()
+                      : 'Cargo',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: BrandPalette.primaryText,
@@ -583,7 +596,7 @@ class _RecentCargoTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  cargo.trackingCode,
+                  cargo.trackingNumber,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: BrandPalette.mutedText,
                     fontFamily: 'monospace',

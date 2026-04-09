@@ -96,28 +96,68 @@ class AppShellPage extends StatelessWidget {
                   .setIndex,
               destinations: [
                 NavigationDestination(
-                  icon: ShipIcon(ShipAssets.clockAndHome, size: 28, key: const ValueKey('nav_home')),
-                  selectedIcon: ShipIcon(ShipAssets.clockAndHome, size: 32, key: const ValueKey('nav_home_selected')),
+                  icon: ShipIcon(
+                    ShipAssets.clockAndHome,
+                    size: 28,
+                    key: const ValueKey('nav_home'),
+                  ),
+                  selectedIcon: ShipIcon(
+                    ShipAssets.clockAndHome,
+                    size: 32,
+                    key: const ValueKey('nav_home_selected'),
+                  ),
                   label: 'Нүүр',
                 ),
                 NavigationDestination(
-                  icon: ShipIcon(ShipAssets.basket, size: 28, key: const ValueKey('nav_orders')),
-                  selectedIcon: ShipIcon(ShipAssets.basket, size: 32, key: const ValueKey('nav_orders_selected')),
+                  icon: ShipIcon(
+                    ShipAssets.basket,
+                    size: 28,
+                    key: const ValueKey('nav_orders'),
+                  ),
+                  selectedIcon: ShipIcon(
+                    ShipAssets.basket,
+                    size: 32,
+                    key: const ValueKey('nav_orders_selected'),
+                  ),
                   label: 'Захиалга',
                 ),
                 NavigationDestination(
-                  icon: ShipIcon(ShipAssets.truck, size: 28, key: const ValueKey('nav_delivery')),
-                  selectedIcon: ShipIcon(ShipAssets.truck, size: 32, key: const ValueKey('nav_delivery_selected')),
+                  icon: ShipIcon(
+                    ShipAssets.truck,
+                    size: 28,
+                    key: const ValueKey('nav_delivery'),
+                  ),
+                  selectedIcon: ShipIcon(
+                    ShipAssets.truck,
+                    size: 32,
+                    key: const ValueKey('nav_delivery_selected'),
+                  ),
                   label: 'Хүргэлт',
                 ),
                 NavigationDestination(
-                  icon: ShipIcon(ShipAssets.locationMaps, size: 28, key: const ValueKey('nav_branch')),
-                  selectedIcon: ShipIcon(ShipAssets.locationMaps, size: 32, key: const ValueKey('nav_branch_selected')),
+                  icon: ShipIcon(
+                    ShipAssets.locationMaps,
+                    size: 28,
+                    key: const ValueKey('nav_branch'),
+                  ),
+                  selectedIcon: ShipIcon(
+                    ShipAssets.locationMaps,
+                    size: 32,
+                    key: const ValueKey('nav_branch_selected'),
+                  ),
                   label: 'Салбар',
                 ),
                 NavigationDestination(
-                  icon: ShipIcon(ShipAssets.manDeliveringPackage, size: 28, key: const ValueKey('nav_settings')),
-                  selectedIcon: ShipIcon(ShipAssets.manDeliveringPackage, size: 32, key: const ValueKey('nav_settings_selected')),
+                  icon: ShipIcon(
+                    ShipAssets.manDeliveringPackage,
+                    size: 28,
+                    key: const ValueKey('nav_settings'),
+                  ),
+                  selectedIcon: ShipIcon(
+                    ShipAssets.manDeliveringPackage,
+                    size: 32,
+                    key: const ValueKey('nav_settings_selected'),
+                  ),
                   label: 'Профайл',
                 ),
               ],

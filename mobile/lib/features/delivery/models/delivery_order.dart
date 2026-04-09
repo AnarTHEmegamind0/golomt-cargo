@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
-enum DeliveryStep { pending, accepted, pickedUp, enRoute, arrived, proof, completed }
+enum DeliveryStep {
+  pending,
+  accepted,
+  pickedUp,
+  enRoute,
+  arrived,
+  proof,
+  completed,
+}
 
 class DeliveryOrder {
   const DeliveryOrder({
@@ -33,10 +41,7 @@ class DeliveryOrder {
   final DeliveryStep step;
   final String? proofImagePath;
 
-  DeliveryOrder copyWith({
-    DeliveryStep? step,
-    String? proofImagePath,
-  }) {
+  DeliveryOrder copyWith({DeliveryStep? step, String? proofImagePath}) {
     return DeliveryOrder(
       id: id,
       restaurantName: restaurantName,

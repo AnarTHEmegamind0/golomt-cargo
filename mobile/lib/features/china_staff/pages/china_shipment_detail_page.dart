@@ -2,6 +2,7 @@ import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/core/services/export_service.dart';
 import 'package:core/features/admin/models/shipment.dart';
 import 'package:core/features/admin/providers/admin_shipments_provider.dart';
 import 'package:core/features/china_staff/providers/china_cargo_provider.dart';
@@ -16,7 +17,8 @@ class ChinaShipmentDetailPage extends StatefulWidget {
   final Shipment shipment;
 
   @override
-  State<ChinaShipmentDetailPage> createState() => _ChinaShipmentDetailPageState();
+  State<ChinaShipmentDetailPage> createState() =>
+      _ChinaShipmentDetailPageState();
 }
 
 class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
@@ -65,6 +67,35 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              try {
+                final exportService = context.read<ExportService>();
+                final result = value == 'pdf'
+                    ? await exportService.exportShipmentPdf(_shipment.id)
+                    : await exportService.exportShipmentXlsx(_shipment.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(result.message)));
+                }
+              } catch (error) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        error.toString().replaceFirst('Exception: ', ''),
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'pdf', child: Text('Export PDF')),
+              PopupMenuItem(value: 'xlsx', child: Text('Export Excel')),
+            ],
+          ),
           if (_shipment.status == ShipmentStatus.draft)
             IconButton(
               onPressed: () => _showAddCargoDialog(context),
@@ -86,69 +117,77 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
             child: shipmentProvider.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : shipmentCargos.isEmpty
-                    ? _EmptyCargoState(
-                        onAddCargo: _shipment.status == ShipmentStatus.draft
-                            ? () => _showAddCargoDialog(context)
-                            : null,
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${shipmentCargos.length} бараа',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                if (_shipment.status == ShipmentStatus.draft)
-                                  TextButton.icon(
-                                    onPressed: () {
-                                      setState(() {
-                                        _isSelectMode = !_isSelectMode;
-                                        if (!_isSelectMode) {
-                                          _selectedCargoIds.clear();
-                                        }
-                                      });
-                                    },
-                                    icon: Icon(
-                                      _isSelectMode ? Icons.close : Icons.checklist,
-                                      size: 18,
-                                    ),
-                                    label: Text(_isSelectMode ? 'Болих' : 'Сонгох'),
-                                  ),
-                              ],
+                ? _EmptyCargoState(
+                    onAddCargo: _shipment.status == ShipmentStatus.draft
+                        ? () => _showAddCargoDialog(context)
+                        : null,
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${shipmentCargos.length} бараа',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              itemCount: shipmentCargos.length,
-                              itemBuilder: (context, index) => _CargoCard(
-                                cargo: shipmentCargos[index],
-                                isSelectMode: _isSelectMode,
-                                isSelected: _selectedCargoIds.contains(shipmentCargos[index].id),
-                                onSelect: (selected) {
+                            if (_shipment.status == ShipmentStatus.draft)
+                              TextButton.icon(
+                                onPressed: () {
                                   setState(() {
-                                    if (selected) {
-                                      _selectedCargoIds.add(shipmentCargos[index].id);
-                                    } else {
-                                      _selectedCargoIds.remove(shipmentCargos[index].id);
+                                    _isSelectMode = !_isSelectMode;
+                                    if (!_isSelectMode) {
+                                      _selectedCargoIds.clear();
                                     }
                                   });
                                 },
-                                onRemove: _shipment.status == ShipmentStatus.draft
-                                    ? () => _removeCargo(context, shipmentCargos[index].id)
-                                    : null,
+                                icon: Icon(
+                                  _isSelectMode ? Icons.close : Icons.checklist,
+                                  size: 18,
+                                ),
+                                label: Text(_isSelectMode ? 'Болих' : 'Сонгох'),
                               ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          itemCount: shipmentCargos.length,
+                          itemBuilder: (context, index) => _CargoCard(
+                            cargo: shipmentCargos[index],
+                            isSelectMode: _isSelectMode,
+                            isSelected: _selectedCargoIds.contains(
+                              shipmentCargos[index].id,
+                            ),
+                            onSelect: (selected) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedCargoIds.add(
+                                    shipmentCargos[index].id,
+                                  );
+                                } else {
+                                  _selectedCargoIds.remove(
+                                    shipmentCargos[index].id,
+                                  );
+                                }
+                              });
+                            },
+                            onRemove: _shipment.status == ShipmentStatus.draft
+                                ? () => _removeCargo(
+                                    context,
+                                    shipmentCargos[index].id,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
 
           // Selection action bar
@@ -182,14 +221,22 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
     );
   }
 
-  void _updateStatus(BuildContext context, ShipmentStatus status) {
-    context.read<AdminShipmentsProvider>().updateStatus(
+  Future<void> _updateStatus(
+    BuildContext context,
+    ShipmentStatus status,
+  ) async {
+    final success = await context.read<AdminShipmentsProvider>().updateStatus(
       shipmentId: _shipment.id,
       status: status,
     );
+    if (success && context.mounted) {
+      await context.read<ChinaCargoProvider>().loadCargos(forceRefresh: true);
+    }
   }
 
   void _removeCargo(BuildContext context, String cargoId) async {
+    final shipmentsProvider = context.read<AdminShipmentsProvider>();
+    final cargoProvider = context.read<ChinaCargoProvider>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -202,7 +249,9 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: BrandPalette.errorRed),
+            style: FilledButton.styleFrom(
+              backgroundColor: BrandPalette.errorRed,
+            ),
             child: const Text('Хасах'),
           ),
         ],
@@ -210,17 +259,19 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
     );
 
     if (confirmed == true && mounted) {
-      final success = await context.read<AdminShipmentsProvider>().removeCargos(
+      final success = await shipmentsProvider.removeCargos(
         shipmentId: _shipment.id,
         cargoIds: [cargoId],
       );
       if (success && mounted) {
-        context.read<ChinaCargoProvider>().unassignCargoFromShipment(cargoId);
+        cargoProvider.unassignCargoFromShipment(cargoId);
       }
     }
   }
 
   void _removeSelectedCargos(BuildContext context) async {
+    final shipmentsProvider = context.read<AdminShipmentsProvider>();
+    final cargoProvider = context.read<ChinaCargoProvider>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -233,7 +284,9 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: BrandPalette.errorRed),
+            style: FilledButton.styleFrom(
+              backgroundColor: BrandPalette.errorRed,
+            ),
             child: const Text('Хасах'),
           ),
         ],
@@ -242,12 +295,11 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
 
     if (confirmed == true && mounted) {
       final cargoIds = _selectedCargoIds.toList();
-      final success = await context.read<AdminShipmentsProvider>().removeCargos(
+      final success = await shipmentsProvider.removeCargos(
         shipmentId: _shipment.id,
         cargoIds: cargoIds,
       );
       if (success && mounted) {
-        final cargoProvider = context.read<ChinaCargoProvider>();
         for (final cargoId in cargoIds) {
           cargoProvider.unassignCargoFromShipment(cargoId);
         }
@@ -423,7 +475,9 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
                             ShipIcon(
                               ShipAssets.boxReturn,
                               size: 48,
-                              color: BrandPalette.mutedText.withValues(alpha: 0.3),
+                              color: BrandPalette.mutedText.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -444,7 +498,9 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? BrandPalette.logoOrange.withValues(alpha: 0.1)
+                                  ? BrandPalette.logoOrange.withValues(
+                                      alpha: 0.1,
+                                    )
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
@@ -559,10 +615,7 @@ class _ChinaShipmentDetailPageState extends State<ChinaShipmentDetailPage> {
 }
 
 class _ShipmentHeader extends StatelessWidget {
-  const _ShipmentHeader({
-    required this.shipment,
-    required this.onStatusChange,
-  });
+  const _ShipmentHeader({required this.shipment, required this.onStatusChange});
 
   final Shipment shipment;
   final void Function(ShipmentStatus) onStatusChange;
@@ -619,7 +672,10 @@ class _ShipmentHeader extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: shipment.status.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
@@ -797,16 +853,16 @@ class _EmptyCargoState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Бараа байхгүй',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText),
           ),
           const SizedBox(height: 4),
           Text(
             'Энэ ачилтанд бараа нэмээгүй байна',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
           ),
           if (onAddCargo != null) ...[
             const SizedBox(height: 16),

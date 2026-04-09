@@ -1,3 +1,6 @@
+import 'package:core/core/assets/ship_assets.dart';
+import 'package:flutter/material.dart';
+
 /// Cargo status enum matching API
 enum CargoStatus {
   created('CREATED'),
@@ -61,6 +64,44 @@ enum CargoStatus {
       case CargoStatus.completedPickup:
       case CargoStatus.completedDelivery:
         return 6;
+    }
+  }
+}
+
+extension CargoStatusPresentation on CargoStatus {
+  Color get color {
+    switch (this) {
+      case CargoStatus.created:
+        return const Color(0xFFFBBF24);
+      case CargoStatus.receivedChina:
+        return const Color(0xFF8B5CF6);
+      case CargoStatus.inTransitToMn:
+        return const Color(0xFF3B82F6);
+      case CargoStatus.arrivedMn:
+      case CargoStatus.awaitingFulfillmentChoice:
+      case CargoStatus.readyForPickup:
+      case CargoStatus.outForDelivery:
+      case CargoStatus.completedPickup:
+      case CargoStatus.completedDelivery:
+        return const Color(0xFF10B981);
+    }
+  }
+
+  String get shipAsset {
+    switch (this) {
+      case CargoStatus.created:
+        return ShipAssets.clockAndHome;
+      case CargoStatus.receivedChina:
+        return ShipAssets.delivery;
+      case CargoStatus.inTransitToMn:
+        return ShipAssets.truck;
+      case CargoStatus.arrivedMn:
+      case CargoStatus.awaitingFulfillmentChoice:
+      case CargoStatus.readyForPickup:
+      case CargoStatus.outForDelivery:
+      case CargoStatus.completedPickup:
+      case CargoStatus.completedDelivery:
+        return ShipAssets.mailArrivedAndHand;
     }
   }
 }
@@ -208,12 +249,21 @@ class CargoModel {
   /// Dimensions display string
   String get dimensionsDisplay {
     if (!hasDimensions) return '-';
-    return '${lengthCm}x${widthCm}x${heightCm}см';
+    return '$lengthCm'
+        'x'
+        '$widthCm'
+        'x'
+        '$heightCm'
+        'см';
   }
 
   /// Final fee to display (override or calculated or base)
   int get finalFeeMnt =>
-      overrideFeeMnt ?? calculatedFeeMnt ?? totalFeeMnt ?? baseShippingFeeMnt ?? 0;
+      overrideFeeMnt ??
+      calculatedFeeMnt ??
+      totalFeeMnt ??
+      baseShippingFeeMnt ??
+      0;
 
   factory CargoModel.fromJson(Map<String, dynamic> json) {
     return CargoModel(

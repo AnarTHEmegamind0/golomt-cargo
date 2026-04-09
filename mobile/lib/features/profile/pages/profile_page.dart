@@ -107,7 +107,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 label: 'Миний мэдээлэл',
               ),
               _MenuTileWithAsset(assetPath: ShipAssets.truck, label: 'Хүргэлт'),
-              _MenuTileWithAsset(assetPath: ShipAssets.locationMaps, label: 'Салбарууд'),
+              _MenuTileWithAsset(
+                assetPath: ShipAssets.locationMaps,
+                label: 'Салбарууд',
+              ),
               _SwitchTile(
                 icon: Icons.dark_mode_outlined,
                 label: 'Харанхуй горим',
@@ -118,8 +121,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
-              _MenuTileWithAsset(assetPath: ShipAssets.handWithCare, label: 'Тусламж'),
-              _MenuTileWithAsset(assetPath: ShipAssets.wallet, label: 'Тооцоолуур'),
+              _MenuTileWithAsset(
+                assetPath: ShipAssets.handWithCare,
+                label: 'Тусламж',
+              ),
+              _MenuTileWithAsset(
+                assetPath: ShipAssets.wallet,
+                label: 'Тооцоолуур',
+              ),
               const SizedBox(height: 12),
               TextButton.icon(
                 onPressed: context.read<AuthProvider>().logout,
@@ -197,7 +206,11 @@ class _SwitchTile extends StatelessWidget {
 }
 
 class _MenuTileWithAsset extends StatelessWidget {
-  const _MenuTileWithAsset({required this.assetPath, required this.label, this.trailingText});
+  const _MenuTileWithAsset({
+    required this.assetPath,
+    required this.label,
+    this.trailingText,
+  });
 
   final String assetPath;
   final String label;

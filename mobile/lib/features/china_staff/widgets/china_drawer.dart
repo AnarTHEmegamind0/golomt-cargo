@@ -19,7 +19,11 @@ class ChinaDrawerItem {
 /// China staff navigation drawer items
 const chinaDrawerItems = [
   ChinaDrawerItem(index: 0, label: 'Тойм', assetPath: ShipAssets.clockAndHome),
-  ChinaDrawerItem(index: 1, label: 'Бараа бүртгэл', assetPath: ShipAssets.boxReturn),
+  ChinaDrawerItem(
+    index: 1,
+    label: 'Бараа бүртгэл',
+    assetPath: ShipAssets.boxReturn,
+  ),
   ChinaDrawerItem(index: 2, label: 'Машин', assetPath: ShipAssets.car),
   ChinaDrawerItem(index: 3, label: 'Ачилт', assetPath: ShipAssets.truck),
 ];
@@ -66,10 +70,11 @@ class ChinaDrawer extends StatelessWidget {
                     children: [
                       Text(
                         'Хятад агуулах',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: BrandPalette.primaryText,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: BrandPalette.primaryText,
+                            ),
                       ),
                       Text(
                         'Голомт Карго',
@@ -109,9 +114,9 @@ class ChinaDrawer extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 'v1.0.0',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: BrandPalette.mutedText,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
               ),
             ),
           ],

@@ -19,7 +19,8 @@ class PinFeedProvider extends ChangeNotifier {
   bool get hasLoaded => _hasLoaded;
 
   List<String> get boards {
-    final uniqueBoards = _allPins.map((pin) => pin.board).toSet().toList()..sort();
+    final uniqueBoards = _allPins.map((pin) => pin.board).toSet().toList()
+      ..sort();
     return ['All', ...uniqueBoards];
   }
 

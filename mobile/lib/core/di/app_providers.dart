@@ -5,6 +5,7 @@ import 'package:core/core/networking/repositories/branch_api_repository.dart';
 import 'package:core/core/networking/repositories/cargo_api_repository.dart';
 import 'package:core/core/networking/repositories/payment_api_repository.dart';
 import 'package:core/core/services/api_service.dart';
+import 'package:core/core/services/export_service.dart';
 import 'package:core/features/admin/providers/admin_branches_provider.dart';
 import 'package:core/features/admin/providers/admin_cargos_provider.dart';
 import 'package:core/features/admin/providers/admin_finance_provider.dart';
@@ -189,6 +190,9 @@ class AppProviders {
       Provider<AdminService>(
         create: (context) => AdminService(repository: context.read()),
       ),
+      Provider<ExportService>(
+        create: (context) => ExportService(adminService: context.read()),
+      ),
       Provider<PricingService>(create: (_) => const PricingService()),
       ChangeNotifierProvider<AdminUsersProvider>(
         create: (context) => AdminUsersProvider(service: context.read()),
@@ -196,11 +200,12 @@ class AppProviders {
       ChangeNotifierProvider<AdminCargosProvider>(
         create: (context) => AdminCargosProvider(
           adminService: context.read(),
-          orderService: context.read(),
+          cargoApiRepository: context.read(),
         ),
       ),
       ChangeNotifierProvider<AdminVehiclesProvider>(
-        create: (context) => AdminVehiclesProvider(adminService: context.read()),
+        create: (context) =>
+            AdminVehiclesProvider(adminService: context.read()),
       ),
       ChangeNotifierProvider<AdminShipmentsProvider>(
         create: (context) =>
@@ -213,17 +218,15 @@ class AppProviders {
         create: (context) => AdminLogsProvider(adminService: context.read()),
       ),
       ChangeNotifierProvider<AdminBranchesProvider>(
-        create: (context) => AdminBranchesProvider(
-          adminService: context.read(),
-          branchService: context.read(),
-        ),
+        create: (context) =>
+            AdminBranchesProvider(adminService: context.read()),
       ),
 
       // China Staff
       ChangeNotifierProvider<ChinaCargoProvider>(
         create: (context) => ChinaCargoProvider(
           adminService: context.read(),
-          orderService: context.read(),
+          cargoApiRepository: context.read(),
         ),
       ),
 

@@ -84,7 +84,8 @@ class Shipment {
           : null,
       cargoCount: json['cargo_count'] as int? ?? 0,
       note: json['note'] as String?,
-      cargoIds: (json['cargo_ids'] as List<dynamic>?)
+      cargoIds:
+          (json['cargo_ids'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],

@@ -75,8 +75,9 @@ class _AdminShellPageState extends State<AdminShellPage> {
                       onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                       icon: const Icon(Icons.menu_rounded),
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            BrandPalette.electricBlue.withValues(alpha: 0.1),
+                        backgroundColor: BrandPalette.electricBlue.withValues(
+                          alpha: 0.1,
+                        ),
                         foregroundColor: BrandPalette.electricBlue,
                       ),
                     ),
@@ -104,9 +105,7 @@ class _AdminShellPageState extends State<AdminShellPage> {
                           children: [
                             Text(
                               _titles[_currentIndex],
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w800,
                                     color: BrandPalette.primaryText,
@@ -114,9 +113,7 @@ class _AdminShellPageState extends State<AdminShellPage> {
                             ),
                             Text(
                               'Админ панел',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: BrandPalette.mutedText,
                                     fontSize: 11,

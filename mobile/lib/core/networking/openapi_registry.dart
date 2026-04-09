@@ -164,10 +164,7 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     path: "/auth/account-info",
   ),
   "GET /auth/ok": OpenApiOperation(method: "GET", path: "/auth/ok"),
-  "GET /auth/error": OpenApiOperation(
-    method: "GET",
-    path: "/auth/error",
-  ),
+  "GET /auth/error": OpenApiOperation(method: "GET", path: "/auth/error"),
   "POST /auth/admin/set-role": OpenApiOperation(
     method: "POST",
     path: "/auth/admin/set-role",
@@ -238,14 +235,8 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     path: "/api/cargos/import",
   ),
   // Vehicle management
-  "GET /api/vehicles": OpenApiOperation(
-    method: "GET",
-    path: "/api/vehicles",
-  ),
-  "POST /api/vehicles": OpenApiOperation(
-    method: "POST",
-    path: "/api/vehicles",
-  ),
+  "GET /api/vehicles": OpenApiOperation(method: "GET", path: "/api/vehicles"),
+  "POST /api/vehicles": OpenApiOperation(method: "POST", path: "/api/vehicles"),
   "PUT /api/vehicles/{vehicleId}": OpenApiOperation(
     method: "PUT",
     path: "/api/vehicles/{vehicleId}",
@@ -255,10 +246,7 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     path: "/api/vehicles/{vehicleId}",
   ),
   // Shipment management
-  "GET /api/shipments": OpenApiOperation(
-    method: "GET",
-    path: "/api/shipments",
-  ),
+  "GET /api/shipments": OpenApiOperation(method: "GET", path: "/api/shipments"),
   "GET /api/shipments/{shipmentId}": OpenApiOperation(
     method: "GET",
     path: "/api/shipments/{shipmentId}",
@@ -279,10 +267,22 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     method: "POST",
     path: "/api/shipments/{shipmentId}/status",
   ),
+  "GET /api/shipments/{shipmentId}/export.pdf": OpenApiOperation(
+    method: "GET",
+    path: "/api/shipments/{shipmentId}/export.pdf",
+  ),
+  "GET /api/shipments/{shipmentId}/export.xlsx": OpenApiOperation(
+    method: "GET",
+    path: "/api/shipments/{shipmentId}/export.xlsx",
+  ),
   // Activity logs
   "GET /api/admin/logs": OpenApiOperation(
     method: "GET",
     path: "/api/admin/logs",
+  ),
+  "GET /api/admin/logs/export.xlsx": OpenApiOperation(
+    method: "GET",
+    path: "/api/admin/logs/export.xlsx",
   ),
   // Finance
   "GET /api/admin/finance/summary": OpenApiOperation(
@@ -290,10 +290,7 @@ const Map<String, OpenApiOperation> kOpenApiOperations = {
     path: "/api/admin/finance/summary",
   ),
   // Branch management
-  "POST /api/branches": OpenApiOperation(
-    method: "POST",
-    path: "/api/branches",
-  ),
+  "POST /api/branches": OpenApiOperation(method: "POST", path: "/api/branches"),
   "PUT /api/branches/{branchId}": OpenApiOperation(
     method: "PUT",
     path: "/api/branches/{branchId}",

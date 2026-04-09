@@ -206,7 +206,6 @@ class _DarkhanHighwayPainter extends CustomPainter {
       const Color(0xFF2563EB).withValues(alpha: 0.48), // royal blue
       const Color(0xFF10B981).withValues(alpha: 0.50), // emerald green
       const Color(0xFF1E40AF).withValues(alpha: 0.52), // deep blue
-
     ];
     final darkTones = <Color>[
       const Color(0xFF22C55E).withValues(alpha: 0.75), // fresh green

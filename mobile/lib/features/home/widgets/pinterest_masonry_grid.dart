@@ -45,7 +45,10 @@ class PinterestMasonryGrid extends StatelessWidget {
     );
   }
 
-  List<List<PinItem>> _distributeItems(List<PinItem> allItems, int columnCount) {
+  List<List<PinItem>> _distributeItems(
+    List<PinItem> allItems,
+    int columnCount,
+  ) {
     final columns = List.generate(columnCount, (_) => <PinItem>[]);
     final estimatedHeights = List<double>.filled(columnCount, 0);
 

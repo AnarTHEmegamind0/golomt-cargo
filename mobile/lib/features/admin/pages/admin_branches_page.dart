@@ -33,11 +33,20 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Expanded(child: Text('Салбарууд', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800))),
+              Expanded(
+                child: Text(
+                  'Салбарууд',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
               IconButton.filled(
                 onPressed: () => _showCreateDialog(context),
                 icon: const Icon(Icons.add_rounded),
-                style: IconButton.styleFrom(backgroundColor: BrandPalette.electricBlue),
+                style: IconButton.styleFrom(
+                  backgroundColor: BrandPalette.electricBlue,
+                ),
               ),
             ],
           ),
@@ -48,30 +57,38 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
             child: provider.isLoading && provider.branches.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : provider.branches.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ShipIcon(ShipAssets.locationMaps, size: 64, color: BrandPalette.mutedText.withValues(alpha: 0.5)),
-                            const SizedBox(height: 16),
-                            Text('Салбар байхгүй', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText)),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ShipIcon(
+                          ShipAssets.locationMaps,
+                          size: 64,
+                          color: BrandPalette.mutedText.withValues(alpha: 0.5),
                         ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                        itemCount: provider.branches.length,
-                        itemBuilder: (context, index) {
-                          final branch = provider.branches[index];
-                          return _BranchCard(
-                            branch: branch,
-                            isProcessing: provider.processingBranchId == branch.id,
-                            onToggleActive: () => provider.toggleActive(branch.id),
-                            onEdit: () => _showEditDialog(context, branch),
-                            onDelete: () => _showDeleteConfirm(context, branch),
-                          );
-                        },
-                      ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Салбар байхгүй',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(color: BrandPalette.mutedText),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    itemCount: provider.branches.length,
+                    itemBuilder: (context, index) {
+                      final branch = provider.branches[index];
+                      return _BranchCard(
+                        branch: branch,
+                        isProcessing: provider.processingBranchId == branch.id,
+                        onToggleActive: () => provider.toggleActive(branch.id),
+                        onEdit: () => _showEditDialog(context, branch),
+                        onDelete: () => _showDeleteConfirm(context, branch),
+                      );
+                    },
+                  ),
           ),
         ),
       ],
@@ -93,23 +110,45 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Нэр')),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Нэр'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: codeController, decoration: const InputDecoration(labelText: 'Код')),
+              TextField(
+                controller: codeController,
+                decoration: const InputDecoration(labelText: 'Код'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Хаяг'), maxLines: 2),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(labelText: 'Хаяг'),
+                maxLines: 2,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Утас'), keyboardType: TextInputType.phone),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(labelText: 'Утас'),
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: chinaAddressController, decoration: const InputDecoration(labelText: 'Хятад хаяг'), maxLines: 2),
+              TextField(
+                controller: chinaAddressController,
+                decoration: const InputDecoration(labelText: 'Хятад хаяг'),
+                maxLines: 2,
+              ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Болих'),
+          ),
           FilledButton(
             onPressed: () {
-              if (nameController.text.isEmpty || codeController.text.isEmpty) return;
+              if (nameController.text.isEmpty || codeController.text.isEmpty)
+                return;
               Navigator.pop(ctx);
               this.context.read<AdminBranchesProvider>().createBranch(
                 name: nameController.text.trim(),
@@ -130,7 +169,9 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
     final nameController = TextEditingController(text: branch.name);
     final addressController = TextEditingController(text: branch.address);
     final phoneController = TextEditingController(text: branch.phone);
-    final chinaAddressController = TextEditingController(text: branch.chinaAddress);
+    final chinaAddressController = TextEditingController(
+      text: branch.chinaAddress,
+    );
 
     showDialog(
       context: context,
@@ -140,18 +181,35 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Нэр')),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Нэр'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Хаяг'), maxLines: 2),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(labelText: 'Хаяг'),
+                maxLines: 2,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Утас')),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(labelText: 'Утас'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: chinaAddressController, decoration: const InputDecoration(labelText: 'Хятад хаяг'), maxLines: 2),
+              TextField(
+                controller: chinaAddressController,
+                decoration: const InputDecoration(labelText: 'Хятад хаяг'),
+                maxLines: 2,
+              ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Болих'),
+          ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -177,10 +235,20 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
         title: const Text('Салбар устгах'),
         content: Text('${branch.name} салбарыг устгах уу?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Болих'),
+          ),
           FilledButton(
-            onPressed: () { Navigator.pop(ctx); this.context.read<AdminBranchesProvider>().deleteBranch(branch.id); },
-            style: FilledButton.styleFrom(backgroundColor: BrandPalette.errorRed),
+            onPressed: () {
+              Navigator.pop(ctx);
+              this.context.read<AdminBranchesProvider>().deleteBranch(
+                branch.id,
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: BrandPalette.errorRed,
+            ),
             child: const Text('Устгах'),
           ),
         ],
@@ -190,7 +258,13 @@ class _AdminBranchesPageState extends State<AdminBranchesPage> {
 }
 
 class _BranchCard extends StatelessWidget {
-  const _BranchCard({required this.branch, required this.isProcessing, required this.onToggleActive, required this.onEdit, required this.onDelete});
+  const _BranchCard({
+    required this.branch,
+    required this.isProcessing,
+    required this.onToggleActive,
+    required this.onEdit,
+    required this.onDelete,
+  });
   final Branch branch;
   final bool isProcessing;
   final VoidCallback onToggleActive, onEdit, onDelete;
@@ -203,7 +277,11 @@ class _BranchCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: branch.isActive ? const Color(0xFFE5E9F2) : BrandPalette.errorRed.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: branch.isActive
+              ? const Color(0xFFE5E9F2)
+              : BrandPalette.errorRed.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,30 +289,77 @@ class _BranchCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 48, height: 48,
-                decoration: BoxDecoration(color: BrandPalette.electricBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: const Center(child: ShipIcon(ShipAssets.locationMaps, color: BrandPalette.electricBlue, size: 24)),
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: BrandPalette.electricBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: ShipIcon(
+                    ShipAssets.locationMaps,
+                    color: BrandPalette.electricBlue,
+                    size: 24,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(branch.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                    Text(branch.address, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(
+                      branch.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      branch.address,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: BrandPalette.mutedText,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: (branch.isActive ? BrandPalette.successGreen : BrandPalette.errorRed).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                child: Text(branch.isActive ? 'Идэвхтэй' : 'Идэвхгүй', style: TextStyle(color: branch.isActive ? BrandPalette.successGreen : BrandPalette.errorRed, fontWeight: FontWeight.w600, fontSize: 12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      (branch.isActive
+                              ? BrandPalette.successGreen
+                              : BrandPalette.errorRed)
+                          .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  branch.isActive ? 'Идэвхтэй' : 'Идэвхгүй',
+                  style: TextStyle(
+                    color: branch.isActive
+                        ? BrandPalette.successGreen
+                        : BrandPalette.errorRed,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ],
           ),
           if (branch.chinaAddress.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text('Хятад: ${branch.chinaAddress}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText), maxLines: 2),
+            Text(
+              'Хятад: ${branch.chinaAddress}',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
+              maxLines: 2,
+            ),
           ],
           const SizedBox(height: 12),
           Row(
@@ -242,12 +367,37 @@ class _BranchCard extends StatelessWidget {
               if (branch.phone.isNotEmpty) ...[
                 Icon(Icons.phone, size: 14, color: BrandPalette.mutedText),
                 const SizedBox(width: 4),
-                Text(branch.phone, style: const TextStyle(fontSize: 12, color: BrandPalette.mutedText)),
+                Text(
+                  branch.phone,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandPalette.mutedText,
+                  ),
+                ),
               ],
               const Spacer(),
-              IconButton(onPressed: isProcessing ? null : onToggleActive, icon: Icon(branch.isActive ? Icons.pause_circle_outline : Icons.play_circle_outline)),
-              IconButton(onPressed: isProcessing ? null : onEdit, icon: const Icon(Icons.edit), style: IconButton.styleFrom(foregroundColor: BrandPalette.electricBlue)),
-              IconButton(onPressed: isProcessing ? null : onDelete, icon: const Icon(Icons.delete_outline), style: IconButton.styleFrom(foregroundColor: BrandPalette.errorRed)),
+              IconButton(
+                onPressed: isProcessing ? null : onToggleActive,
+                icon: Icon(
+                  branch.isActive
+                      ? Icons.pause_circle_outline
+                      : Icons.play_circle_outline,
+                ),
+              ),
+              IconButton(
+                onPressed: isProcessing ? null : onEdit,
+                icon: const Icon(Icons.edit),
+                style: IconButton.styleFrom(
+                  foregroundColor: BrandPalette.electricBlue,
+                ),
+              ),
+              IconButton(
+                onPressed: isProcessing ? null : onDelete,
+                icon: const Icon(Icons.delete_outline),
+                style: IconButton.styleFrom(
+                  foregroundColor: BrandPalette.errorRed,
+                ),
+              ),
             ],
           ),
           if (isProcessing) const LinearProgressIndicator(),

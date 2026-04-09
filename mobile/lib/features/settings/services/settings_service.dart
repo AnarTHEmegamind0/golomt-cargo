@@ -8,6 +8,6 @@ class SettingsService {
   final SettingsRepository _settingsRepository;
 
   Future<AppSettings> read() => _settingsRepository.read();
-  Future<void> write(AppSettings settings) => _settingsRepository.write(settings);
+  Future<void> write(AppSettings settings) =>
+      _settingsRepository.write(settings);
 }
-

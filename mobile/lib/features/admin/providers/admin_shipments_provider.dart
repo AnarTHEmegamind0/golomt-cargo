@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// Provider for shipment management
 class AdminShipmentsProvider extends ChangeNotifier {
   AdminShipmentsProvider({required AdminService adminService})
-      : _adminService = adminService;
+    : _adminService = adminService;
 
   final AdminService _adminService;
 

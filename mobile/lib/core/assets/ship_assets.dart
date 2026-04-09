@@ -21,8 +21,10 @@ class ShipAssets {
   // Delivery status
   static const String delivery = '$_basePath/delivery.png';
   static const String deliveryAlt = '$_basePath/delivery (1).png';
-  static const String manDeliveringPackage = '$_basePath/man-delivering-package-.png';
-  static const String mailArrivedAndHand = '$_basePath/mail-arrived-and-hand-.png';
+  static const String manDeliveringPackage =
+      '$_basePath/man-delivering-package-.png';
+  static const String mailArrivedAndHand =
+      '$_basePath/mail-arrived-and-hand-.png';
 
   // Package & returns
   static const String boxReturn = '$_basePath/box-return.png';

@@ -4,4 +4,3 @@ class Profile {
   final String displayName;
   final String email;
 }
-

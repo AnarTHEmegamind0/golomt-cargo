@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// Provider for vehicle management
 class AdminVehiclesProvider extends ChangeNotifier {
   AdminVehiclesProvider({required AdminService adminService})
-      : _adminService = adminService;
+    : _adminService = adminService;
 
   final AdminService _adminService;
 

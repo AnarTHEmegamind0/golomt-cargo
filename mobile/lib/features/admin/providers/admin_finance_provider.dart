@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// Provider for financial reports
 class AdminFinanceProvider extends ChangeNotifier {
   AdminFinanceProvider({required AdminService adminService})
-      : _adminService = adminService;
+    : _adminService = adminService;
 
   final AdminService _adminService;
 

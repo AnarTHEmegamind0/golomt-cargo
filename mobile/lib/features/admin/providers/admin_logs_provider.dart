@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// Provider for activity logs
 class AdminLogsProvider extends ChangeNotifier {
   AdminLogsProvider({required AdminService adminService})
-      : _adminService = adminService;
+    : _adminService = adminService;
 
   final AdminService _adminService;
 

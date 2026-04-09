@@ -1,18 +1,18 @@
 import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/core/networking/repositories/cargo_api_repository.dart';
 import 'package:core/features/admin/services/admin_service.dart';
-import 'package:core/features/orders/services/order_service.dart';
 import 'package:flutter/foundation.dart';
 
 /// Provider for China staff cargo management - track code import and receiving
 class ChinaCargoProvider extends ChangeNotifier {
   ChinaCargoProvider({
     required AdminService adminService,
-    required OrderService orderService,
+    required CargoApiRepository cargoApiRepository,
   }) : _adminService = adminService,
-       _orderService = orderService;
+       _cargoApiRepository = cargoApiRepository;
 
   final AdminService _adminService;
-  final OrderService _orderService;
+  final CargoApiRepository _cargoApiRepository;
 
   List<CargoModel> _cargos = [];
   List<CargoModel> _importedCargos = [];
@@ -34,32 +34,40 @@ class ChinaCargoProvider extends ChangeNotifier {
       _cargos.where((c) => c.status == CargoStatus.receivedChina).toList();
 
   /// Filter cargos ready for shipment (received with weight recorded)
-  List<CargoModel> get readyForShipmentCargos =>
-      _cargos.where((c) =>
-        c.status == CargoStatus.receivedChina &&
-        c.weightGrams != null &&
-        c.shipmentId == null
-      ).toList();
+  List<CargoModel> get readyForShipmentCargos => _cargos
+      .where(
+        (c) =>
+            c.status == CargoStatus.receivedChina &&
+            c.weightGrams != null &&
+            c.shipmentId == null,
+      )
+      .toList();
 
   /// Get cargos by status
   List<CargoModel> getByStatus(CargoStatus status) =>
       _cargos.where((c) => c.status == status).toList();
 
   /// Get cargos not assigned to any shipment
-  List<CargoModel> get unassignedCargos =>
-      _cargos.where((c) =>
-        c.shipmentId == null &&
-        (c.status == CargoStatus.receivedChina || c.status == CargoStatus.created)
-      ).toList();
+  List<CargoModel> get unassignedCargos => _cargos
+      .where(
+        (c) =>
+            c.shipmentId == null &&
+            (c.status == CargoStatus.receivedChina ||
+                c.status == CargoStatus.created),
+      )
+      .toList();
 
   /// Search filtered cargos
   List<CargoModel> get filteredCargos {
     if (_searchQuery.isEmpty) return _cargos;
     final query = _searchQuery.toLowerCase();
-    return _cargos.where((c) =>
-      c.trackingNumber.toLowerCase().contains(query) ||
-      (c.customer?.name.toLowerCase().contains(query) ?? false)
-    ).toList();
+    return _cargos
+        .where(
+          (c) =>
+              c.trackingNumber.toLowerCase().contains(query) ||
+              (c.customer?.name.toLowerCase().contains(query) ?? false),
+        )
+        .toList();
   }
 
   void setSearchQuery(String query) {
@@ -77,15 +85,7 @@ class ChinaCargoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final orders = await _orderService.fetchAll();
-      _cargos = orders.map((o) => CargoModel(
-        id: o.id,
-        trackingNumber: o.trackingCode,
-        status: _mapOrderStatusToCargoStatus(o.status.name),
-        paymentStatus: PaymentStatus.unpaid,
-        weightGrams: o.weight > 0 ? (o.weight * 1000).toInt() : null,
-        shipmentId: null,
-      )).toList();
+      _cargos = await _fetchAllCargos();
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
@@ -94,25 +94,14 @@ class ChinaCargoProvider extends ChangeNotifier {
     }
   }
 
-  CargoStatus _mapOrderStatusToCargoStatus(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return CargoStatus.created;
-      case 'processing':
-        return CargoStatus.receivedChina;
-      case 'transit':
-        return CargoStatus.inTransitToMn;
-      case 'delivered':
-        return CargoStatus.arrivedMn;
-      default:
-        return CargoStatus.created;
-    }
-  }
-
   /// Import track codes - creates cargos from list of tracking numbers
   Future<ImportResult> importTrackCodes(List<String> trackCodes) async {
     if (trackCodes.isEmpty) {
-      return ImportResult(success: 0, failed: 0, errors: ['Track code жагсаалт хоосон байна']);
+      return ImportResult(
+        success: 0,
+        failed: 0,
+        errors: ['Track code жагсаалт хоосон байна'],
+      );
     }
 
     _isImporting = true;
@@ -137,7 +126,11 @@ class ChinaCargoProvider extends ChangeNotifier {
       );
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
-      return ImportResult(success: 0, failed: trackCodes.length, errors: [_error!]);
+      return ImportResult(
+        success: 0,
+        failed: trackCodes.length,
+        errors: [_error!],
+      );
     } finally {
       _isImporting = false;
       notifyListeners();
@@ -166,7 +159,7 @@ class ChinaCargoProvider extends ChangeNotifier {
 
     try {
       await _adminService.receiveCargo(cargoId: cargoId, imagePath: imagePath);
-      _updateCargoStatus(cargoId, CargoStatus.receivedChina);
+      await _reloadCargo(cargoId);
       return true;
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
@@ -210,17 +203,7 @@ class ChinaCargoProvider extends ChangeNotifier {
         );
       }
 
-      // Update local state
-      final index = _cargos.indexWhere((c) => c.id == cargoId);
-      if (index != -1) {
-        _cargos[index] = _cargos[index].copyWith(
-          weightGrams: weightGrams,
-          heightCm: heightCm,
-          widthCm: widthCm,
-          lengthCm: lengthCm,
-          isFragile: isFragile,
-        );
-      }
+      await _reloadCargo(cargoId);
       return true;
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
@@ -231,11 +214,45 @@ class ChinaCargoProvider extends ChangeNotifier {
     }
   }
 
-  void _updateCargoStatus(String cargoId, CargoStatus newStatus) {
-    final index = _cargos.indexWhere((c) => c.id == cargoId);
-    if (index != -1) {
-      _cargos[index] = _cargos[index].copyWith(status: newStatus);
+  Future<List<CargoModel>> _fetchAllCargos({String? query}) async {
+    final cargos = <CargoModel>[];
+    var page = 1;
+    var totalPages = 1;
+
+    do {
+      final result = query == null || query.isEmpty
+          ? await _cargoApiRepository.getCargos(page: page, limit: 100)
+          : await _cargoApiRepository.searchCargos(
+              query: query,
+              page: page,
+              limit: 100,
+            );
+
+      if (!result.isSuccess || result.data == null) {
+        throw Exception(result.error?.message ?? 'Failed to load cargos.');
+      }
+
+      cargos.addAll(result.data!.data);
+      totalPages = result.data!.meta.totalPages;
+      page++;
+    } while (page <= totalPages);
+
+    return cargos;
+  }
+
+  Future<void> _reloadCargo(String cargoId) async {
+    final result = await _cargoApiRepository.getCargoById(cargoId);
+    if (!result.isSuccess || result.data == null) {
+      return;
     }
+
+    final index = _cargos.indexWhere((c) => c.id == cargoId);
+    if (index == -1) {
+      _cargos = [result.data!.data, ..._cargos];
+      return;
+    }
+
+    _cargos[index] = result.data!.data;
   }
 
   /// Update cargo shipment assignment locally

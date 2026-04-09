@@ -254,10 +254,7 @@ class _RoleDropdown extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
           items: UserRole.values.map((role) {
-            return DropdownMenuItem(
-              value: role,
-              child: Text(role.label),
-            );
+            return DropdownMenuItem(value: role, child: Text(role.label));
           }).toList(),
           onChanged: onChanged == null
               ? null

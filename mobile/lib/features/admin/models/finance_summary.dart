@@ -77,7 +77,8 @@ class FinanceSummary {
       unpaidCargos: json['unpaid_cargos'] as int? ?? 0,
       avgPricePerKg: (json['avg_price_per_kg'] as num?)?.toDouble() ?? 0.0,
       avgPricePerCbm: (json['avg_price_per_cbm'] as num?)?.toDouble() ?? 0.0,
-      dailyRevenues: (json['daily_revenues'] as List<dynamic>?)
+      dailyRevenues:
+          (json['daily_revenues'] as List<dynamic>?)
               ?.map((e) => DailyRevenue.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

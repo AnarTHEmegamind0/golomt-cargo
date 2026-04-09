@@ -118,8 +118,16 @@ class _NotificationCard extends StatelessWidget {
             ),
             child: Center(
               child: notification.assetPath != null
-                  ? ShipIcon(notification.assetPath!, size: 22, color: notification.color)
-                  : Icon(notification.icon, color: notification.color, size: 22),
+                  ? ShipIcon(
+                      notification.assetPath!,
+                      size: 22,
+                      color: notification.color,
+                    )
+                  : Icon(
+                      notification.icon,
+                      color: notification.color,
+                      size: 22,
+                    ),
             ),
           ),
           const SizedBox(width: 14),
@@ -185,7 +193,10 @@ class _NotificationData {
     this.assetPath,
     required this.color,
     this.isRead = false,
-  }) : assert(icon != null || assetPath != null, 'Either icon or assetPath must be provided');
+  }) : assert(
+         icon != null || assetPath != null,
+         'Either icon or assetPath must be provided',
+       );
 
   final String title;
   final String message;

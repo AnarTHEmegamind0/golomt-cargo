@@ -53,8 +53,9 @@ class PricingService {
     final weightBasedFee = (weightKg * PricingRates.pricePerKg).round();
 
     // Calculate volume-based fee
-    final volumeRate =
-        isFragile ? PricingRates.pricePerCbmFragile : PricingRates.pricePerCbm;
+    final volumeRate = isFragile
+        ? PricingRates.pricePerCbmFragile
+        : PricingRates.pricePerCbm;
     final volumeBasedFee = (volumeCbm * volumeRate).round();
 
     // Use the higher of the two methods

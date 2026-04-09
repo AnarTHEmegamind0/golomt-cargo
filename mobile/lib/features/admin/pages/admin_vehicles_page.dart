@@ -58,21 +58,22 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
             child: provider.isLoading && provider.vehicles.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : provider.vehicles.isEmpty
-                    ? _buildEmptyState(context)
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                        itemCount: provider.vehicles.length,
-                        itemBuilder: (context, index) {
-                          final vehicle = provider.vehicles[index];
-                          return _VehicleCard(
-                            vehicle: vehicle,
-                            isProcessing: provider.processingVehicleId == vehicle.id,
-                            onToggleActive: () => provider.toggleActive(vehicle.id),
-                            onEdit: () => _showEditDialog(context, vehicle),
-                            onDelete: () => _showDeleteConfirm(context, vehicle),
-                          );
-                        },
-                      ),
+                ? _buildEmptyState(context)
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    itemCount: provider.vehicles.length,
+                    itemBuilder: (context, index) {
+                      final vehicle = provider.vehicles[index];
+                      return _VehicleCard(
+                        vehicle: vehicle,
+                        isProcessing:
+                            provider.processingVehicleId == vehicle.id,
+                        onToggleActive: () => provider.toggleActive(vehicle.id),
+                        onEdit: () => _showEditDialog(context, vehicle),
+                        onDelete: () => _showDeleteConfirm(context, vehicle),
+                      );
+                    },
+                  ),
           ),
         ),
       ],
@@ -84,9 +85,18 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ShipIcon(ShipAssets.car, size: 64, color: BrandPalette.mutedText.withValues(alpha: 0.5)),
+          ShipIcon(
+            ShipAssets.car,
+            size: 64,
+            color: BrandPalette.mutedText.withValues(alpha: 0.5),
+          ),
           const SizedBox(height: 16),
-          Text('Машин байхгүй', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText)),
+          Text(
+            'Машин байхгүй',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText),
+          ),
         ],
       ),
     );
@@ -105,25 +115,48 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: plateController, decoration: const InputDecoration(labelText: 'Дугаар', hintText: '1234УБА'), textCapitalization: TextCapitalization.characters),
+              TextField(
+                controller: plateController,
+                decoration: const InputDecoration(
+                  labelText: 'Дугаар',
+                  hintText: '1234УБА',
+                ),
+                textCapitalization: TextCapitalization.characters,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Нэр')),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Нэр'),
+              ),
               const SizedBox(height: 12),
               DropdownButtonFormField<VehicleType>(
                 value: selectedType,
                 decoration: const InputDecoration(labelText: 'Төрөл'),
-                items: VehicleType.values.map((t) => DropdownMenuItem(value: t, child: Text(t.label))).toList(),
-                onChanged: (t) { if (t != null) setState(() => selectedType = t); },
+                items: VehicleType.values
+                    .map(
+                      (t) => DropdownMenuItem(value: t, child: Text(t.label)),
+                    )
+                    .toList(),
+                onChanged: (t) {
+                  if (t != null) setState(() => selectedType = t);
+                },
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Болих'),
+            ),
             FilledButton(
               onPressed: () {
                 if (plateController.text.isEmpty) return;
                 Navigator.pop(ctx);
-                this.context.read<AdminVehiclesProvider>().createVehicle(plateNumber: plateController.text.trim(), name: nameController.text.trim(), type: selectedType);
+                this.context.read<AdminVehiclesProvider>().createVehicle(
+                  plateNumber: plateController.text.trim(),
+                  name: nameController.text.trim(),
+                  type: selectedType,
+                );
               },
               child: const Text('Үүсгэх'),
             ),
@@ -146,24 +179,44 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: plateController, decoration: const InputDecoration(labelText: 'Дугаар')),
+              TextField(
+                controller: plateController,
+                decoration: const InputDecoration(labelText: 'Дугаар'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Нэр')),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Нэр'),
+              ),
               const SizedBox(height: 12),
               DropdownButtonFormField<VehicleType>(
                 value: selectedType,
                 decoration: const InputDecoration(labelText: 'Төрөл'),
-                items: VehicleType.values.map((t) => DropdownMenuItem(value: t, child: Text(t.label))).toList(),
-                onChanged: (t) { if (t != null) setState(() => selectedType = t); },
+                items: VehicleType.values
+                    .map(
+                      (t) => DropdownMenuItem(value: t, child: Text(t.label)),
+                    )
+                    .toList(),
+                onChanged: (t) {
+                  if (t != null) setState(() => selectedType = t);
+                },
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Болих'),
+            ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                this.context.read<AdminVehiclesProvider>().updateVehicle(vehicleId: vehicle.id, plateNumber: plateController.text.trim(), name: nameController.text.trim(), type: selectedType);
+                this.context.read<AdminVehiclesProvider>().updateVehicle(
+                  vehicleId: vehicle.id,
+                  plateNumber: plateController.text.trim(),
+                  name: nameController.text.trim(),
+                  type: selectedType,
+                );
               },
               child: const Text('Хадгалах'),
             ),
@@ -180,10 +233,20 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
         title: const Text('Машин устгах'),
         content: Text('${vehicle.plateNumber} машиныг устгах уу?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Болих')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Болих'),
+          ),
           FilledButton(
-            onPressed: () { Navigator.pop(ctx); this.context.read<AdminVehiclesProvider>().deleteVehicle(vehicle.id); },
-            style: FilledButton.styleFrom(backgroundColor: BrandPalette.errorRed),
+            onPressed: () {
+              Navigator.pop(ctx);
+              this.context.read<AdminVehiclesProvider>().deleteVehicle(
+                vehicle.id,
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: BrandPalette.errorRed,
+            ),
             child: const Text('Устгах'),
           ),
         ],
@@ -193,7 +256,13 @@ class _AdminVehiclesPageState extends State<AdminVehiclesPage> {
 }
 
 class _VehicleCard extends StatelessWidget {
-  const _VehicleCard({required this.vehicle, required this.isProcessing, required this.onToggleActive, required this.onEdit, required this.onDelete});
+  const _VehicleCard({
+    required this.vehicle,
+    required this.isProcessing,
+    required this.onToggleActive,
+    required this.onEdit,
+    required this.onDelete,
+  });
   final Vehicle vehicle;
   final bool isProcessing;
   final VoidCallback onToggleActive, onEdit, onDelete;
@@ -206,31 +275,69 @@ class _VehicleCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: vehicle.isActive ? const Color(0xFFE5E9F2) : BrandPalette.errorRed.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: vehicle.isActive
+              ? const Color(0xFFE5E9F2)
+              : BrandPalette.errorRed.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         children: [
           Row(
             children: [
               Container(
-                width: 48, height: 48,
-                decoration: BoxDecoration(color: BrandPalette.electricBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: const Center(child: ShipIcon(ShipAssets.car, color: BrandPalette.electricBlue, size: 24)),
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: BrandPalette.electricBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: ShipIcon(
+                    ShipAssets.car,
+                    color: BrandPalette.electricBlue,
+                    size: 24,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(vehicle.plateNumber, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, fontFamily: 'monospace')),
-                    Text(vehicle.name, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText)),
+                    Text(
+                      vehicle.plateNumber,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    Text(
+                      vehicle.name,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: BrandPalette.mutedText,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(color: BrandPalette.navyBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                child: Text(vehicle.type.label, style: const TextStyle(color: BrandPalette.navyBlue, fontWeight: FontWeight.w600, fontSize: 12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: BrandPalette.navyBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  vehicle.type.label,
+                  style: const TextStyle(
+                    color: BrandPalette.navyBlue,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ],
           ),
@@ -238,17 +345,52 @@ class _VehicleCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
-                  color: (vehicle.isActive ? BrandPalette.successGreen : BrandPalette.errorRed).withValues(alpha: 0.1),
+                  color:
+                      (vehicle.isActive
+                              ? BrandPalette.successGreen
+                              : BrandPalette.errorRed)
+                          .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(vehicle.isActive ? 'Идэвхтэй' : 'Идэвхгүй', style: TextStyle(color: vehicle.isActive ? BrandPalette.successGreen : BrandPalette.errorRed, fontWeight: FontWeight.w600, fontSize: 12)),
+                child: Text(
+                  vehicle.isActive ? 'Идэвхтэй' : 'Идэвхгүй',
+                  style: TextStyle(
+                    color: vehicle.isActive
+                        ? BrandPalette.successGreen
+                        : BrandPalette.errorRed,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
               ),
               const Spacer(),
-              IconButton(onPressed: isProcessing ? null : onToggleActive, icon: Icon(vehicle.isActive ? Icons.pause_circle_outline : Icons.play_circle_outline)),
-              IconButton(onPressed: isProcessing ? null : onEdit, icon: const Icon(Icons.edit), style: IconButton.styleFrom(foregroundColor: BrandPalette.electricBlue)),
-              IconButton(onPressed: isProcessing ? null : onDelete, icon: const Icon(Icons.delete_outline), style: IconButton.styleFrom(foregroundColor: BrandPalette.errorRed)),
+              IconButton(
+                onPressed: isProcessing ? null : onToggleActive,
+                icon: Icon(
+                  vehicle.isActive
+                      ? Icons.pause_circle_outline
+                      : Icons.play_circle_outline,
+                ),
+              ),
+              IconButton(
+                onPressed: isProcessing ? null : onEdit,
+                icon: const Icon(Icons.edit),
+                style: IconButton.styleFrom(
+                  foregroundColor: BrandPalette.electricBlue,
+                ),
+              ),
+              IconButton(
+                onPressed: isProcessing ? null : onDelete,
+                icon: const Icon(Icons.delete_outline),
+                style: IconButton.styleFrom(
+                  foregroundColor: BrandPalette.errorRed,
+                ),
+              ),
             ],
           ),
           if (isProcessing) const LinearProgressIndicator(),

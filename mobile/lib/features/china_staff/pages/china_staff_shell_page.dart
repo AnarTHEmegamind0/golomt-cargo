@@ -30,12 +30,7 @@ class _ChinaStaffShellPageState extends State<ChinaStaffShellPage> {
     ChinaShipmentsPage(), // 3: Ачилт
   ];
 
-  final _titles = const [
-    'Тойм',
-    'Бараа бүртгэл',
-    'Машин',
-    'Ачилт',
-  ];
+  final _titles = const ['Тойм', 'Бараа бүртгэл', 'Машин', 'Ачилт'];
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +58,9 @@ class _ChinaStaffShellPageState extends State<ChinaStaffShellPage> {
                       onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                       icon: const Icon(Icons.menu_rounded),
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            BrandPalette.logoOrange.withValues(alpha: 0.1),
+                        backgroundColor: BrandPalette.logoOrange.withValues(
+                          alpha: 0.1,
+                        ),
                         foregroundColor: BrandPalette.logoOrange,
                       ),
                     ),
@@ -92,9 +88,7 @@ class _ChinaStaffShellPageState extends State<ChinaStaffShellPage> {
                           children: [
                             Text(
                               _titles[_currentIndex],
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w800,
                                     color: BrandPalette.primaryText,
@@ -102,9 +96,7 @@ class _ChinaStaffShellPageState extends State<ChinaStaffShellPage> {
                             ),
                             Text(
                               'Хятад агуулах',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: BrandPalette.mutedText,
                                     fontSize: 11,

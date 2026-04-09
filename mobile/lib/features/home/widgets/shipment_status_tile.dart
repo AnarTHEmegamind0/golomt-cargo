@@ -38,12 +38,16 @@ class ShipmentStatusTile extends StatelessWidget {
             const Spacer(),
             Text(
               value,
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               title,
-              style: textTheme.bodyMedium?.copyWith(color: const Color(0xFF667085)),
+              style: textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF667085),
+              ),
             ),
             const SizedBox(height: 8),
             Text(

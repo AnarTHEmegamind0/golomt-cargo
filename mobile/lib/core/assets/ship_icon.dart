@@ -11,12 +11,7 @@ import 'package:flutter/material.dart';
 /// )
 /// ```
 class ShipIcon extends StatelessWidget {
-  const ShipIcon(
-    this.assetPath, {
-    super.key,
-    this.size = 24,
-    this.color,
-  });
+  const ShipIcon(this.assetPath, {super.key, this.size = 24, this.color});
 
   /// The asset path from [ShipAssets].
   final String assetPath;
@@ -105,11 +100,7 @@ class ShipIconCircle extends StatelessWidget {
         shape: borderRadius != null ? BoxShape.rectangle : BoxShape.circle,
       ),
       child: Center(
-        child: ShipIcon(
-          assetPath,
-          size: effectiveIconSize,
-          color: iconColor,
-        ),
+        child: ShipIcon(assetPath, size: effectiveIconSize, color: iconColor),
       ),
     );
   }

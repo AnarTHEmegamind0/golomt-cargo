@@ -39,7 +39,16 @@ class _HomeFeedSkeletonState extends State<HomeFeedSkeleton>
             ? 3
             : 2;
 
-        final placeholderSizes = <double>[0.72, 0.95, 0.82, 1.09, 0.8, 1.04, 0.75, 0.92];
+        final placeholderSizes = <double>[
+          0.72,
+          0.95,
+          0.82,
+          1.09,
+          0.8,
+          1.04,
+          0.75,
+          0.92,
+        ];
         final columns = List.generate(columnCount, (_) => <double>[]);
         final heights = List<double>.filled(columnCount, 0);
 
@@ -57,7 +66,8 @@ class _HomeFeedSkeletonState extends State<HomeFeedSkeleton>
         return AnimatedBuilder(
           animation: _controller,
           builder: (context, _) {
-            final wave = 0.45 + (0.25 * math.sin(_controller.value * math.pi * 2));
+            final wave =
+                0.45 + (0.25 * math.sin(_controller.value * math.pi * 2));
 
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,

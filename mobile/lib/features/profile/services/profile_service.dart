@@ -9,4 +9,3 @@ class ProfileService {
 
   Future<Profile> fetchProfile() => _profileRepository.fetchProfile();
 }
-

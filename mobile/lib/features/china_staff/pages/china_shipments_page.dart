@@ -162,9 +162,9 @@ class _ChinaShipmentsPageState extends State<ChinaShipmentsPage>
   void _showCreateDialog(BuildContext context) {
     final vehicles = context.read<AdminVehiclesProvider>().activeVehicles;
     if (vehicles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Эхлээд машин бүртгэнэ үү')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Эхлээд машин бүртгэнэ үү')));
       return;
     }
 
@@ -185,10 +185,12 @@ class _ChinaShipmentsPageState extends State<ChinaShipmentsPage>
                   value: selectedVehicleId,
                   decoration: const InputDecoration(labelText: 'Машин'),
                   items: vehicles
-                      .map((v) => DropdownMenuItem(
-                            value: v.id,
-                            child: Text('${v.plateNumber} - ${v.name}'),
-                          ))
+                      .map(
+                        (v) => DropdownMenuItem(
+                          value: v.id,
+                          child: Text('${v.plateNumber} - ${v.name}'),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => selectedVehicleId = v),
                 ),
@@ -278,9 +280,9 @@ class _ShipmentList extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               '${status.label} ачилт байхгүй',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: BrandPalette.mutedText,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText),
             ),
           ],
         ),
@@ -310,10 +312,7 @@ class _ShipmentList extends StatelessWidget {
 }
 
 class _ShipmentCard extends StatelessWidget {
-  const _ShipmentCard({
-    required this.shipment,
-    required this.onTap,
-  });
+  const _ShipmentCard({required this.shipment, required this.onTap});
 
   final Shipment shipment;
   final VoidCallback onTap;
@@ -360,10 +359,11 @@ class _ShipmentCard extends StatelessWidget {
                     children: [
                       Text(
                         shipment.vehiclePlateNumber,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'monospace',
+                            ),
                       ),
                       Text(
                         shipment.dateRangeDisplay,
@@ -411,9 +411,9 @@ class _ShipmentCard extends StatelessWidget {
                         onPressed: isProcessing
                             ? null
                             : () => provider.updateStatus(
-                                  shipmentId: shipment.id,
-                                  status: next,
-                                ),
+                                shipmentId: shipment.id,
+                                status: next,
+                              ),
                         child: Text(next.label),
                       ),
                     ),

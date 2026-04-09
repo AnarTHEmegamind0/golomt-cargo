@@ -1,9 +1,4 @@
-enum UserRole {
-  customer,
-  chinaStaff,
-  mongoliaStaff,
-  admin,
-}
+enum UserRole { customer, chinaStaff, mongoliaStaff, admin }
 
 extension UserRoleParsing on UserRole {
   static UserRole fromString(String? raw) {
@@ -48,7 +43,10 @@ extension UserRoleParsing on UserRole {
     }
   }
 
-  bool get isStaff => this == UserRole.chinaStaff || this == UserRole.mongoliaStaff || this == UserRole.admin;
+  bool get isStaff =>
+      this == UserRole.chinaStaff ||
+      this == UserRole.mongoliaStaff ||
+      this == UserRole.admin;
 }
 
 class User {

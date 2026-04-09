@@ -112,7 +112,9 @@ class _PinItemCardState extends State<PinItemCard> {
               widget.item.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 5),
             Row(

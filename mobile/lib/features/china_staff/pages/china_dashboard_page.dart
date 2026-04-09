@@ -49,9 +49,9 @@ class _ChinaDashboardPageState extends State<ChinaDashboardPage> {
           children: [
             Text(
               'Өнөөдрийн тойм',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 16),
 
@@ -80,7 +80,8 @@ class _ChinaDashboardPageState extends State<ChinaDashboardPage> {
                 ),
                 _StatCard(
                   title: 'Бэлтгэж буй',
-                  value: '${shipmentProvider.getByStatus(ShipmentStatus.draft).length}',
+                  value:
+                      '${shipmentProvider.getByStatus(ShipmentStatus.draft).length}',
                   subtitle: 'ачилт',
                   icon: ShipAssets.clockAndHome,
                   color: BrandPalette.logoOrange,
@@ -118,11 +119,14 @@ class _ChinaDashboardPageState extends State<ChinaDashboardPage> {
             ),
             const SizedBox(height: 8),
 
-            if (shipmentProvider.isLoading && shipmentProvider.shipments.isEmpty)
-              const Center(child: Padding(
-                padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
-              ))
+            if (shipmentProvider.isLoading &&
+                shipmentProvider.shipments.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: CircularProgressIndicator(),
+                ),
+              )
             else if (shipmentProvider.shipments.isEmpty)
               _EmptyState(
                 icon: ShipAssets.truck,
@@ -130,7 +134,9 @@ class _ChinaDashboardPageState extends State<ChinaDashboardPage> {
                 subtitle: 'Шинэ ачилт үүсгэхийн тулд "Ачилт" хэсэгт очно уу',
               )
             else
-              ...shipmentProvider.shipments.take(3).map((shipment) => _ShipmentItem(shipment: shipment)),
+              ...shipmentProvider.shipments
+                  .take(3)
+                  .map((shipment) => _ShipmentItem(shipment: shipment)),
           ],
         ),
       ),
@@ -221,7 +227,11 @@ class _ShipmentItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
-              child: ShipIcon(ShipAssets.truck, color: shipment.status.color, size: 20),
+              child: ShipIcon(
+                ShipAssets.truck,
+                color: shipment.status.color,
+                size: 20,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -289,20 +299,24 @@ class _EmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ShipIcon(icon, size: 48, color: BrandPalette.mutedText.withValues(alpha: 0.5)),
+          ShipIcon(
+            icon,
+            size: 48,
+            color: BrandPalette.mutedText.withValues(alpha: 0.5),
+          ),
           const SizedBox(height: 12),
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: BrandPalette.mutedText),
           ),
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: BrandPalette.mutedText,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: BrandPalette.mutedText),
             textAlign: TextAlign.center,
           ),
         ],

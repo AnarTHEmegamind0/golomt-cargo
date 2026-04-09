@@ -1,18 +1,13 @@
 import 'package:core/features/admin/services/admin_service.dart';
 import 'package:core/features/branch/models/branch.dart';
-import 'package:core/features/branch/services/branch_service.dart';
 import 'package:flutter/foundation.dart';
 
 /// Provider for branch management
 class AdminBranchesProvider extends ChangeNotifier {
-  AdminBranchesProvider({
-    required AdminService adminService,
-    required BranchService branchService,
-  })  : _adminService = adminService,
-        _branchService = branchService;
+  AdminBranchesProvider({required AdminService adminService})
+    : _adminService = adminService;
 
   final AdminService _adminService;
-  final BranchService _branchService;
 
   List<Branch> _branches = [];
   bool _isLoading = false;
@@ -38,7 +33,7 @@ class AdminBranchesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _branches = await _branchService.fetchAll();
+      _branches = await _adminService.listBranches();
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
     } finally {

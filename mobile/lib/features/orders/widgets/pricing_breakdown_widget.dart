@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 
 /// Widget showing detailed pricing breakdown
 class PricingBreakdownWidget extends StatelessWidget {
-  const PricingBreakdownWidget({
-    super.key,
-    required this.calculation,
-  });
+  const PricingBreakdownWidget({super.key, required this.calculation});
 
   final PricingCalculation calculation;
 
@@ -33,14 +30,13 @@ class PricingBreakdownWidget extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  BrandPalette.electricBlue,
-                  BrandPalette.navyBlue,
-                ],
+                colors: [BrandPalette.electricBlue, BrandPalette.navyBlue],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: Column(
               children: [
@@ -63,7 +59,10 @@ class PricingBreakdownWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -72,7 +71,9 @@ class PricingBreakdownWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        calculation.method == 'volume' ? Icons.view_in_ar : Icons.scale,
+                        calculation.method == 'volume'
+                            ? Icons.view_in_ar
+                            : Icons.scale,
                         color: Colors.white,
                         size: 16,
                       ),
@@ -125,14 +126,16 @@ class PricingBreakdownWidget extends StatelessWidget {
                   label: 'Жингээр тооцсон',
                   value: _formatPrice(calculation.weightBasedFeeMnt),
                   isSelected: calculation.method == 'weight',
-                  formula: '${calculation.weightKg.toStringAsFixed(2)} кг × ${PricingRates.pricePerKg}₮',
+                  formula:
+                      '${calculation.weightKg.toStringAsFixed(2)} кг × ${PricingRates.pricePerKg}₮',
                 ),
                 const SizedBox(height: 10),
                 _ComparisonRow(
                   label: 'Эзлэхүүнээр тооцсон',
                   value: _formatPrice(calculation.volumeBasedFeeMnt),
                   isSelected: calculation.method == 'volume',
-                  formula: '${calculation.volumeCbm.toStringAsFixed(4)} м³ × ${calculation.isFragile ? PricingRates.pricePerCbmFragile : PricingRates.pricePerCbm}₮',
+                  formula:
+                      '${calculation.volumeCbm.toStringAsFixed(4)} м³ × ${calculation.isFragile ? PricingRates.pricePerCbmFragile : PricingRates.pricePerCbm}₮',
                 ),
                 const SizedBox(height: 16),
                 Container(
@@ -140,17 +143,25 @@ class PricingBreakdownWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: BrandPalette.successGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: BrandPalette.successGreen.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: BrandPalette.successGreen.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: BrandPalette.successGreen, size: 20),
+                      const Icon(
+                        Icons.info_outline,
+                        color: BrandPalette.successGreen,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Жин болон эзлэхүүний аль өндөр тооцоог сонгоно',
                           style: TextStyle(
-                            color: BrandPalette.successGreen.withValues(alpha: 0.9),
+                            color: BrandPalette.successGreen.withValues(
+                              alpha: 0.9,
+                            ),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -255,9 +266,15 @@ class _ComparisonRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isSelected ? BrandPalette.electricBlue.withValues(alpha: 0.08) : BrandPalette.softBlueBackground,
+        color: isSelected
+            ? BrandPalette.electricBlue.withValues(alpha: 0.08)
+            : BrandPalette.softBlueBackground,
         borderRadius: BorderRadius.circular(12),
-        border: isSelected ? Border.all(color: BrandPalette.electricBlue.withValues(alpha: 0.3)) : null,
+        border: isSelected
+            ? Border.all(
+                color: BrandPalette.electricBlue.withValues(alpha: 0.3),
+              )
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +294,9 @@ class _ComparisonRow extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? BrandPalette.electricBlue : BrandPalette.mutedText,
+                  color: isSelected
+                      ? BrandPalette.electricBlue
+                      : BrandPalette.mutedText,
                   fontSize: 13,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
@@ -286,7 +305,9 @@ class _ComparisonRow extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                  color: isSelected ? BrandPalette.electricBlue : BrandPalette.primaryText,
+                  color: isSelected
+                      ? BrandPalette.electricBlue
+                      : BrandPalette.primaryText,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),

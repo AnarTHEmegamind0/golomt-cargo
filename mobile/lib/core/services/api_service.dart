@@ -50,13 +50,19 @@ class ApiService {
     String path, {
     dynamic data,
     Map<String, dynamic>? query,
+    ResponseType? responseType,
+    Map<String, dynamic>? headers,
   }) async {
     return _retry(
       () => _dio.request(
         path,
         data: data,
         queryParameters: query,
-        options: Options(method: method),
+        options: Options(
+          method: method,
+          responseType: responseType,
+          headers: headers,
+        ),
       ),
     );
   }

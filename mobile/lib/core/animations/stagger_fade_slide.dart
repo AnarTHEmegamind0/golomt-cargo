@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StaggerFadeSlide extends StatefulWidget {
-  const StaggerFadeSlide({
-    super.key,
-    required this.index,
-    required this.child,
-  });
+  const StaggerFadeSlide({super.key, required this.index, required this.child});
 
   final int index;
   final Widget child;
