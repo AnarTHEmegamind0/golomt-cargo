@@ -1,0 +1,100 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{mongolian}
+\setotherlanguage{english}
+\setmainfont{DejaVu Serif}
+\usepackage{graphicx}
+
+\newcommand{\manualpage}[3]{%
+\section*{#1}%
+\begin{center}
+\includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{\detokenize{#2}}
+\end{center}
+\textbf{Юу харагдах вэ:} #3
+\newpage
+}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Голомт Карго мобайл системийн хэрэглэгчийн гарын авлага}
+
+\vspace{0.5em}
+{\large Хэрэглэгч, админ, Хятад агуулахын ажилтны дэлгэцүүд}
+\end{center}
+
+\newpage
+
+\section*{Хэрэглэгчийн апп (User)}
+
+\manualpage{Нэвтрэх}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 22.21.06.png}{Имэйл, нууц үг оруулж нэвтрэнэ. \"Нууц үг мартсан?\" холбоосоор сэргээх боломжтой, шинэ хэрэглэгч бол \"Бүртгүүлэх\"-ийг сонгоно.}
+
+\manualpage{Нүүр}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 22.21.21.png}{Сайн уу мэндчилгээ, өнөөдрийн онцлох мэдээлэл, хурдан үйлдлүүд (салбар, трак код, хаяг, хүргэлт, заавар, тусламж) болон таны каргын товч статистик харагдана.}
+
+\manualpage{Захиалга жагсаалт}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 21.51.10.png}{Захиалгуудын үндсэн дэлгэц. Дээд хэсгийн хайлтаар трак код эсвэл бараагаа хайна. \"Захиалга нэмэх\" товчоор шинэ захиалга үүсгэнэ.}
+
+\manualpage{Захиалга нэмэх}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 21.51.16.png}{Трак код болон тайлбар оруулаад \"Захиалга нэмэх\" товчоор илгээнэ. Бар код унших товчоор кодыг сканнердаж оруулах боломжтой.}
+
+\manualpage{Захиалгын дэлгэрэнгүй}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 21.51.10.png}{Захиалгыг сонгоход дэлгэрэнгүй мэдээлэл гарч ирнэ. Энэ хэсэгт статус, системийн төлөв, жин зэрэг мэдээллүүд харагдана.}
+
+\manualpage{Хүргэлт}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 21.51.27.png}{Хүргэлтийн явцын дэлгэц. Табуудаас хүргэлтийн төлөвөөр шүүнэ. Идэвхтэй хүргэлт байхгүй үед \"Хүргэлт олдсонгүй\" гэсэн хоосон төлөв харагдана.}
+
+\manualpage{Салбарууд}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 22.01.11.png}{Ойролцоох салбарууд карт хэлбэрээр харагдана. Салбарын нэр, хаяг, ажлын цагийг үзнэ.}
+
+\manualpage{Салбарын дэлгэрэнгүй}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 22.01.14.png}{Сонгосон салбарын дэлгэрэнгүй мэдээлэл: код, хаяг, утас, ажлын цаг, газрын зураг зэрэг мэдээлэл харагдана.}
+
+\manualpage{Профайл}{../screenshots/user/Simulator Screenshot - utas - 2026-04-09 at 22.01.18.png}{Профайл хэсгээс миний мэдээлэл, хүргэлт, салбарууд, харанхуй горим, тусламж, тооцоолуур зэрэг тохиргоонууд руу орно. \"Гарах\" товчоор системээс гарна.}
+
+\section*{Админ панел (Admin)}
+
+\manualpage{Тойм}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.01.57.png}{Санхүүгийн тойм, нийт орлого, төлсөн/төлөөгүй дүн, цуглуулалтын хувь, машин болон каргын тоо зэргийг нэг дор харуулна.}
+
+\manualpage{Тойм дэлгэрэнгүй}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.01.png}{Ачилтын төлөвүүд болон сүүлийн карго жагсаалт харагдана. Карго бүрийн төлөвийн шошго нь хурдан ойлгомжтой.}
+
+\manualpage{Хажуу цэс}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.04.png}{Админ хэсгүүдийн үндсэн навигаци. Тойм, Бараа, Ачилт, Машин, Хэрэглэгчид, Салбар, Санхүү, Лог гэсэн хэсгүүдэд шилжинэ.}
+
+\manualpage{Бараа удирдлага}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.07.png}{Барааны жагсаалт. Хайлтаар трак код, утас, нэрээр шүүнэ. Төлөвийн табууд болон төлбөрийн төлөв нэг дор харагдана.}
+
+\manualpage{Бараа хүлээн авах}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.13.png}{Бараа хүлээн авах үед зураг хавсаргах боломжтой модал. \"Зураг авах\" товчоор баримтжуулна.}
+
+\manualpage{Бэлтгэж буй бараа}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.16.png}{Бэлтгэж буй таб дээр жин бүртгэх, хэмжээ/үнэ оруулах, тээвэрлэх үйлдлүүд боломжтой.}
+
+\manualpage{Замд явж буй бараа}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.19.png}{Замд таб дээр хэмжээг дахин засах, \"Ирсэн болгох\" зэрэг дараагийн төлөв рүү шилжүүлэх товчнууд харагдана.}
+
+\manualpage{Хэмжээ, үнэ бүртгэх}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.02.22.png}{Урт, өргөн, өндөр болон үнэ override утгуудыг оруулж хадгална. Эмзэг бараа гэсэн нэмэлт тохируулга бий.}
+
+\manualpage{Машин (хоосон төлөв)}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.03.03.png}{Ачилтын машин байхгүй үед хоосон төлөв харагдана. Баруун дээд булангийн \"+\"-аар шинэ машин нэмнэ.}
+
+\manualpage{Машин жагсаалт}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.03.25.png}{Идэвхтэй машины карт дээр зогсоох, засах, устгах товчнууд байрлана. Төрөл болон төлөвийг шошгоор ялган харуулна.}
+
+\manualpage{Хэрэглэгчид}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.28.png}{Хэрэглэгчийн жагсаалт дээр эрхийн түвшин солих (админ/монгол ажилтан/хэрэглэгч) болон хориглох үйлдлүүд харагдана.}
+
+\manualpage{Шинэ хэрэглэгч}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.33.png}{Шинэ хэрэглэгчийн нэр, имэйл, нууц үг, эрхийн түвшинг оруулаад \"Үүсгэх\" товчоор бүртгэнэ.}
+
+\manualpage{Салбарууд}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.37.png}{Салбарын жагсаалт. Салбар бүр дээр идэвхтэй/идэвхгүй төлөв болон засах, түр зогсоох, устгах үйлдлүүд бий.}
+
+\manualpage{Салбар засах}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.41.png}{Салбарын нэр, хаяг, утас, Хятадын агуулахын хаягийг засварлана. \"Хадгалах\"-аар шинэчлэнэ.}
+
+\manualpage{Санхүүгийн тайлан}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.45.png}{Тодорхой хугацаагаар шүүж нийт орлого, төлсөн, төлөөгүй, цуглуулалтын хувь болон карго статистикийг харна.}
+
+\manualpage{Үйлдлийн лог}{../screenshots/admin/Simulator Screenshot - utas - 2026-04-09 at 22.04.59.png}{Системийн үйлдлийн түүх. Үүсгэсэн болон шинэчилсэн үйлдлүүдийг шүүлтүүрээр ангилж үзнэ.}
+
+\section*{Хятад агуулахын ажилтан (China Staff)}
+
+\manualpage{Өнөөдрийн тойм}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.07.51.png}{Хятадын агуулахын өнөөдрийн статистик: хүлээн авсан бараа, ачилтад бэлэн, бэлтгэж буй ачилт, идэвхтэй машин зэрэг тоонууд.}
+
+\manualpage{Бараа бүртгэл - Камер}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.07.56.png}{Камер ашиглан баркод сканнердах горим. Камер боломжгүй үед төхөөрөмжийн анхааруулга гарна.}
+
+\manualpage{Бараа бүртгэл - Scanner}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.07.59.png}{USB/Bluetooth сканнер ашиглах горим. Сканнердсан кодыг текст талбарт автоматаар оруулна.}
+
+\manualpage{Бараа бүртгэл - Текст}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.08.03.png}{Track code-уудыг мөр мөрөөр оруулж бөөнөөр бүртгэнэ. \"Бүртгэх\" товчоор илгээнэ.}
+
+\manualpage{Бараа бүртгэл - Файл}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.08.06.png}{TXT эсвэл CSV файл сонгож track code-уудыг олноор нь импортлоно. Файлд мөр бүр нэг код байх ёстой.}
+
+\manualpage{Машин}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.08.17.png}{Ачилтын машинуудын жагсаалт. Засах, зогсоох, устгах үйлдлүүд болон идэвхтэй төлөвийг харуулна.}
+
+\manualpage{Шинэ ачилт}{../screenshots/china_staff/Simulator Screenshot - utas - 2026-04-09 at 22.08.31.png}{Шинэ ачилт үүсгэх модал. Машин сонгох, гарах огноо, тэмдэглэл оруулж \"Үүсгэх\"-ээр баталгаажуулна.}
+
+\end{document}
