@@ -17,3 +17,12 @@ export type FulfillmentType = (typeof fulfillmentTypes)[number];
 
 export const cargoPaymentStatuses = ["UNPAID", "PAID"] as const;
 export type CargoPaymentStatus = (typeof cargoPaymentStatuses)[number];
+
+export const cargoPricingMethods = ["WEIGHT", "VOLUME", "FRAGILE_VOLUME"] as const;
+export type CargoPricingMethod = (typeof cargoPricingMethods)[number];
+
+export const cargoImportSources = ["MANUAL", "TEXT", "FILE", "BARCODE"] as const;
+export type CargoImportSource = (typeof cargoImportSources)[number];
+
+export const cargoPlaceholderStatuses = ["UNASSIGNED", "LINKED"] as const;
+export type CargoPlaceholderStatus = (typeof cargoPlaceholderStatuses)[number];

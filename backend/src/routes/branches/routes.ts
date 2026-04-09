@@ -19,6 +19,7 @@ export const branchRoutes = new Elysia().guard(
         name: row.name,
         address: row.address ?? null,
         phone: row.phone ?? null,
+        chinaAddress: row.chinaAddress ?? null,
         isActive: row.isActive,
         })),
       };

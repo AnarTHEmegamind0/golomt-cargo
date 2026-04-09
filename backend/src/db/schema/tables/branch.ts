@@ -6,6 +6,7 @@ export const branch = sqliteTable("branch", {
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   address: text("address"),
+  chinaAddress: text("china_address"),
   phone: text("phone"),
   isActive: integer("is_active", { mode: "boolean" }).default(true).notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })

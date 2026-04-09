@@ -15,6 +15,13 @@
       "when": 1772607722239,
       "tag": "0001_windy_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775703138860,
+      "tag": "0002_burly_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

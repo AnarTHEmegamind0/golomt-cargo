@@ -115,6 +115,14 @@ export const cargoSummarySchema = t.Object({
   status: t.String(),
   paymentStatus: t.String(),
   receivedImageUrl: t.Nullable(t.String()),
+  fulfillmentType: t.Optional(t.Union([t.String(), t.Null()])),
+  deliveryAddress: t.Optional(t.Union([t.String(), t.Null()])),
+  deliveryPhone: t.Optional(t.Union([t.String(), t.Null()])),
+  weightGrams: t.Optional(t.Union([t.Number(), t.Null()])),
+  baseShippingFeeMnt: t.Optional(t.Union([t.Number(), t.Null()])),
+  totalFeeMnt: t.Optional(t.Union([t.Number(), t.Null()])),
+  createdAt: t.Optional(t.Union([t.String(), t.Null()])),
+  updatedAt: t.Optional(t.Union([t.String(), t.Null()])),
   customer: t.Nullable(
     t.Object({
       id: t.String(),
@@ -122,6 +130,13 @@ export const cargoSummarySchema = t.Object({
       email: t.String(),
     })
   ),
+  heightCm: t.Optional(t.Union([t.Number(), t.Null()])),
+  widthCm: t.Optional(t.Union([t.Number(), t.Null()])),
+  lengthCm: t.Optional(t.Union([t.Number(), t.Null()])),
+  isFragile: t.Optional(t.Boolean()),
+  calculatedFeeMnt: t.Optional(t.Union([t.Number(), t.Null()])),
+  overrideFeeMnt: t.Optional(t.Union([t.Number(), t.Null()])),
+  shipmentId: t.Optional(t.Union([t.String(), t.Null()])),
 });
 
 export const cargoSummaryListSchema = t.Array(cargoSummarySchema);
@@ -149,6 +164,7 @@ export const branchSchema = t.Object({
   name: t.String(),
   address: t.Nullable(t.String()),
   phone: t.Nullable(t.String()),
+  chinaAddress: t.Optional(t.Nullable(t.String())),
   isActive: t.Boolean(),
 });
 

@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { eq } from "drizzle-orm";
 import { cargo } from "~/db/schema";
+import { insertAdminActivityLog } from "~/lib/operations/logging";
 import {
   cargoIdParamsSchema,
   messageResponseSchema,
@@ -31,6 +32,17 @@ export const mongoliaCargoRoutes = new Elysia().guard(
         fromStatus: item.status,
         toStatus: "AWAITING_FULFILLMENT_CHOICE",
         changedByUserId: authUser.id,
+      });
+
+      await insertAdminActivityLog({
+        db,
+        actorUserId: authUser.id,
+        actorRole: authUser.role,
+        action: "ARRIVE",
+        targetType: "CARGO",
+        targetId: params.cargoId,
+        description: `Marked cargo ${item.trackingNumber} as arrived in Mongolia`,
+        metadata: { fromStatus: item.status, toStatus: "AWAITING_FULFILLMENT_CHOICE" },
       });
 
       return { message: "Cargo marked as arrived in Mongolia" };

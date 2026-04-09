@@ -349,7 +349,8 @@
                         "description",
                         "status",
                         "paymentStatus",
-                        "receivedImageUrl"
+                        "receivedImageUrl",
+                        "customer"
                       ],
                       "properties": {
                         "id": {
@@ -377,6 +378,176 @@
                         },
                         "receivedImageUrl": {
                           "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "fulfillmentType": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "deliveryAddress": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "deliveryPhone": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "weightGrams": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "baseShippingFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "totalFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "createdAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "updatedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "customer": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "id",
+                                "name",
+                                "email"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "email": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "heightCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "widthCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "lengthCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "isFragile": {
+                          "type": "boolean"
+                        },
+                        "calculatedFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "overrideFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "shipmentId": {
                           "anyOf": [
                             {
                               "type": "string"
@@ -469,6 +640,46 @@
         ],
         "parameters": [
           {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "maximum": 100,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
             "name": "status",
             "in": "query",
             "required": false,
@@ -531,7 +742,8 @@
                   "type": "object",
                   "required": [
                     "message",
-                    "data"
+                    "data",
+                    "meta"
                   ],
                   "properties": {
                     "message": {
@@ -547,7 +759,8 @@
                           "description",
                           "status",
                           "paymentStatus",
-                          "receivedImageUrl"
+                          "receivedImageUrl",
+                          "customer"
                         ],
                         "properties": {
                           "id": {
@@ -583,7 +796,200 @@
                                 "type": "null"
                               }
                             ]
+                          },
+                          "fulfillmentType": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryAddress": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryPhone": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "weightGrams": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "baseShippingFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "totalFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "updatedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "customer": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "email"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "email": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "heightCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "widthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lengthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isFragile": {
+                            "type": "boolean"
+                          },
+                          "calculatedFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "overrideFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "shipmentId": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
                         }
                       }
                     }
@@ -869,6 +1275,46 @@
             }
           },
           {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "maximum": 100,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
             "name": "trackingNumber",
             "in": "query",
             "required": false,
@@ -961,7 +1407,8 @@
                   "type": "object",
                   "required": [
                     "message",
-                    "data"
+                    "data",
+                    "meta"
                   ],
                   "properties": {
                     "message": {
@@ -977,7 +1424,8 @@
                           "description",
                           "status",
                           "paymentStatus",
-                          "receivedImageUrl"
+                          "receivedImageUrl",
+                          "customer"
                         ],
                         "properties": {
                           "id": {
@@ -1013,7 +1461,200 @@
                                 "type": "null"
                               }
                             ]
+                          },
+                          "fulfillmentType": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryAddress": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryPhone": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "weightGrams": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "baseShippingFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "totalFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "updatedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "customer": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "email"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "email": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "heightCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "widthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lengthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isFragile": {
+                            "type": "boolean"
+                          },
+                          "calculatedFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "overrideFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "shipmentId": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
                         }
                       }
                     }
@@ -1207,7 +1848,8 @@
                         "description",
                         "status",
                         "paymentStatus",
-                        "receivedImageUrl"
+                        "receivedImageUrl",
+                        "customer"
                       ],
                       "properties": {
                         "id": {
@@ -1235,6 +1877,176 @@
                         },
                         "receivedImageUrl": {
                           "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "fulfillmentType": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "deliveryAddress": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "deliveryPhone": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "weightGrams": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "baseShippingFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "totalFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "createdAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "updatedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "customer": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "id",
+                                "name",
+                                "email"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "email": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "heightCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "widthCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "lengthCm": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "isFragile": {
+                          "type": "boolean"
+                        },
+                        "calculatedFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "overrideFeeMnt": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "shipmentId": {
                           "anyOf": [
                             {
                               "type": "string"
@@ -2060,6 +2872,4535 @@
         "operationId": "postApiCargosByCargoIdArrive"
       }
     },
+    "/api/vehicles": {
+      "get": {
+        "tags": [
+          "Staff/Admin API",
+          "Vehicles"
+        ],
+        "summary": "List vehicles",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "plate_number",
+                          "name",
+                          "type",
+                          "is_active",
+                          "created_at",
+                          "updated_at"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "plate_number": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "TRUCK",
+                              "VAN",
+                              "CONTAINER"
+                            ]
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Response for status 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "validation",
+                      "type": "string"
+                    },
+                    "on": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "found": {},
+                    "property": {
+                      "type": "string"
+                    },
+                    "expected": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "on"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiVehicles"
+      },
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Vehicles"
+        ],
+        "summary": "Create vehicle",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plate_number",
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plate_number",
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plate_number",
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "plate_number",
+                        "name",
+                        "type",
+                        "is_active",
+                        "created_at",
+                        "updated_at"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "plate_number": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "TRUCK",
+                            "VAN",
+                            "CONTAINER"
+                          ]
+                        },
+                        "is_active": {
+                          "type": "boolean"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Response for status 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiVehicles"
+      }
+    },
+    "/api/vehicles/{vehicleId}": {
+      "put": {
+        "tags": [
+          "Staff/Admin API",
+          "Vehicles"
+        ],
+        "summary": "Update vehicle",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plate_number": {
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "TRUCK",
+                      "VAN",
+                      "CONTAINER"
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "plate_number",
+                        "name",
+                        "type",
+                        "is_active",
+                        "created_at",
+                        "updated_at"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "plate_number": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "TRUCK",
+                            "VAN",
+                            "CONTAINER"
+                          ]
+                        },
+                        "is_active": {
+                          "type": "boolean"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Response for status 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "putApiVehiclesByVehicleId"
+      },
+      "delete": {
+        "tags": [
+          "Staff/Admin API",
+          "Vehicles"
+        ],
+        "summary": "Delete vehicle",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Response for status 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deleteApiVehiclesByVehicleId"
+      }
+    },
+    "/api/shipments": {
+      "get": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "List shipments",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "maximum": 100,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "DEPARTED",
+                "IN_TRANSIT",
+                "ARRIVED",
+                "COMPLETED"
+              ]
+            }
+          },
+          {
+            "name": "vehicleId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "vehicle_id",
+                          "vehicle_plate_number",
+                          "status",
+                          "created_at",
+                          "departure_date",
+                          "arrival_date",
+                          "cargo_count",
+                          "note",
+                          "cargo_ids"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "vehicle_id": {
+                            "type": "string"
+                          },
+                          "vehicle_plate_number": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "DRAFT",
+                              "DEPARTED",
+                              "IN_TRANSIT",
+                              "ARRIVED",
+                              "COMPLETED"
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "departure_date": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "arrival_date": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "cargo_count": {
+                            "anyOf": [
+                              {
+                                "format": "integer",
+                                "default": 0,
+                                "type": "string"
+                              },
+                              {
+                                "type": "integer"
+                              }
+                            ]
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "cargo_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Response for status 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "validation",
+                      "type": "string"
+                    },
+                    "on": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "found": {},
+                    "property": {
+                      "type": "string"
+                    },
+                    "expected": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "on"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiShipments"
+      },
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "Create shipment",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehicle_id"
+                ],
+                "properties": {
+                  "vehicle_id": {
+                    "type": "string"
+                  },
+                  "departure_date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehicle_id"
+                ],
+                "properties": {
+                  "vehicle_id": {
+                    "type": "string"
+                  },
+                  "departure_date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehicle_id"
+                ],
+                "properties": {
+                  "vehicle_id": {
+                    "type": "string"
+                  },
+                  "departure_date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "vehicle_id",
+                        "vehicle_plate_number",
+                        "status",
+                        "created_at",
+                        "departure_date",
+                        "arrival_date",
+                        "cargo_count",
+                        "note",
+                        "cargo_ids"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "vehicle_id": {
+                          "type": "string"
+                        },
+                        "vehicle_plate_number": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "DRAFT",
+                            "DEPARTED",
+                            "IN_TRANSIT",
+                            "ARRIVED",
+                            "COMPLETED"
+                          ]
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "departure_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "arrival_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_count": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "note": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "cargos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "trackingNumber",
+                              "description",
+                              "status",
+                              "paymentStatus",
+                              "receivedImageUrl",
+                              "customer"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "trackingNumber": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "paymentStatus": {
+                                "type": "string"
+                              },
+                              "receivedImageUrl": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "fulfillmentType": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryAddress": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryPhone": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "weightGrams": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "baseShippingFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "totalFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "updatedAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "customer": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "email"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "email": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "heightCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "widthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "lengthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "isFragile": {
+                                "type": "boolean"
+                              },
+                              "calculatedFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "overrideFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "shipmentId": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiShipments"
+      }
+    },
+    "/api/shipments/{shipmentId}": {
+      "get": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "Get shipment",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "vehicle_id",
+                        "vehicle_plate_number",
+                        "status",
+                        "created_at",
+                        "departure_date",
+                        "arrival_date",
+                        "cargo_count",
+                        "note",
+                        "cargo_ids"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "vehicle_id": {
+                          "type": "string"
+                        },
+                        "vehicle_plate_number": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "DRAFT",
+                            "DEPARTED",
+                            "IN_TRANSIT",
+                            "ARRIVED",
+                            "COMPLETED"
+                          ]
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "departure_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "arrival_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_count": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "note": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "cargos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "trackingNumber",
+                              "description",
+                              "status",
+                              "paymentStatus",
+                              "receivedImageUrl",
+                              "customer"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "trackingNumber": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "paymentStatus": {
+                                "type": "string"
+                              },
+                              "receivedImageUrl": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "fulfillmentType": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryAddress": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryPhone": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "weightGrams": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "baseShippingFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "totalFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "updatedAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "customer": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "email"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "email": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "heightCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "widthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "lengthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "isFragile": {
+                                "type": "boolean"
+                              },
+                              "calculatedFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "overrideFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "shipmentId": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiShipmentsByShipmentId"
+      }
+    },
+    "/api/shipments/{shipmentId}/cargos": {
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "Add cargos to shipment",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiShipmentsByShipmentIdCargos"
+      },
+      "delete": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "Remove cargos from shipment",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cargo_ids"
+                ],
+                "properties": {
+                  "cargo_ids": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deleteApiShipmentsByShipmentIdCargos"
+      }
+    },
+    "/api/shipments/{shipmentId}/status": {
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Shipments"
+        ],
+        "summary": "Update shipment status",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "shipmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "DRAFT",
+                      "DEPARTED",
+                      "IN_TRANSIT",
+                      "ARRIVED",
+                      "COMPLETED"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "DRAFT",
+                      "DEPARTED",
+                      "IN_TRANSIT",
+                      "ARRIVED",
+                      "COMPLETED"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "DRAFT",
+                      "DEPARTED",
+                      "IN_TRANSIT",
+                      "ARRIVED",
+                      "COMPLETED"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "vehicle_id",
+                        "vehicle_plate_number",
+                        "status",
+                        "created_at",
+                        "departure_date",
+                        "arrival_date",
+                        "cargo_count",
+                        "note",
+                        "cargo_ids"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "vehicle_id": {
+                          "type": "string"
+                        },
+                        "vehicle_plate_number": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "DRAFT",
+                            "DEPARTED",
+                            "IN_TRANSIT",
+                            "ARRIVED",
+                            "COMPLETED"
+                          ]
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "departure_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "arrival_date": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_count": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "note": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "cargo_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "cargos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "trackingNumber",
+                              "description",
+                              "status",
+                              "paymentStatus",
+                              "receivedImageUrl",
+                              "customer"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "trackingNumber": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "paymentStatus": {
+                                "type": "string"
+                              },
+                              "receivedImageUrl": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "fulfillmentType": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryAddress": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "deliveryPhone": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "weightGrams": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "baseShippingFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "totalFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "updatedAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "customer": {
+                                "nullable": true,
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "email"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "email": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "heightCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "widthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "lengthCm": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "isFragile": {
+                                "type": "boolean"
+                              },
+                              "calculatedFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "overrideFeeMnt": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "shipmentId": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiShipmentsByShipmentIdStatus"
+      }
+    },
+    "/api/cargos/import": {
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Cargos"
+        ],
+        "summary": "Import track codes",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "trackingNumbers"
+                ],
+                "properties": {
+                  "source_type": {
+                    "type": "string",
+                    "enum": [
+                      "MANUAL",
+                      "TEXT",
+                      "FILE",
+                      "BARCODE"
+                    ]
+                  },
+                  "trackingNumbers": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "trackingNumbers"
+                ],
+                "properties": {
+                  "source_type": {
+                    "type": "string",
+                    "enum": [
+                      "MANUAL",
+                      "TEXT",
+                      "FILE",
+                      "BARCODE"
+                    ]
+                  },
+                  "trackingNumbers": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "trackingNumbers"
+                ],
+                "properties": {
+                  "source_type": {
+                    "type": "string",
+                    "enum": [
+                      "MANUAL",
+                      "TEXT",
+                      "FILE",
+                      "BARCODE"
+                    ]
+                  },
+                  "trackingNumbers": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "trackingNumber",
+                          "description",
+                          "status",
+                          "paymentStatus",
+                          "receivedImageUrl",
+                          "customer"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "trackingNumber": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "paymentStatus": {
+                            "type": "string"
+                          },
+                          "receivedImageUrl": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "fulfillmentType": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryAddress": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deliveryPhone": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "weightGrams": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "baseShippingFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "totalFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "updatedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "customer": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "email"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "email": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "heightCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "widthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lengthCm": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isFragile": {
+                            "type": "boolean"
+                          },
+                          "calculatedFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "overrideFeeMnt": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "shipmentId": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "total",
+                        "created",
+                        "existing",
+                        "failed",
+                        "errors"
+                      ],
+                      "properties": {
+                        "total": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "created": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "existing": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "failed": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Response for status 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "validation",
+                      "type": "string"
+                    },
+                    "on": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "found": {},
+                    "property": {
+                      "type": "string"
+                    },
+                    "expected": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "on"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiCargosImport"
+      }
+    },
+    "/api/cargos/{cargoId}/record-dimensions": {
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Cargos"
+        ],
+        "summary": "Record cargo dimensions and price",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "cargoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "heightCm",
+                  "widthCm",
+                  "lengthCm",
+                  "isFragile"
+                ],
+                "properties": {
+                  "heightCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "widthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "lengthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "isFragile": {
+                    "type": "boolean"
+                  },
+                  "calculatedFeeMnt": {
+                    "minimum": 0,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "overrideFeeMnt": {
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "anyOf": [
+                          {
+                            "format": "integer",
+                            "default": 0,
+                            "type": "string"
+                          },
+                          {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "heightCm",
+                  "widthCm",
+                  "lengthCm",
+                  "isFragile"
+                ],
+                "properties": {
+                  "heightCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "widthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "lengthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "isFragile": {
+                    "type": "boolean"
+                  },
+                  "calculatedFeeMnt": {
+                    "minimum": 0,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "overrideFeeMnt": {
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "anyOf": [
+                          {
+                            "format": "integer",
+                            "default": 0,
+                            "type": "string"
+                          },
+                          {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "heightCm",
+                  "widthCm",
+                  "lengthCm",
+                  "isFragile"
+                ],
+                "properties": {
+                  "heightCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "widthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "lengthCm": {
+                    "minimum": 1,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "isFragile": {
+                    "type": "boolean"
+                  },
+                  "calculatedFeeMnt": {
+                    "minimum": 0,
+                    "anyOf": [
+                      {
+                        "format": "integer",
+                        "default": 0,
+                        "type": "string"
+                      },
+                      {
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "overrideFeeMnt": {
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "minimum": 0,
+                        "anyOf": [
+                          {
+                            "format": "integer",
+                            "default": 0,
+                            "type": "string"
+                          },
+                          {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "weight_kg",
+                        "volume_cbm",
+                        "is_fragile",
+                        "weight_based_fee_mnt",
+                        "volume_based_fee_mnt",
+                        "calculated_fee_mnt",
+                        "override_fee_mnt",
+                        "final_fee_mnt",
+                        "method"
+                      ],
+                      "properties": {
+                        "weight_kg": {
+                          "type": "number"
+                        },
+                        "volume_cbm": {
+                          "type": "number"
+                        },
+                        "is_fragile": {
+                          "type": "boolean"
+                        },
+                        "weight_based_fee_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "volume_based_fee_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "calculated_fee_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "override_fee_mnt": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "format": "integer",
+                                  "default": 0,
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "final_fee_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "WEIGHT",
+                            "VOLUME",
+                            "FRAGILE_VOLUME"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Response for status 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiCargosByCargoIdRecord-dimensions"
+      }
+    },
+    "/api/admin/logs": {
+      "get": {
+        "tags": [
+          "Staff/Admin API",
+          "Admin"
+        ],
+        "summary": "List activity logs",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "maximum": 100,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "anyOf": [
+                {
+                  "format": "integer",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CREATE",
+                "UPDATE",
+                "DELETE",
+                "STATUS_CHANGE",
+                "RECEIVE",
+                "SHIP",
+                "ARRIVE",
+                "BAN",
+                "UNBAN",
+                "ROLE_CHANGE",
+                "PRICE_OVERRIDE",
+                "WEIGHT_RECORD",
+                "IMPORT",
+                "EXPORT",
+                "ASSIGN_SHIPMENT",
+                "REMOVE_SHIPMENT_CARGO"
+              ]
+            }
+          },
+          {
+            "name": "targetType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CARGO",
+                "USER",
+                "SHIPMENT",
+                "VEHICLE",
+                "BRANCH",
+                "EXPORT_JOB"
+              ]
+            }
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorUserId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "admin_id",
+                          "admin_name",
+                          "action",
+                          "target_type",
+                          "target_id",
+                          "description",
+                          "created_at",
+                          "metadata"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "admin_id": {
+                            "type": "string"
+                          },
+                          "admin_name": {
+                            "type": "string"
+                          },
+                          "action": {
+                            "type": "string",
+                            "enum": [
+                              "CREATE",
+                              "UPDATE",
+                              "DELETE",
+                              "STATUS_CHANGE",
+                              "RECEIVE",
+                              "SHIP",
+                              "ARRIVE",
+                              "BAN",
+                              "UNBAN",
+                              "ROLE_CHANGE",
+                              "PRICE_OVERRIDE",
+                              "WEIGHT_RECORD",
+                              "IMPORT",
+                              "EXPORT",
+                              "ASSIGN_SHIPMENT",
+                              "REMOVE_SHIPMENT_CARGO"
+                            ]
+                          },
+                          "target_type": {
+                            "type": "string",
+                            "enum": [
+                              "CARGO",
+                              "USER",
+                              "SHIPMENT",
+                              "VEHICLE",
+                              "BRANCH",
+                              "EXPORT_JOB"
+                            ]
+                          },
+                          "target_id": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "metadata": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "patternProperties": {
+                                  "^(.*)$": {}
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiAdminLogs"
+      }
+    },
+    "/api/admin/finance/summary": {
+      "get": {
+        "tags": [
+          "Staff/Admin API",
+          "Admin"
+        ],
+        "summary": "Get finance summary",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "total_revenue_mnt",
+                        "paid_amount_mnt",
+                        "unpaid_amount_mnt",
+                        "total_cargos",
+                        "paid_cargos",
+                        "unpaid_cargos",
+                        "avg_price_per_kg",
+                        "avg_price_per_cbm",
+                        "daily_revenues"
+                      ],
+                      "properties": {
+                        "total_revenue_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "paid_amount_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "unpaid_amount_mnt": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "total_cargos": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "paid_cargos": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "unpaid_cargos": {
+                          "anyOf": [
+                            {
+                              "format": "integer",
+                              "default": 0,
+                              "type": "string"
+                            },
+                            {
+                              "type": "integer"
+                            }
+                          ]
+                        },
+                        "avg_price_per_kg": {
+                          "type": "number"
+                        },
+                        "avg_price_per_cbm": {
+                          "type": "number"
+                        },
+                        "daily_revenues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "date",
+                              "revenue",
+                              "cargo_count"
+                            ],
+                            "properties": {
+                              "date": {
+                                "type": "string"
+                              },
+                              "revenue": {
+                                "anyOf": [
+                                  {
+                                    "format": "integer",
+                                    "default": 0,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "integer"
+                                  }
+                                ]
+                              },
+                              "cargo_count": {
+                                "anyOf": [
+                                  {
+                                    "format": "integer",
+                                    "default": 0,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "integer"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiAdminFinanceSummary"
+      }
+    },
+    "/api/branches": {
+      "post": {
+        "tags": [
+          "Staff/Admin API",
+          "Branches"
+        ],
+        "summary": "Create branch",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "code",
+                  "address"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "code",
+                  "address"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "code",
+                  "address"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "code",
+                        "name",
+                        "address",
+                        "phone",
+                        "isActive"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "phone": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "chinaAddress": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Response for status 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiBranches"
+      },
+      "get": {
+        "tags": [
+          "Shared API",
+          "Branches"
+        ],
+        "summary": "List active branches",
+        "security": [
+          {
+            "customerBearerAuth": []
+          },
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Shared endpoint. Use the bearer token that matches the signed-in account role: customer token for customers, staff/admin token for admin or staff accounts.",
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "code",
+                          "name",
+                          "address",
+                          "phone",
+                          "isActive"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "address": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "phone": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "chinaAddress": {
+                            "nullable": true,
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isActive": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Response for status 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "validation",
+                      "type": "string"
+                    },
+                    "on": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "found": {},
+                    "property": {
+                      "type": "string"
+                    },
+                    "expected": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "on"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getApiBranches"
+      }
+    },
+    "/api/branches/{branchId}": {
+      "put": {
+        "tags": [
+          "Staff/Admin API",
+          "Branches"
+        ],
+        "summary": "Update branch",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "code": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "address": {
+                    "minLength": 1,
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  "chinaAddress": {
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "code",
+                        "name",
+                        "address",
+                        "phone",
+                        "isActive"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "phone": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "chinaAddress": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Response for status 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "putApiBranchesByBranchId"
+      },
+      "delete": {
+        "tags": [
+          "Staff/Admin API",
+          "Branches"
+        ],
+        "summary": "Delete branch",
+        "security": [
+          {
+            "staffBearerAuth": []
+          }
+        ],
+        "description": "Staff/admin endpoint. Use a staff/admin bearer token from an admin, china_staff, or mongolia_staff account.",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response for status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response for status 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deleteApiBranchesByBranchId"
+      }
+    },
     "/api/payments": {
       "post": {
         "tags": [
@@ -2465,133 +7806,6 @@
           }
         ],
         "operationId": "postApiPaymentsByPaymentIdMark-paid"
-      }
-    },
-    "/api/branches": {
-      "get": {
-        "tags": [
-          "Shared API",
-          "Branches"
-        ],
-        "summary": "List active branches",
-        "security": [
-          {
-            "customerBearerAuth": []
-          },
-          {
-            "staffBearerAuth": []
-          }
-        ],
-        "description": "Shared endpoint. Use the bearer token that matches the signed-in account role: customer token for customers, staff/admin token for admin or staff accounts.",
-        "responses": {
-          "200": {
-            "description": "Response for status 200",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "code",
-                          "name",
-                          "address",
-                          "phone",
-                          "isActive"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "code": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "address": {
-                            "nullable": true,
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "phone": {
-                            "nullable": true,
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "isActive": {
-                            "type": "boolean"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for status 422",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "const": "validation",
-                      "type": "string"
-                    },
-                    "on": {
-                      "type": "string"
-                    },
-                    "summary": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "found": {},
-                    "property": {
-                      "type": "string"
-                    },
-                    "expected": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "type",
-                    "on"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "operationId": "getApiBranches"
       }
     },
     "/api/mock-items/": {

@@ -24,9 +24,24 @@ const cargoSummarySelection = {
   status: cargo.status,
   paymentStatus: cargo.paymentStatus,
   receivedImageUrl: cargo.receivedImageUrl,
+  fulfillmentType: cargo.fulfillmentType,
+  deliveryAddress: cargo.deliveryAddress,
+  deliveryPhone: cargo.deliveryPhone,
+  weightGrams: cargo.weightGrams,
+  baseShippingFeeMnt: cargo.baseShippingFeeMnt,
+  totalFeeMnt: cargo.totalFeeMnt,
+  createdAt: cargo.createdAt,
+  updatedAt: cargo.updatedAt,
   customerId: user.id,
   customerName: user.name,
   customerEmail: user.email,
+  heightCm: cargo.heightCm,
+  widthCm: cargo.widthCm,
+  lengthCm: cargo.lengthCm,
+  isFragile: cargo.isFragile,
+  calculatedFeeMnt: cargo.calculatedFeeMnt,
+  overrideFeeMnt: cargo.overrideFeeMnt,
+  shipmentId: cargo.shipmentId,
 };
 
 const toCargoSummary = (row: any) => ({
@@ -36,6 +51,14 @@ const toCargoSummary = (row: any) => ({
   status: row.status,
   paymentStatus: row.paymentStatus,
   receivedImageUrl: row.receivedImageUrl ?? null,
+  fulfillmentType: row.fulfillmentType ?? null,
+  deliveryAddress: row.deliveryAddress ?? null,
+  deliveryPhone: row.deliveryPhone ?? null,
+  weightGrams: row.weightGrams ?? null,
+  baseShippingFeeMnt: row.baseShippingFeeMnt ?? null,
+  totalFeeMnt: row.totalFeeMnt ?? null,
+  createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
+  updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
   customer: row.customerId
     ? {
         id: row.customerId,
@@ -43,6 +66,13 @@ const toCargoSummary = (row: any) => ({
         email: row.customerEmail,
       }
     : null,
+  heightCm: row.heightCm ?? null,
+  widthCm: row.widthCm ?? null,
+  lengthCm: row.lengthCm ?? null,
+  isFragile: Boolean(row.isFragile ?? false),
+  calculatedFeeMnt: row.calculatedFeeMnt ?? null,
+  overrideFeeMnt: row.overrideFeeMnt ?? null,
+  shipmentId: row.shipmentId ?? null,
 });
 
 const toCargoEvent = (row: any) => ({

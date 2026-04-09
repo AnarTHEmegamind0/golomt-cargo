@@ -1,6 +1,8 @@
 import { Elysia } from "elysia";
 import { eq } from "drizzle-orm";
 import { cargo } from "~/db/schema";
+import { insertAdminActivityLog } from "~/lib/operations/logging";
+import { calculateCargoPricing } from "~/lib/operations/pricing";
 import {
   cargoIdParamsSchema,
   markWeightResponseEnvelopeSchema,
@@ -67,6 +69,17 @@ export const chinaCargoRoutes = new Elysia().guard(
           changedByUserId: authUser.id,
         });
 
+        await insertAdminActivityLog({
+          db,
+          actorUserId: authUser.id,
+          actorRole: authUser.role,
+          action: "RECEIVE",
+          targetType: "CARGO",
+          targetId: params.cargoId,
+          description: `Received cargo ${item.trackingNumber} in China`,
+          metadata: { receivedImageUrl },
+        });
+
         return {
           message: "Cargo received successfully",
           receivedImageUrl,
@@ -119,6 +132,17 @@ export const chinaCargoRoutes = new Elysia().guard(
           changedByUserId: authUser.id,
         });
 
+        await insertAdminActivityLog({
+          db,
+          actorUserId: authUser.id,
+          actorRole: authUser.role,
+          action: "SHIP",
+          targetType: "CARGO",
+          targetId: params.cargoId,
+          description: `Shipped cargo ${item.trackingNumber} to Mongolia`,
+          metadata: { fromStatus: item.status, toStatus: "IN_TRANSIT_TO_MN" },
+        });
+
         return { message: "Cargo shipped successfully" };
       }, {
         detail: withAudience("staff", {
@@ -137,21 +161,51 @@ export const chinaCargoRoutes = new Elysia().guard(
         },
       })
       .post("/cargos/:cargoId/record-weight", async (ctx: any) => {
-        const { params, body, db, status } = ctx;
+        const { params, body, db, status, authUser } = ctx;
         const input = body;
         const [item] = await db.select().from(cargo).where(eq(cargo.id, params.cargoId)).limit(1);
         if (!item) return status(404, { message: "Cargo not found" });
 
-        const totalFeeMnt = input.baseShippingFeeMnt + (item.localDeliveryFeeMnt ?? 0);
+        let baseShippingFeeMnt = input.baseShippingFeeMnt;
+        let totalFeeMnt = input.baseShippingFeeMnt + (item.localDeliveryFeeMnt ?? 0);
+        let calculatedFeeMnt = item.calculatedFeeMnt ?? null;
+        let pricingMethod = item.pricingMethod ?? null;
+
+        if (item.heightCm && item.widthCm && item.lengthCm && !item.overrideFeeMnt) {
+          const pricing = calculateCargoPricing({
+            weightGrams: input.weightGrams,
+            heightCm: item.heightCm,
+            widthCm: item.widthCm,
+            lengthCm: item.lengthCm,
+            isFragile: Boolean(item.isFragile),
+          });
+          baseShippingFeeMnt = pricing.weightBasedFeeMnt;
+          calculatedFeeMnt = pricing.calculatedFeeMnt;
+          pricingMethod = pricing.method;
+          totalFeeMnt = pricing.finalFeeMnt;
+        }
 
         await db
           .update(cargo)
           .set({
             weightGrams: input.weightGrams,
-            baseShippingFeeMnt: input.baseShippingFeeMnt,
+            baseShippingFeeMnt,
+            calculatedFeeMnt,
+            pricingMethod,
             totalFeeMnt,
           })
           .where(eq(cargo.id, params.cargoId));
+
+        await insertAdminActivityLog({
+          db,
+          actorUserId: authUser?.id,
+          actorRole: authUser?.role,
+          action: "WEIGHT_RECORD",
+          targetType: "CARGO",
+          targetId: params.cargoId,
+          description: `Recorded cargo weight for ${item.trackingNumber}`,
+          metadata: { weightGrams: input.weightGrams, totalFeeMnt },
+        });
 
         return {
           message: "Cargo weight recorded successfully",
