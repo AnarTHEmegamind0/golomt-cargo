@@ -161,79 +161,155 @@ class _AdminShipmentsPageState extends State<AdminShipmentsPage>
       ).showSnackBar(const SnackBar(content: Text('Эхлээд машин бүртгэнэ үү')));
       return;
     }
-    String? selectedVehicleId = vehicles.first.id;
-    DateTime? departureDate;
-    final noteController = TextEditingController();
 
-    showDialog(
+    showDialog<_CreateShipmentResult>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: const Text('Шинэ ачилт'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedVehicleId,
-                decoration: const InputDecoration(labelText: 'Машин'),
-                items: vehicles
-                    .map(
-                      (v) => DropdownMenuItem(
-                        value: v.id,
-                        child: Text('${v.plateNumber} - ${v.name}'),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => selectedVehicleId = v),
+      builder: (ctx) => _CreateShipmentDialog(vehicles: vehicles),
+    ).then((result) {
+      if (result != null) {
+        context.read<AdminShipmentsProvider>().createShipment(
+          vehicleId: result.vehicleId,
+          departureDate: result.departureDate,
+          note: result.note,
+        );
+      }
+    });
+  }
+}
+
+class _CreateShipmentResult {
+  const _CreateShipmentResult({
+    required this.vehicleId,
+    this.departureDate,
+    this.note,
+  });
+
+  final String vehicleId;
+  final DateTime? departureDate;
+  final String? note;
+}
+
+class _CreateShipmentDialog extends StatefulWidget {
+  const _CreateShipmentDialog({required this.vehicles});
+
+  final List<dynamic> vehicles;
+
+  @override
+  State<_CreateShipmentDialog> createState() => _CreateShipmentDialogState();
+}
+
+class _CreateShipmentDialogState extends State<_CreateShipmentDialog> {
+  late String _selectedVehicleId;
+  DateTime? _departureDate;
+  final _noteController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedVehicleId = widget.vehicles.first.id as String;
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Шинэ ачилт'),
+      content: IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DropdownButtonFormField<String>(
+              value: _selectedVehicleId,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Машин',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Гарах огноо'),
-                subtitle: Text(
-                  departureDate != null
-                      ? '${departureDate!.year}/${departureDate!.month}/${departureDate!.day}'
-                      : 'Сонгоогүй',
-                ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: ctx,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (date != null) setState(() => departureDate = date);
-                },
-              ),
-              TextField(
-                controller: noteController,
-                decoration: const InputDecoration(labelText: 'Тэмдэглэл'),
-                maxLines: 2,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Болих'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (selectedVehicleId == null) return;
-                Navigator.pop(ctx);
-                this.context.read<AdminShipmentsProvider>().createShipment(
-                  vehicleId: selectedVehicleId!,
-                  departureDate: departureDate,
-                  note: noteController.text.isNotEmpty
-                      ? noteController.text
-                      : null,
+              items: widget.vehicles.map((v) {
+                final vehicle = v as dynamic;
+                return DropdownMenuItem<String>(
+                  value: vehicle.id as String,
+                  child: Text(
+                    '${vehicle.plateNumber} - ${vehicle.name}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _selectedVehicleId = value);
+                }
               },
-              child: const Text('Үүсгэх'),
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: _pickDate,
+              borderRadius: BorderRadius.circular(8),
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Гарах огноо',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                child: Text(
+                  _departureDate != null
+                      ? '${_departureDate!.year}/${_departureDate!.month.toString().padLeft(2, '0')}/${_departureDate!.day.toString().padLeft(2, '0')}'
+                      : 'Сонгоогүй',
+                  style: TextStyle(
+                    color: _departureDate != null
+                        ? null
+                        : Theme.of(context).hintColor,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _noteController,
+              decoration: const InputDecoration(
+                labelText: 'Тэмдэглэл',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
             ),
           ],
         ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Болих'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('Үүсгэх')),
+      ],
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _departureDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (date != null && mounted) {
+      setState(() => _departureDate = date);
+    }
+  }
+
+  void _submit() {
+    Navigator.pop(
+      context,
+      _CreateShipmentResult(
+        vehicleId: _selectedVehicleId,
+        departureDate: _departureDate,
+        note: _noteController.text.isNotEmpty ? _noteController.text : null,
       ),
     );
   }
@@ -375,6 +451,13 @@ class _ShipmentCard extends StatelessWidget {
                   (next) => Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: FilledButton.tonal(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(0, 36),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
                       onPressed: isProcessing
                           ? null
                           : () => provider.updateStatus(
