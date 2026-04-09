@@ -8,7 +8,12 @@ import { cfBindings } from "~/ctx/cf-bindings";
 import { betterAuth } from "~/ctx/better-auth";
 import { OpenAPI } from "./lib/auth";
 import { openApiSecuritySchemes, openApiTags } from "~/lib/openapi";
-import { beginRequestLog, completeRequestLog, logRequestError } from "~/lib/runtime-logging";
+import {
+  attachResponseLog,
+  beginRequestLog,
+  completeRequestLog,
+  logRequestError,
+} from "~/lib/runtime-logging";
 import { apiRoutes } from "~/routes";
 
 type AppOpenAPIConfig = Partial<ElysiaOpenAPIConfig<boolean, string>>;
@@ -27,6 +32,9 @@ export const createApp = async ({ openapiConfig = defaultOpenAPIConfig }: AppOpt
   })
     .onRequest((ctx: any) => {
       beginRequestLog(ctx);
+    })
+    .onAfterHandle((ctx: any) => {
+      attachResponseLog(ctx, ctx.response ?? null);
     })
     .onError((ctx: any) => {
       logRequestError(ctx, ctx.error, ctx.code);
