@@ -162,9 +162,9 @@ class _ChinaShipmentsPageState extends State<ChinaShipmentsPage>
   void _showCreateDialog(BuildContext context) {
     final vehicles = context.read<AdminVehiclesProvider>().activeVehicles;
     if (vehicles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Эхлээд машин бүртгэнэ үү')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Эхлээд машин бүртгэнэ үү')));
       return;
     }
 
@@ -482,6 +482,13 @@ class _ShipmentCard extends StatelessWidget {
                     (next) => Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: FilledButton.tonal(
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(0, 36),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
                         onPressed: isProcessing
                             ? null
                             : () => provider.updateStatus(
