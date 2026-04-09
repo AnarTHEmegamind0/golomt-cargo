@@ -412,7 +412,7 @@ class ApiAdminRepository implements AdminRepository {
         data: {
           'vehicle_id': vehicleId,
           if (departureDate != null)
-            'departure_date': departureDate.toIso8601String(),
+            'departure_date': departureDate.toUtc().toIso8601String(),
           if (note != null) 'note': note,
         },
       );

@@ -183,12 +183,16 @@ class _ChinaShipmentsPageState extends State<ChinaShipmentsPage>
               children: [
                 DropdownButtonFormField<String>(
                   value: selectedVehicleId,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Машин'),
                   items: vehicles
                       .map(
                         (v) => DropdownMenuItem(
                           value: v.id,
-                          child: Text('${v.plateNumber} - ${v.name}'),
+                          child: Text(
+                            '${v.plateNumber} - ${v.name}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       )
                       .toList(),
