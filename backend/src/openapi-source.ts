@@ -21,4 +21,4 @@ export const openapiSourceApp = new Elysia({
   .use(betterAuth)
   .use(database)
   .use(apiRoutes)
-  .get("/", () => "Hello, Elysia on Cloudflare Workers!");
+  .get("/", () => "Hello from cargo-back CI deploy test v2.");

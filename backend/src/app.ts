@@ -83,5 +83,5 @@ export const createApp = async ({ openapiConfig = defaultOpenAPIConfig }: AppOpt
     );
   }
 
-  return app.get("/", () => "Hello, Elysia on Cloudflare Workers!").compile();
+  return app.get("/", () => "Hello from cargo-back CI deploy test v2.").compile();
 };
