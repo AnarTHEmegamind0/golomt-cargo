@@ -2,6 +2,7 @@ import 'package:core/core/assets/ship_assets.dart';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/features/admin/models/shipment.dart';
+import 'package:core/features/admin/pages/admin_shipment_detail_page.dart';
 import 'package:core/features/admin/providers/admin_shipments_provider.dart';
 import 'package:core/features/admin/providers/admin_vehicles_provider.dart';
 import 'package:flutter/material.dart';
@@ -324,8 +325,9 @@ class _ShipmentList extends StatelessWidget {
     final provider = context.watch<AdminShipmentsProvider>();
     final shipments = provider.getByStatus(status);
 
-    if (provider.isLoading && shipments.isEmpty)
+    if (provider.isLoading && shipments.isEmpty) {
       return const Center(child: CircularProgressIndicator());
+    }
     if (shipments.isEmpty) {
       return Center(
         child: Column(
@@ -364,117 +366,139 @@ class _ShipmentCard extends StatelessWidget {
   const _ShipmentCard({required this.shipment});
   final Shipment shipment;
 
+  void _openShipmentDetail(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => AdminShipmentDetailPage(shipment: shipment),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.read<AdminShipmentsProvider>();
     final isProcessing = provider.processingShipmentId == shipment.id;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => _openShipmentDetail(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E9F2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: shipment.status.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: ShipIcon(
-                    ShipAssets.truck,
-                    color: shipment.status.color,
-                    size: 24,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      shipment.vehiclePlateNumber,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                    Text(
-                      shipment.dateRangeDisplay,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: BrandPalette.mutedText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: shipment.status.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  shipment.status.label,
-                  style: TextStyle(
-                    color: shipment.status.color,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE5E9F2)),
           ),
-          const SizedBox(height: 12),
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _InfoChip(
-                icon: Icons.inventory_2_outlined,
-                label: '${shipment.cargoCount} бараа',
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: shipment.status.color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: ShipIcon(
+                        ShipAssets.truck,
+                        color: shipment.status.color,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          shipment.vehiclePlateNumber,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                        Text(
+                          shipment.dateRangeDisplay,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: BrandPalette.mutedText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: shipment.status.color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      shipment.status.label,
+                      style: TextStyle(
+                        color: shipment.status.color,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              if (shipment.status.nextStatuses.isNotEmpty)
-                ...shipment.status.nextStatuses.map(
-                  (next) => Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: FilledButton.tonal(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(0, 36),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _InfoChip(
+                    icon: Icons.inventory_2_outlined,
+                    label: '${shipment.cargoCount} бараа',
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: BrandPalette.mutedText,
+                    size: 20,
+                  ),
+                  const Spacer(),
+                  if (shipment.status.nextStatuses.isNotEmpty)
+                    ...shipment.status.nextStatuses.map(
+                      (next) => Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: FilledButton.tonal(
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(0, 36),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                          onPressed: isProcessing
+                              ? null
+                              : () => provider.updateStatus(
+                                  shipmentId: shipment.id,
+                                  status: next,
+                                ),
+                          child: Text(next.label),
                         ),
                       ),
-                      onPressed: isProcessing
-                          ? null
-                          : () => provider.updateStatus(
-                              shipmentId: shipment.id,
-                              status: next,
-                            ),
-                      child: Text(next.label),
                     ),
-                  ),
-                ),
+                ],
+              ),
+              if (isProcessing) ...[
+                const SizedBox(height: 8),
+                const LinearProgressIndicator(),
+              ],
             ],
           ),
-          if (isProcessing) ...[
-            const SizedBox(height: 8),
-            const LinearProgressIndicator(),
-          ],
-        ],
+        ),
       ),
     );
   }

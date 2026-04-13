@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:core/core/assets/ship_icon.dart';
 import 'package:core/core/brand_palette.dart';
 import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/features/admin/models/pricing_calculation.dart';
+import 'package:core/features/admin/services/pricing_service.dart';
 import 'package:core/features/auth/models/user.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +17,7 @@ class AdminCargoCard extends StatelessWidget {
     super.key,
     required this.cargo,
     this.onReceive,
-    this.onRecordWeight,
-    this.onRecordDimensions,
+    this.onRecordPricing,
     this.onShip,
     this.onArrive,
     this.isProcessing = false,
@@ -24,16 +25,15 @@ class AdminCargoCard extends StatelessWidget {
 
   final CargoModel cargo;
   final Future<bool> Function(String? imagePath)? onReceive;
-  final Future<bool> Function(int weightGrams, int baseShippingFeeMnt)?
-  onRecordWeight;
+  /// Unified callback for recording weight, dimensions, and pricing
   final Future<bool> Function({
+    required int weightGrams,
     required int heightCm,
     required int widthCm,
     required int lengthCm,
     required bool isFragile,
     int? overrideFeeMnt,
-  })?
-  onRecordDimensions;
+  })? onRecordPricing;
   final VoidCallback? onShip;
   final VoidCallback? onArrive;
   final bool isProcessing;
@@ -41,7 +41,7 @@ class AdminCargoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final role = context.watch<AuthProvider>().user?.role ?? UserRole.customer;
-    final canPrice = role == UserRole.admin && onRecordDimensions != null;
+    final canPrice = role == UserRole.admin && onRecordPricing != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -201,35 +201,20 @@ class AdminCargoCard extends StatelessWidget {
       );
     }
 
-    if (cargo.status == CargoStatus.receivedChina && onRecordWeight != null) {
+    // Unified pricing button (weight + dimensions + price)
+    if (canPrice && cargo.status == CargoStatus.receivedChina) {
       if (buttons.isNotEmpty) {
         buttons.add(const SizedBox(width: 8));
       }
       buttons.add(
         Expanded(
           child: _ActionButton(
-            label: 'Жин бүртгэх',
-            icon: Icons.scale_rounded,
-            color: BrandPalette.logoOrange,
-            onPressed: isProcessing ? null : () => _showWeightDialog(context),
-          ),
-        ),
-      );
-    }
-
-    if (canPrice) {
-      if (buttons.isNotEmpty) {
-        buttons.add(const SizedBox(width: 8));
-      }
-      buttons.add(
-        Expanded(
-          child: _ActionButton(
-            label: 'Хэмжээ / үнэ',
-            icon: Icons.calculate_outlined,
-            color: BrandPalette.navyBlue,
+            label: 'Үнэ тооцоолох',
+            icon: Icons.calculate_rounded,
+            color: BrandPalette.electricBlue,
             onPressed: isProcessing
                 ? null
-                : () => _showDimensionsDialog(context),
+                : () => _showPricingCalculatorSheet(context),
           ),
         ),
       );
@@ -274,187 +259,16 @@ class AdminCargoCard extends StatelessWidget {
     return Row(children: buttons);
   }
 
-  void _showWeightDialog(BuildContext context) {
-    final weightController = TextEditingController(
-      text: cargo.weightGrams != null ? cargo.weightKg.toStringAsFixed(2) : '',
-    );
-    final feeController = TextEditingController(
-      text: cargo.baseShippingFeeMnt?.toString() ?? '',
-    );
+  void _showPricingCalculatorSheet(BuildContext context) {
+    if (onRecordPricing == null) return;
 
-    showDialog<void>(
+    showModalBottomSheet<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Жин бүртгэх'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: weightController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Жин (кг)',
-                hintText: '0.00',
-                suffixText: 'кг',
-              ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: feeController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Суурь тээврийн төлбөр',
-                hintText: '0',
-                suffixText: '₮',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Болих'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final weightKg = double.tryParse(weightController.text);
-              final fee = int.tryParse(feeController.text);
-              if (weightKg == null || weightKg <= 0) {
-                return;
-              }
-
-              final computedFee = ((weightKg * 2000).ceil())
-                  .clamp(2000, 1 << 31)
-                  .toInt();
-              final success = await onRecordWeight!(
-                (weightKg * 1000).round(),
-                fee ?? computedFee,
-              );
-              if (context.mounted && success) {
-                Navigator.pop(dialogContext);
-              }
-            },
-            child: const Text('Хадгалах'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDimensionsDialog(BuildContext context) {
-    if (onRecordDimensions == null) {
-      return;
-    }
-
-    final heightController = TextEditingController(
-      text: cargo.heightCm?.toString() ?? '',
-    );
-    final widthController = TextEditingController(
-      text: cargo.widthCm?.toString() ?? '',
-    );
-    final lengthController = TextEditingController(
-      text: cargo.lengthCm?.toString() ?? '',
-    );
-    final overrideFeeController = TextEditingController(
-      text: cargo.overrideFeeMnt?.toString() ?? '',
-    );
-    var isFragile = cargo.isFragile;
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setState) => AlertDialog(
-          title: const Text('Хэмжээ, үнэ бүртгэх'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: lengthController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: 'Урт (см)'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: widthController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: 'Өргөн (см)'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: heightController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: 'Өндөр (см)'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: overrideFeeController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                    labelText: 'Эцсийн үнэ override',
-                    hintText: 'Хоосон орхиж болно',
-                    suffixText: '₮',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SwitchListTile(
-                  value: isFragile,
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Эмзэг бараа'),
-                  onChanged: (value) => setState(() => isFragile = value),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Болих'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final heightCm = int.tryParse(heightController.text);
-                final widthCm = int.tryParse(widthController.text);
-                final lengthCm = int.tryParse(lengthController.text);
-                final overrideFee = overrideFeeController.text.trim().isEmpty
-                    ? null
-                    : int.tryParse(overrideFeeController.text.trim());
-
-                if (heightCm == null ||
-                    widthCm == null ||
-                    lengthCm == null ||
-                    heightCm <= 0 ||
-                    widthCm <= 0 ||
-                    lengthCm <= 0) {
-                  return;
-                }
-
-                final success = await onRecordDimensions!(
-                  heightCm: heightCm,
-                  widthCm: widthCm,
-                  lengthCm: lengthCm,
-                  isFragile: isFragile,
-                  overrideFeeMnt: overrideFee,
-                );
-                if (context.mounted && success) {
-                  Navigator.pop(dialogContext);
-                }
-              },
-              child: const Text('Хадгалах'),
-            ),
-          ],
-        ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => _PricingCalculatorSheet(
+        cargo: cargo,
+        onSave: onRecordPricing!,
       ),
     );
   }
@@ -605,6 +419,711 @@ class _ActionButton extends StatelessWidget {
         foregroundColor: color,
         backgroundColor: color.withValues(alpha: 0.12),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      ),
+    );
+  }
+}
+
+/// Bottom sheet for unified pricing calculation (weight + dimensions + price)
+class _PricingCalculatorSheet extends StatefulWidget {
+  const _PricingCalculatorSheet({
+    required this.cargo,
+    required this.onSave,
+  });
+
+  final CargoModel cargo;
+  final Future<bool> Function({
+    required int weightGrams,
+    required int heightCm,
+    required int widthCm,
+    required int lengthCm,
+    required bool isFragile,
+    int? overrideFeeMnt,
+  }) onSave;
+
+  @override
+  State<_PricingCalculatorSheet> createState() => _PricingCalculatorSheetState();
+}
+
+class _PricingCalculatorSheetState extends State<_PricingCalculatorSheet> {
+  final _pricingService = const PricingService();
+
+  late final TextEditingController _weightController;
+  late final TextEditingController _lengthController;
+  late final TextEditingController _widthController;
+  late final TextEditingController _heightController;
+  late final TextEditingController _overrideController;
+
+  late bool _isFragile;
+  PricingCalculation? _calculation;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _weightController = TextEditingController(
+      text: widget.cargo.weightGrams != null
+          ? widget.cargo.weightKg.toStringAsFixed(2)
+          : '',
+    );
+    _lengthController = TextEditingController(
+      text: widget.cargo.lengthCm?.toString() ?? '',
+    );
+    _widthController = TextEditingController(
+      text: widget.cargo.widthCm?.toString() ?? '',
+    );
+    _heightController = TextEditingController(
+      text: widget.cargo.heightCm?.toString() ?? '',
+    );
+    _overrideController = TextEditingController(
+      text: widget.cargo.overrideFeeMnt?.toString() ?? '',
+    );
+    _isFragile = widget.cargo.isFragile;
+
+    // Calculate initial price if data exists
+    _updateCalculation();
+  }
+
+  @override
+  void dispose() {
+    _weightController.dispose();
+    _lengthController.dispose();
+    _widthController.dispose();
+    _heightController.dispose();
+    _overrideController.dispose();
+    super.dispose();
+  }
+
+  int? _getWeightGrams() {
+    final weightKg = double.tryParse(_weightController.text);
+    if (weightKg == null || weightKg <= 0) return null;
+    return (weightKg * 1000).round();
+  }
+
+  void _updateCalculation() {
+    final weightGrams = _getWeightGrams();
+    final lengthCm = int.tryParse(_lengthController.text) ?? 0;
+    final widthCm = int.tryParse(_widthController.text) ?? 0;
+    final heightCm = int.tryParse(_heightController.text) ?? 0;
+    final overrideFee = _overrideController.text.trim().isEmpty
+        ? null
+        : int.tryParse(_overrideController.text.trim());
+
+    // Need at least weight OR dimensions to calculate
+    if ((weightGrams != null && weightGrams > 0) ||
+        (lengthCm > 0 && widthCm > 0 && heightCm > 0)) {
+      setState(() {
+        _calculation = _pricingService.calculateFromCargo(
+          weightGrams: weightGrams,
+          heightCm: heightCm,
+          widthCm: widthCm,
+          lengthCm: lengthCm,
+          isFragile: _isFragile,
+          overrideFeeMnt: overrideFee,
+        );
+      });
+    } else {
+      setState(() => _calculation = null);
+    }
+  }
+
+  Future<void> _save() async {
+    final weightGrams = _getWeightGrams();
+    final lengthCm = int.tryParse(_lengthController.text);
+    final widthCm = int.tryParse(_widthController.text);
+    final heightCm = int.tryParse(_heightController.text);
+    final overrideFee = _overrideController.text.trim().isEmpty
+        ? null
+        : int.tryParse(_overrideController.text.trim());
+
+    // Validate - need weight and dimensions
+    if (weightGrams == null || weightGrams <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Жингийг оруулна уу')),
+      );
+      return;
+    }
+
+    if (lengthCm == null || widthCm == null || heightCm == null ||
+        lengthCm <= 0 || widthCm <= 0 || heightCm <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Хэмжээсийг бөглөнө үү')),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    final success = await widget.onSave(
+      weightGrams: weightGrams,
+      heightCm: heightCm,
+      widthCm: widthCm,
+      lengthCm: lengthCm,
+      isFragile: _isFragile,
+      overrideFeeMnt: overrideFee,
+    );
+
+    if (mounted) {
+      setState(() => _isSaving = false);
+      if (success) {
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: BrandPalette.mutedText.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: BrandPalette.electricBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.calculate_rounded,
+                    color: BrandPalette.electricBlue,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Үнэ тооцоолох',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        widget.cargo.trackingNumber,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: BrandPalette.mutedText,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // Content
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Weight input
+                  Text(
+                    'Жин',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _weightController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                    ],
+                    decoration: InputDecoration(
+                      hintText: '0.00',
+                      suffixText: 'кг',
+                      prefixIcon: const Icon(Icons.scale_rounded),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onChanged: (_) => _updateCalculation(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Pricing rates info
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: BrandPalette.electricBlue.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: BrandPalette.electricBlue.withValues(alpha: 0.15),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Үнийн тариф',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 6,
+                          children: [
+                            _RateChip(
+                              label: '${PricingRates.pricePerKg}₮/кг',
+                              icon: Icons.scale,
+                            ),
+                            _RateChip(
+                              label: '${PricingRates.pricePerCbm}₮/м³',
+                              icon: Icons.view_in_ar,
+                            ),
+                            _RateChip(
+                              label: '${PricingRates.pricePerCbmFragile}₮/м³ (эмзэг)',
+                              icon: Icons.warning_amber,
+                              color: BrandPalette.logoOrange,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Dimensions inputs
+                  Text(
+                    'Хэмжээс (см)',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _DimensionInput(
+                          controller: _lengthController,
+                          label: 'Урт',
+                          onChanged: (_) => _updateCalculation(),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _DimensionInput(
+                          controller: _widthController,
+                          label: 'Өргөн',
+                          onChanged: (_) => _updateCalculation(),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _DimensionInput(
+                          controller: _heightController,
+                          label: 'Өндөр',
+                          onChanged: (_) => _updateCalculation(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Fragile toggle
+                  Container(
+                    decoration: BoxDecoration(
+                      color: _isFragile
+                          ? BrandPalette.logoOrange.withValues(alpha: 0.1)
+                          : BrandPalette.softBlueBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      border: _isFragile
+                          ? Border.all(
+                              color: BrandPalette.logoOrange.withValues(alpha: 0.3),
+                            )
+                          : null,
+                    ),
+                    child: SwitchListTile(
+                      title: const Text(
+                        'Эмзэг бараа',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: const Text(
+                        'Шил, цахилгаан бараа гэх мэт',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      secondary: Icon(
+                        Icons.warning_amber_rounded,
+                        color: _isFragile
+                            ? BrandPalette.logoOrange
+                            : BrandPalette.mutedText,
+                      ),
+                      value: _isFragile,
+                      onChanged: (value) {
+                        setState(() => _isFragile = value);
+                        _updateCalculation();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Override fee input
+                  TextField(
+                    controller: _overrideController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      labelText: 'Үнэ override (заавал биш)',
+                      hintText: 'Автоматаар тооцно',
+                      suffixText: '₮',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.edit_rounded),
+                    ),
+                    onChanged: (_) => _updateCalculation(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Pricing breakdown
+                  if (_calculation != null) ...[
+                    _PricingBreakdownCard(calculation: _calculation!),
+                    const SizedBox(height: 20),
+                  ],
+
+                  // Save button
+                  FilledButton.icon(
+                    onPressed: _isSaving ? null : _save,
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.save_rounded),
+                    label: Text(_isSaving ? 'Хадгалж байна...' : 'Хадгалах'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      backgroundColor: BrandPalette.electricBlue,
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RateChip extends StatelessWidget {
+  const _RateChip({
+    required this.label,
+    required this.icon,
+    this.color = BrandPalette.electricBlue,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DimensionInput extends StatelessWidget {
+  const _DimensionInput({
+    required this.controller,
+    required this.label,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixText: 'см',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      ),
+      onChanged: onChanged,
+    );
+  }
+}
+
+class _PricingBreakdownCard extends StatelessWidget {
+  const _PricingBreakdownCard({required this.calculation});
+
+  final PricingCalculation calculation;
+
+  String _formatPrice(int price) {
+    final formatted = price.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+    return '$formatted₮';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            BrandPalette.electricBlue,
+            BrandPalette.navyBlue,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          // Final price header
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const Text(
+                  'Тээврийн төлбөр',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _formatPrice(calculation.finalFeeMnt),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        calculation.method == 'volume'
+                            ? Icons.view_in_ar
+                            : Icons.scale,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        calculation.methodLabel,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (calculation.hasOverride) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: BrandPalette.logoOrange.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.edit, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'Override хийсэн',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          // Breakdown
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+            ),
+            child: Column(
+              children: [
+                _BreakdownRow(
+                  label: 'Жингээр тооцсон',
+                  value: _formatPrice(calculation.weightBasedFeeMnt),
+                  isSelected: calculation.method == 'weight',
+                ),
+                const SizedBox(height: 8),
+                _BreakdownRow(
+                  label: 'Эзлэхүүнээр тооцсон',
+                  value: _formatPrice(calculation.volumeBasedFeeMnt),
+                  isSelected: calculation.method == 'volume',
+                ),
+                if (calculation.isFragile) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.warning_amber,
+                        size: 16,
+                        color: BrandPalette.logoOrange,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Эмзэг барааны нэмэлт тооцоолсон',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: BrandPalette.logoOrange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BreakdownRow extends StatelessWidget {
+  const _BreakdownRow({
+    required this.label,
+    required this.value,
+    this.isSelected = false,
+  });
+
+  final String label;
+  final String value;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? BrandPalette.electricBlue.withValues(alpha: 0.1)
+            : BrandPalette.softBlueBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: isSelected
+            ? Border.all(
+                color: BrandPalette.electricBlue.withValues(alpha: 0.3),
+              )
+            : null,
+      ),
+      child: Row(
+        children: [
+          if (isSelected)
+            Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                color: BrandPalette.electricBlue,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check, color: Colors.white, size: 10),
+            ),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: isSelected ? BrandPalette.electricBlue : BrandPalette.mutedText,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: isSelected ? BrandPalette.electricBlue : BrandPalette.primaryText,
+            ),
+          ),
+        ],
       ),
     );
   }

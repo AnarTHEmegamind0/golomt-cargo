@@ -197,6 +197,50 @@ class AdminCargosProvider extends ChangeNotifier {
     }
   }
 
+  /// Unified pricing - records weight and dimensions together
+  Future<bool> recordPricing({
+    required String cargoId,
+    required int weightGrams,
+    required int heightCm,
+    required int widthCm,
+    required int lengthCm,
+    required bool isFragile,
+    int? overrideFeeMnt,
+  }) async {
+    _processingCargoId = cargoId;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Record weight first (calculates base fee)
+      final baseFee = ((weightGrams / 1000) * 2000).ceil().clamp(2000, 1 << 30);
+      await _adminService.recordCargoWeight(
+        cargoId: cargoId,
+        weightGrams: weightGrams,
+        baseShippingFeeMnt: baseFee,
+      );
+
+      // Then record dimensions (recalculates final fee)
+      await _adminService.recordCargoDimensions(
+        cargoId: cargoId,
+        heightCm: heightCm,
+        widthCm: widthCm,
+        lengthCm: lengthCm,
+        isFragile: isFragile,
+        overrideFeeMnt: overrideFeeMnt,
+      );
+
+      await _reloadCargo(cargoId);
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      return false;
+    } finally {
+      _processingCargoId = null;
+      notifyListeners();
+    }
+  }
+
   Future<List<CargoModel>> _fetchAllCargos({String? query}) async {
     final cargos = <CargoModel>[];
     var page = 1;

@@ -208,8 +208,10 @@ class AppProviders {
             AdminVehiclesProvider(adminService: context.read()),
       ),
       ChangeNotifierProvider<AdminShipmentsProvider>(
-        create: (context) =>
-            AdminShipmentsProvider(adminService: context.read()),
+        create: (context) => AdminShipmentsProvider(
+          adminService: context.read(),
+          cargoApiRepository: context.read(),
+        ),
       ),
       ChangeNotifierProvider<AdminFinanceProvider>(
         create: (context) => AdminFinanceProvider(adminService: context.read()),

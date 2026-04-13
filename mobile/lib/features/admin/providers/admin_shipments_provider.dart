@@ -1,24 +1,34 @@
+import 'package:core/core/networking/models/cargo_model.dart';
+import 'package:core/core/networking/repositories/cargo_api_repository.dart';
 import 'package:core/features/admin/models/shipment.dart';
 import 'package:core/features/admin/services/admin_service.dart';
 import 'package:flutter/foundation.dart';
 
 /// Provider for shipment management
 class AdminShipmentsProvider extends ChangeNotifier {
-  AdminShipmentsProvider({required AdminService adminService})
-    : _adminService = adminService;
+  AdminShipmentsProvider({
+    required AdminService adminService,
+    required CargoApiRepository cargoApiRepository,
+  }) : _adminService = adminService,
+       _cargoApiRepository = cargoApiRepository;
 
   final AdminService _adminService;
+  final CargoApiRepository _cargoApiRepository;
 
   List<Shipment> _shipments = [];
   Shipment? _selectedShipment;
+  List<CargoModel> _shipmentCargos = [];
   bool _isLoading = false;
+  bool _isLoadingCargos = false;
   String? _error;
   String? _processingShipmentId;
   ShipmentStatus? _statusFilter;
 
   List<Shipment> get shipments => _shipments;
   Shipment? get selectedShipment => _selectedShipment;
+  List<CargoModel> get shipmentCargos => _shipmentCargos;
   bool get isLoading => _isLoading;
+  bool get isLoadingCargos => _isLoadingCargos;
   String? get error => _error;
   String? get processingShipmentId => _processingShipmentId;
   ShipmentStatus? get statusFilter => _statusFilter;
@@ -196,7 +206,37 @@ class AdminShipmentsProvider extends ChangeNotifier {
   /// Clear selected shipment
   void clearSelection() {
     _selectedShipment = null;
+    _shipmentCargos = [];
     notifyListeners();
+  }
+
+  /// Load cargos for a shipment
+  Future<void> loadShipmentCargos(String shipmentId) async {
+    _isLoadingCargos = true;
+    _shipmentCargos = [];
+    _error = null;
+    notifyListeners();
+
+    try {
+      // First load shipment details to get cargo IDs
+      final shipment = await _adminService.getShipment(shipmentId);
+      _selectedShipment = shipment;
+
+      // Load each cargo by ID
+      final cargos = <CargoModel>[];
+      for (final cargoId in shipment.cargoIds) {
+        final result = await _cargoApiRepository.getCargoById(cargoId);
+        if (result.isSuccess && result.data != null) {
+          cargos.add(result.data!.data);
+        }
+      }
+      _shipmentCargos = cargos;
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      _isLoadingCargos = false;
+      notifyListeners();
+    }
   }
 
   /// Clear error
